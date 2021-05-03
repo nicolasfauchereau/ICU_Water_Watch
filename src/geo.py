@@ -2,6 +2,8 @@
 The `geo` module contains all functions related to reading, manipulating and working with geometries
 """
 
+from . import utils
+
 def make_mask_from_polygon(polygon, lon, lat, wrap_lon=False): 
     """
     make a mask (xarray.DataArray) from a shapely polygon and 
@@ -155,6 +157,93 @@ def read_shapefiles(dpath=None, filename=None, crs=4326, merge=False, buffer=Non
             
     return polygons 
 
+
+def get_EEZs(dpath_shapes=None): 
+    """
+    [summary]
+
+    [extended_summary]
+
+    Parameters
+    ----------
+    dpath_shapes : [type], optional
+        [description], by default None
+
+    Returns
+    -------
+    [type]
+        [description]
+
+    Raises
+    ------
+    ValueError
+        [description]
+    """
+    
+    import pathlib
+    
+    if dpath_shapes is None: 
+        
+        dpath_shapes = pathlib.Path.cwd().parents[2].joinpath('shapefiles')
+        
+    else: 
+        
+        if type(dpath_shapes) != pathlib.PosixPath: 
+            
+            dpath_shapes = pathlib.Path(dpath_shapes)
+
+    if not dpath_shapes.exists(): 
+        
+        raise ValueError(f"{str(dpath_shapes)} does not exist")
+    
+    EEZs = read_shapefiles(dpath_shapes.joinpath('EEZs'), filename='ICU_geometries0_360_EEZ.shp')
+    
+    merged_EEZs = read_shapefiles(dpath_shapes.joinpath('EEZs'), filename='ICU_geometries0_360_EEZ.shp', merge=True, buffer=0.05)
+    
+    return EEZs, merged_EEZs
+
+def get_coastlines(dpath_shapes=None): 
+    """
+    [summary]
+
+    [extended_summary]
+
+    Parameters
+    ----------
+    dpath_shapes : [type], optional
+        [description], by default None
+
+    Returns
+    -------
+    [type]
+        [description]
+
+    Raises
+    ------
+    ValueError
+        [description]
+    """
+    
+    import pathlib
+
+    if dpath_shapes is None: 
+        
+        dpath_shapes = pathlib.Path.cwd().parents[2].joinpath('shapefiles')
+        
+    else: 
+        
+        if type(dpath_shapes) != pathlib.PosixPath: 
+            
+            dpath_shapes = pathlib.Path(dpath_shapes)
+
+    if not dpath_shapes.exists(): 
+        
+        raise ValueError(f"{str(dpath_shapes)} does not exist")
+    
+    coastlines = read_shapefiles(dpath_shapes.joinpath('Coastlines'), filename='ICU_geometries0_360_coastlines.shp')
+        
+    return coastlines
+
 def shift_geom(shift, gdataframe):
     """
     shift the geometries contained in a geodataframe
@@ -233,7 +322,6 @@ def make_point_buffer_gdf(lon, lat, radius=2000, radius_unit='km'):
     
     from shapely.geometry import Point
     import geopandas as gpd 
-    import regionmask
     
     # transform lat and lon into a Point geometry 
     point = Point(lon, lat)
@@ -308,4 +396,3 @@ def gpd_from_domain(lonmin=None, lonmax=None, latmin=None, latmax=None, crs='432
     shape_gpd = shape_gpd.set_crs(f'EPSG:{crs}')
     
     return shape_gpd
-

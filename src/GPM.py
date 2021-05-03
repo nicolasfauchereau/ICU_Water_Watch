@@ -147,6 +147,23 @@ def get_attrs(dset):
 
     return last_day, ndays
 
+
+def calculate_realtime_accumulation(dset): 
+    """
+    """
+
+    # calculates the accumulation, make sure we keep the attributes 
+
+    dset = dset.sum('time', keep_attrs=True)
+    
+    dset = dset.compute()
+    
+    # expand the dimension time to have singleton dimension with last date of the ndays accumulation
+    
+    dset = dset.expand_dims({'time':[datetime.strptime(dset.attrs['last_day'], "%Y-%m-%d")]})
+            
+    return dset
+
 def convert_rainfall_OBS(dset, varin='precipitationCal', varout='precip', timevar='time'): 
     """
     converts the rainfall - anomalies or raw data - originally in mm/day
@@ -191,6 +208,119 @@ def convert_rainfall_OBS(dset, varin='precipitationCal', varout='precip', timeva
         dset = dset.rename({'var':varout})
         
         return dset 
+    
+def get_climatology(dpath=None, ndays=None, date=None, window_clim=2, lag=None): 
+    """
+    [summary]
+
+    [extended_summary]
+
+    Parameters
+    ----------
+    dpath : [type], optional
+        [description], by default None
+    ndays : int, optional
+        [description], by default 30
+    date : [type], optional
+        [description], by default None
+    window_clim : int, optional
+        [description], by default 2
+    lag : int, optional
+        [description], by default 1
+
+    Returns
+    -------
+    [type]
+        [description]
+
+    Raises
+    ------
+    ValueError
+        [description]
+    """
+    
+    if dpath is None: 
+        
+        dpath = pathlib.Path.cwd().parents[1].joinpath('data/GPM_IMERG/daily') 
+        
+    else:
+        
+        if type(dpath) != pathlib.PosixPath: 
+            
+            dpath = pathlib.Path(dpath)
+        
+        if not dpath.exists(): 
+            
+            raise ValueError(f"The path {str(dpath)} does not exist")
+        
+    if date is None: 
+        
+        date =  datetime.utcnow() - timedelta(days=lag)
+    
+    clim_file = dpath.joinpath(f'GPM_IMERG_daily.v06.2001.2019_precipitationCal_{ndays}d_runsum.nc')
+    
+    dset_clim = xr.open_dataset(clim_file)
+    
+    dates_clim = [date + timedelta(days=shift) for shift in list(range(-window_clim, window_clim+1))]
+    
+    time_clim = pd.to_datetime(dset_clim.time.data)
+
+    time_clim = [time_clim[(time_clim.month == d.month) & (time_clim.day == d.day)] for d in dates_clim]
+
+    dset_clim_ref = []
+    
+    for t in time_clim: 
+        
+        dset_clim_ref.append(dset_clim.sel(time=t))
+
+    dset_clim_ref = xr.concat(dset_clim_ref, dim='time')
+    
+    dset_clim.close()
+    
+    return dset_clim_ref
+
+
+def calc_anoms_and_pctscores(dset, dset_clim):
+    """
+    [summary]
+
+    [extended_summary]
+
+    Parameters
+    ----------
+    dset : [type]
+        [description]
+    dset_clim : [type]
+        [description]
+
+    Returns
+    -------
+    [type]
+        [description]
+    """
+    
+    # anomalies in mm 
+
+    anoms = dset - dset_clim.mean('time')
+
+    # percentage of score, compared to the climatological values 
+    
+    pctscore = calculate_percentileofscore(dset.squeeze(), dset_clim)
+    
+    pctscore = pctscore.expand_dims({'time':dset.time})
+
+    dset['pctscore'] = pctscore
+    
+    dset['anoms'] = anoms['precipitationCal']
+    
+    return dset
+
+    
+    
+    
+    
+    
+    
 
 def get_rain_days_stats(dset, varname='precipitationCal', timevar='time', threshold=1, expand_dim=True): 
     """

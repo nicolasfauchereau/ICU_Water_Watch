@@ -328,21 +328,21 @@ def map_decile(dset, varname='pctscore', mask_EEZ=True, cmap=None, geoms=None, t
             
             fpath = pathlib.Path(fpath)
 
-        f.savefig(fpath.joinpath(f"pctscore_{ndays}days_to_{last_day}.png"), dpi=200, bbox_inches='tight') 
+        f.savefig(fpath.joinpath(f"pctscore_{ndays}days_to_{last_day:%Y-%m-%d}.png"), dpi=200, bbox_inches='tight') 
 
     if close: 
 
         plt.close(f)
 
-def map_precip_accum(dset, varname='precipitationCal', mask_EEZs=True, geoms=None, cmap=None, fpath=None, close=True, gridlines=False): 
+def map_precip_accum(dset, varname='precipitationCal', mask=None, geoms=None, cmap=None, fpath=None, close=True, gridlines=False): 
 
     last_day, ndays = get_attrs(dset) 
     
     dataarray = dset[varname].squeeze()
 
-    if mask_EEZs: 
+    if mask is not None: # 
         
-        dataarray = dataarray * dset['EEZs'] 
+        dataarray = dataarray * dset[mask] 
         
     # min, max and steps are defined in a dictionnary, with keys being the number of days
     
@@ -406,7 +406,7 @@ def map_precip_accum(dset, varname='precipitationCal', mask_EEZs=True, geoms=Non
         plt.close(f)
 
 
-def map_precip_anoms(dset, varname='anoms', mask_EEZs=True, cmap=None, geoms=None, fpath=None, close=True, gridlines=False): 
+def map_precip_anoms(dset, varname='anoms', mask=None, cmap=None, geoms=None, fpath=None, close=True, gridlines=False): 
     """
     """
 
@@ -414,9 +414,9 @@ def map_precip_anoms(dset, varname='anoms', mask_EEZs=True, cmap=None, geoms=Non
     
     dataarray = dset[varname].squeeze()
 
-    if mask_EEZs: 
+    if mask is not None: 
         
-        dataarray = dataarray * dset['EEZs'] 
+        dataarray = dataarray * dset[mask] 
             
     vmax = dict_anoms_max[ndays]['vmax']
     
@@ -475,15 +475,15 @@ def map_precip_anoms(dset, varname='anoms', mask_EEZs=True, cmap=None, geoms=Non
         
         plt.close(f)
         
-def map_dry_days_Pacific(dset, varname='dry_days', mask_EEZs=True, cmap=None, geoms=None, fpath=None, close=True, gridlines=False): 
+def map_dry_days_Pacific(dset, varname='dry_days', mask=None, cmap=None, geoms=None, fpath=None, close=True, gridlines=False): 
     
     last_day, ndays = get_attrs(dset)
 
     dataarray = dset[varname].squeeze()
     
-    if mask_EEZs: 
+    if mask is not None: 
         
-        dataarray = dataarray * dset['EEZs']
+        dataarray = dataarray * dset[mask]
         
     # defines the levels 
     
@@ -553,15 +553,15 @@ def map_dry_days_Pacific(dset, varname='dry_days', mask_EEZs=True, cmap=None, ge
         
         plt.close(f)
 
-def map_days_since_rain_Pacific(dset, varname='days_since_rain', mask_EEZs=True, cmap=None, geoms=None, fpath=None, close=True, gridlines=False): 
+def map_days_since_rain_Pacific(dset, varname='days_since_rain', mask=None, cmap=None, geoms=None, fpath=None, close=True, gridlines=False): 
     
     last_day, ndays = get_attrs(dset)
     
     dataarray = dset[varname].squeeze()
     
-    if mask_EEZs: 
+    if (mask is not None) and (mask in dset.data_vars): 
         
-        dataarray = dataarray * dset['EEZs']
+        dataarray = dataarray * dset[mask]
         
     # defines the levels 
     
@@ -754,7 +754,7 @@ def map_dry_days(dset, world_coastlines, country_coastline, EEZ, varname='dry_da
         
         plt.close(f)
         
-def map_EAR_Watch_Pacific(dset, varname='pctscore', mask_EEZs=True, geoms=None, fpath=None, close=True, gridlines=False): 
+def map_EAR_Watch_Pacific(dset, varname='pctscore', mask=None, geoms=None, fpath=None, close=True, gridlines=False): 
 
     # get the last date and the number of days from the dataset 
     
@@ -764,9 +764,9 @@ def map_EAR_Watch_Pacific(dset, varname='pctscore', mask_EEZs=True, geoms=None, 
     
     # if mask_EEZs is True, we multiply the percentage of score by the EEZs mask 
 
-    if mask_EEZs: 
+    if (mask is not None) and (mask in dset.data_vars): 
         
-        dataarray = dataarray * dset['EEZs']
+        dataarray = dataarray * dset[mask]
 
     # here hard-coded thresholds, colors and labels 
 
@@ -843,7 +843,7 @@ def map_EAR_Watch_Pacific(dset, varname='pctscore', mask_EEZs=True, geoms=None, 
         plt.close(f)
 
 
-def map_USDM_Pacific(dset, mask_EEZs=True, geoms=None, fpath=None, close=True, gridlines=False): 
+def map_USDM_Pacific(dset, mask=None, geoms=None, fpath=None, close=True, gridlines=False): 
 
     # here hard-coded thresholds, colors and labels
 
@@ -856,12 +856,6 @@ def map_USDM_Pacific(dset, mask_EEZs=True, geoms=None, fpath=None, close=True, g
     ticks = [thresholds[i] + ticks_marks[i] for i in range(len(thresholds) - 1)]
     
     cmap = matplotlib.colors.ListedColormap(rgbs, name='USDM')
-    
-    # cbar_ticklabels = [f"D{i}" for i in range(len(thresholds)-2)]
-    
-    # cbar_ticklabels.reverse() 
-    
-    # cbar_ticklabels = cbar_ticklabels + ['None']
     
     cbar_ticklabels = ['D4 (Exceptional Drought)', 'D3 (Extreme Drought)', 'D2 (Severe Drought)', 'D1 (Moderate Drought)', 'D0 (Abnormally Dry)', 'None']
     
@@ -877,9 +871,9 @@ def map_USDM_Pacific(dset, mask_EEZs=True, geoms=None, fpath=None, close=True, g
 
     dataarray = dset['pctscore'].squeeze() 
 
-    if mask_EEZs: 
+    if (mask is not None) and (mask in dset.data_vars): 
         
-        dataarray = dataarray * dset['EEZs']
+        dataarray = dataarray * dset[mask]
 
     # plot starts here
 
