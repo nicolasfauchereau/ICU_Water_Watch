@@ -2,7 +2,6 @@
 `utils` module for the ICU Water Watch 
 """
 
-
 def roll_longitudes(dset, lon_name='lon'): 
     """
     roll the longitudes of a dataset so that it goes from 0 to 360
@@ -268,3 +267,40 @@ def convert_rainfall_OBS(dset, varin='precipitationCal', varout='precip', timeva
         dset = dset.rename({'var':varout})
         
         return dset 
+
+
+def pixel2poly(dset, varname=None, lon_name='lon', lat_name='lat'):
+    """
+    
+    converts pixels (grid points) in a dataarray to shapely polygons
+    
+    modified from: 
+    
+    https://github.com/TomasBeuzen/python-for-geospatial-analysis/tree/main/chapters/scripts
+        
+    """
+    import itertools
+    import numpy as np
+    import pandas as pd
+    import xarray as xr
+    from shapely.geometry import Polygon
+    
+    x = dset[lon_name].data 
+    y = dset[lat_name].data
+    
+    # note that it only works for 2D data 
+    
+    z = dset[varname].squeeze().data 
+    
+    polygons = []
+    values = []
+    half_res = resolution / 2
+    for i, j  in itertools.product(range(len(x)), range(len(y))):
+        minx, maxx = x[i] - half_res, x[i] + half_res
+        miny, maxy = y[j] - half_res, y[j] + half_res
+        polygons.append(Polygon([(minx, miny), (minx, maxy), (maxx, maxy), (maxx, miny)]))
+        if isinstance(z, (int, float)):
+            values.append(z)
+        else:
+            values.append(z[j, i])
+    return polygons, values

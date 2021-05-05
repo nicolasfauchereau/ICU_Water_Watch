@@ -264,15 +264,15 @@ def colorbar_index(ncolors, cmap, ticklabels=None, fontsize=15, color='gray', la
 
     colorbar.ax.tick_params(labelsize=fontsize, labelcolor=color)
 
-def map_decile(dset, varname='pctscore', mask_EEZ=True, cmap=None, geoms=None, ticklabels=None, fpath=None, close=True, gridlines=False): 
+def map_decile(dset, varname='pctscore', mask=None, cmap=None, geoms=None, ticklabels=None, fpath=None, close=True, gridlines=False): 
     
     last_day, ndays = get_attrs(dset)
     
     dataarray = dset[varname].squeeze()
     
-    if mask_EEZ: 
+    if (mask is not None) and (mask in dset.data_vars): 
         
-        dataarray = dataarray * dset['EEZs']
+        dataarray = dataarray * dset[mask]
      
     if ticklabels is None: 
         
@@ -340,7 +340,7 @@ def map_precip_accum(dset, varname='precipitationCal', mask=None, geoms=None, cm
     
     dataarray = dset[varname].squeeze()
 
-    if mask is not None: # 
+    if (mask is not None) and (mask in dset.data_vars): 
         
         dataarray = dataarray * dset[mask] 
         
@@ -414,7 +414,7 @@ def map_precip_anoms(dset, varname='anoms', mask=None, cmap=None, geoms=None, fp
     
     dataarray = dset[varname].squeeze()
 
-    if mask is not None: 
+    if (mask is not None) and (mask in dset.data_vars): 
         
         dataarray = dataarray * dset[mask] 
             
@@ -481,7 +481,7 @@ def map_dry_days_Pacific(dset, varname='dry_days', mask=None, cmap=None, geoms=N
 
     dataarray = dset[varname].squeeze()
     
-    if mask is not None: 
+    if (mask is not None) and (mask in dset.data_vars):
         
         dataarray = dataarray * dset[mask]
         
