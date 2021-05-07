@@ -218,10 +218,17 @@ def detrend_dim(da, dim, deg=1):
     
     import xarray as xr 
     
+    # calculates the average
+    average = da.mean(dim=dim)
+    
     # detrend along a single dimension
     p = da.polyfit(dim=dim, deg=deg)
     fit = xr.polyval(da[dim], p.polyfit_coefficients)
-    return da - fit
+    
+    # return the detrended + average
+    
+    return (da - fit) + average
+
 
 def convert_rainfall_OBS(dset, varin='precipitationCal', varout='precip', timevar='time'): 
     """
@@ -304,3 +311,43 @@ def pixel2poly(dset, varname=None, lon_name='lon', lat_name='lat'):
         else:
             values.append(z[j, i])
     return polygons, values
+
+def interpolate_NaN(data):
+    """
+
+    """
+    import numpy as np 
+    from scipy import interpolate
+    
+    x = np.arange(0, data.shape[1])
+    y = np.arange(0, data.shape[0])
+    
+    # mask invalid values
+    array = np.ma.masked_invalid(data)
+    xx, yy = np.meshgrid(x, y)
+    
+    # get only the valid values
+    x1 = xx[~array.mask]
+    y1 = yy[~array.mask]
+    
+    newarr = array[~array.mask]
+    
+    interp = interpolate.NearestNDInterpolator(list(zip(x1, y1)), newarr)
+    
+    x_out = x
+    y_out = y
+    
+    xx, yy = np.meshgrid(x_out, y_out)
+    
+    return interp(xx, yy)
+
+def interpolate_NaN_da(dataarray, lon_name='lon', lat_name='lat'): 
+
+    import xarray as xr
+
+    regridded = xr.apply_ufunc(interpolate_NaN, dataarray,
+                           input_core_dims=[[lat_name,lon_name]],
+                           output_core_dims=[[lat_name,lon_name]],
+                           vectorize=True, dask="allowed")
+    
+    return regridded

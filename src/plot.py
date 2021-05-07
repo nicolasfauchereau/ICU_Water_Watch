@@ -278,7 +278,7 @@ def map_decile(dset, varname='pctscore', mask=None, cmap=None, geoms=None, tickl
         
         ticklabels=["< 10", "10-20", "20-30", "30-40", "40-50", "50-60", "60-70", "70-80", "80-90", "> 90"]
     
-    cbar_kwargs={'shrink':0.725, 'pad':0.0025 , 'label':'percentile'}
+    cbar_kwargs={'shrink':0.77, 'pad':0.0025 , 'label':'percentile'}
     
     if cmap is None and palettable: 
         
@@ -319,6 +319,8 @@ def map_decile(dset, varname='pctscore', mask=None, cmap=None, geoms=None, tickl
     ax.set_title("") # to get rid of the default title
     
     ax.text(0.99, 0.94, title, fontsize=13, fontdict={'color':'green'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
+    
+    ax.set_extent(domain, crs = ccrs.PlateCarree())
     
     f.patch.set_facecolor('white')
 
