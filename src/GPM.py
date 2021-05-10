@@ -615,3 +615,49 @@ def update(lag=1, opath='/home/nicolasf/operational/ICU/ops/data/GPM_IMERG/daily
                 
                 pass
 
+def save(dset, opath=None, kind='accum', complevel=4): 
+    """
+    saves a dataset containing either:
+    
+    - the accumulation statistics (rainfall accumulation, anomalies and percentage of score): kind='accum' or 
+    - the nb days statistics: dry days, wet days and days since last rain: kind='ndays'
+
+    Parameters
+    ----------
+    dset : xarray.Dataset 
+        The xarray dataset to save to disk 
+    opath : string or pathlib.PosixPath, optional
+        The path where to save the dataset, by default None
+    kind : str, optional
+        The kind of dataset, either 'accum' or 'ndays', by default 'accum'
+    complevel : int, optional
+        The compression level, by default 4
+    """
+    if opath is None: 
+        
+        opath = pathlib.Path.cwd() 
+        
+    else: 
+        
+        if type(opath) != pathlib.PosixPath: 
+            
+            opath = pathlib.Path(opath)
+            
+        if not opath.exists(): 
+            
+            opath.mkdir(parents=True)
+            
+    last_date, ndays  = get_attrs(dset)
+    
+    # build the filename 
+    
+    filename = f"GPM_IMERG_{kind}_{ndays}ndays_to_{last_date:%Y-%m-%d}.nc"
+    
+    # saves to disk, using compression level 'complevel' (by default 4)
+    
+    dset.to_netcdf(opath.joinpath(filename), encoding=dset.encoding.update({'zlib':True, 'complevel':complevel}))
+    
+    print(f"\nsaving {filename} in {str(opath)}")
+    
+    
+    
