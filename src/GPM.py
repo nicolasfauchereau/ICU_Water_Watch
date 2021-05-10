@@ -87,13 +87,13 @@ def get_files_list(dpath=None, ndays=None, date=None, lag=None):
     return lfiles
 
 
-def make_dataset(lfiles=None, dpath=None, ndays=None, check_lag=True): 
+def make_dataset(lfiles=None, dpath=None, varname='precipitationCal', ndays=None, check_lag=True): 
     
     if lfiles is None: 
         
         lfiles = get_files_list(dpath, ndays=ndays)
 
-    dset = xr.open_mfdataset(lfiles, concat_dim='time', combine='by_coords', parallel=True)[['precipitationCal']]
+    dset = xr.open_mfdataset(lfiles, concat_dim='time', combine='by_coords', parallel=True)[[varname]]
     
     # get the last date in the dataset 
     

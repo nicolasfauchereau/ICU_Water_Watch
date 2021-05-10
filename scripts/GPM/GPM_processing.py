@@ -1,6 +1,44 @@
 #!/home/nicolasf/anaconda3/envs/pangeo/bin/python
 # coding: utf-8
 
+"""
+Script for the retrieval and processing of the GPM-IMERG rainfall estimates (for the Island Climate Update "Water Watch")
+
+--------------------------------------------------------------------------------------------------------------------------
+
+usage: GPM_processing.py [-h] [-d DPATH] [-n NDAYS] [-l LAG] [-ds DPATH_SHAPES] [-o OPATH] [-f FPATH]
+
+optional arguments:
+
+-h, --help              
+                        show this help message and exit
+
+-d DPATH, --dpath DPATH
+                        
+                        the path where to find the GPM-IMERG realtime netcdf files and climatologies, REQUIRED
+
+-n NDAYS, --ndays NDAYS
+                        
+                        the number of days over which to calculate the accumulation and take the climatology
+
+-l LAG, --lag LAG       
+                        
+                        the lag (in days) to realtime, if run in the morning (NZ time) 1 should be OK
+
+-ds DPATH_SHAPES, --dpath_shapes DPATH_SHAPES
+                        
+                        the path to the `EEZs` and `Coastlines` folder containing the respective shapefiles, REQUIRED
+
+-o OPATH, --opath OPATH
+                        
+                        the path where to save the outputs files (netcdf and geotiff), REQUIRED
+
+-f FPATH, --fpath FPATH
+                        
+                        the path where to save the figures, REQUIRED
+--------------------------------------------------------------------------------------------------------------------------
+"""
+
 def main(dpath='/home/nicolasf/operational/ICU/ops/data/GPM_IMERG/daily/extended_SP', ndays=30, lag=1, dpath_shapes='/home/nicolasf/operational/ICU/development/hotspots/data/shapefiles', opath='/home/nicolasf/operational/ICU/development/hotspots/outputs/GPM_IMERG', fpath='.'): 
     
     import matplotlib
