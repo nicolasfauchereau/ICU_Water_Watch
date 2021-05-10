@@ -75,13 +75,13 @@ def main(dpath='/home/nicolasf/operational/ICU/ops/data/GPM_IMERG/daily/extended
     
     # calculate the accumulation 
     
-    print(f"\ncalculating accumulation for the {ndays} period ending {last_date:%Y-%m-%d}")
+    print(f"\ncalculating accumulation for the {ndays} days period ending {last_date:%Y-%m-%d}")
 
     dset_accum = GPM.calculate_realtime_accumulation(dset)
 
     # get the rain days statistics 
     
-    print(f"getting the rain days statistics for the {ndays} period ending {last_date:%Y-%m-%d}")    
+    print(f"getting the rain days statistics for the {ndays} days period ending {last_date:%Y-%m-%d}")    
 
     dset_ndays = GPM.get_rain_days_stats(dset)
 
