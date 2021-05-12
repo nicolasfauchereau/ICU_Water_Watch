@@ -110,16 +110,34 @@ def main(dpath='/home/nicolasf/operational/ICU/ops/data/GPM_IMERG/daily/extended
     GPM.save(dset_ndays, opath=opath, kind='ndays')
     
     # NOW start the plotting
+    
+    # accumulation
+
+    plot.map_precip_accum(dset_accum, mask='EEZ', close=False, geoms=EEZs, fpath=fpath)
+
+    # anomalies 
 
     plot.map_precip_anoms(dset_accum, mask='EEZ', close=False, geoms=EEZs, fpath=fpath)
 
-    plot.map_dry_days_Pacific(dset_ndays, mask='EEZ', geoms=EEZs, close=False)
+    # number of dry days 
 
-    plot.map_EAR_Watch_Pacific(dset_accum, mask='EEZ', geoms=EEZs, close=False, fpath=fpath)
+    plot.map_dry_days_Pacific(dset_ndays, mask='EEZ', geoms=EEZs, fpath=fpath)
+    
+    # days since last rain 
+    
+    plot.map_days_since_rain_Pacific(dset_ndays, mask='EEZ', geoms=EEZs, fpath=fpath)
+    
+    # "Early Action Rainfall" watch definitions
 
-    plot.map_USDM_Pacific(dset_accum, mask='EEZ', geoms=EEZs, close=False, fpath=fpath)
+    plot.map_EAR_Watch_Pacific(dset_accum, mask='EEZ', geoms=EEZs, fpath=fpath)
+    
+    # US Drought Monitor definitions
 
-    plot.map_decile(dset_accum, mask='EEZ', geoms=EEZs, close=False, fpath=fpath)
+    plot.map_USDM_Pacific(dset_accum, mask='EEZ', geoms=EEZs, fpath=fpath)
+    
+    # percentile of score (in decile bins)
+
+    plot.map_decile(dset_accum, mask='EEZ', geoms=EEZs, fpath=fpath)
     
     # interpolate at high resolution 
     
