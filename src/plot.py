@@ -278,7 +278,7 @@ def map_decile(dset, varname='pctscore', mask=None, cmap=None, geoms=None, tickl
         
         ticklabels=["< 10", "10-20", "20-30", "30-40", "40-50", "50-60", "60-70", "70-80", "80-90", "> 90"]
     
-    cbar_kwargs={'shrink':0.77, 'pad':0.0025 , 'label':'percentile'}
+    cbar_kwargs={'shrink':0.7, 'pad':0.025 , 'label':'percentile'}
     
     if cmap is None and palettable: 
         
