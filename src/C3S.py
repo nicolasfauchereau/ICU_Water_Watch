@@ -1,21 +1,9 @@
-def rename_variables(dset, expand_dim=False, date=None): 
-    dict_rename = {}
-    dict_rename['latitude'] = 'lat'
-    dict_rename['longitude'] = 'lon'
-    dict_rename['time'] = 'step'
-    dict_rename['number'] = 'member'
-    
-    dset = dset.rename(dict_rename)
-    
-    steps = list(range(0, len(dset['step'])))
-    
-    dset['step'] = (('step'), steps)
-    
-    if expand_dim and (date is not None): 
-    
-        dset = dset.expand_dims(dim={'time':[date]}, axis=0) 
-        
-    return dset
+from . import utils
+
+# list of available GCMs here, not that operationally, we are only using the C3S GCMs: 
+# ['ECMWF', 'UKMO', 'METEO_FRANCE', 'DWD', 'CMCC', 'NCEP', 'JMA', 'ECCC']
+
+GCMs = ['ECMWF', 'UKMO', 'METEO_FRANCE', 'DWD', 'CMCC', 'NCEP', 'JMA', 'ECCC', 'KMA', 'NASA', 'MSC']
 
 def convert_rainfall(dset, varin='tprate', varout='precip', leadvar='step', timevar='time', dropvar=True):
     """
@@ -58,9 +46,6 @@ def convert_rainfall(dset, varin='tprate', varout='precip', leadvar='step', time
 
     # gets the dates for each month 
     dates = pd.to_datetime(dset[timevar].data).to_pydatetime()
-
-    # gets the number of steps 
-    nsteps = len(dset[leadvar])
     
     # gets the number of days in each month 
     ndays = []
@@ -82,9 +67,11 @@ def convert_rainfall(dset, varin='tprate', varout='precip', leadvar='step', time
 
     return dset
 
-def preprocess_GCM(dset): 
+def preprocess_GCM(dset, domain=[120, 245, -55, 30]): 
     
+    import numpy as np
     import pandas as pd
+    import xarray as xr 
     from dateutil.relativedelta import relativedelta
     
     dict_rename = {}
@@ -104,8 +91,29 @@ def preprocess_GCM(dset):
     if dset.lat.data[0] > dset.lat.data[-1]: 
     
         dset = dset.sortby('lat')
+        
+    # roll longitudes 
     
-    # get the init date, we assume here that the first step is leadtime 1 (NOT 0)
+    if any (dset['lon'] < 0): 
+        
+        dset = utils.roll_longitudes(dset)
+    
+    # selects the domain 
+    if domain is not None: 
+        
+        dset = dset.sel({'lon':slice(*domain[:2]), 'lat':slice(*domain[2:])})
+    
+    # if not on a one degree grid, we interpolate (i.e. the JMA comes on a 2.5 * 2.5 deg grid originally)
+    if (all(np.diff(dset['lon']) != 1)) or (all(np.diff(dset['lon']) != 1)): 
+        
+        target_grid = {}
+        target_grid['lon'] = np.arange(dset['lon'].data[0], dset['lon'].data[-1] + 1, 1.)
+        target_grid['lat'] = np.arange(dset['lat'].data[0], dset['lat'].data[-1] + 1, 1.)
+        target_grid = xr.Dataset(target_grid)
+        
+        dset = dset.interp_like(target_grid)
+    
+    # get the init date, we assume here that the first step is leadtime 1 (NOT, I repeat *NOT* 0)
     
     init_date = pd.to_datetime(dset.step.data[0]) - relativedelta(months=1)
     
@@ -121,13 +129,10 @@ def preprocess_GCM(dset):
         
     return dset 
 
-
 def get_percentile_bounds(dset, name='quantile'): 
     """
     get the percentile bounds (inserting 0 and 1 at the beginning and the end respectively)
     from a percentile climatology file 
-
-    [extended_summary]
 
     Parameters
     ----------
@@ -280,7 +285,7 @@ def get_GCM_available_period(dpath='/media/nicolasf/END19101/ICU/data/CDS/', GCM
     lfiles_gcm.sort()
         
     print(f"The number of monthly files for GCM {GCM} is: {len(lfiles_gcm)}\n") 
-    print(f"first file available: {str(lfiles_gcm[0])}\nlast file available: {str(lfiles_gcm[-1])}") 
+    print(f"first file available: {str(lfiles_gcm[0])}\nlast file available: {str(lfiles_gcm[-1])}\n") 
  
 def get_one_GCM(dpath='/media/nicolasf/END19101/ICU/data/CDS/', GCM='ECMWF', varname='tprate', start_year=1993, end_year=2016, anomalies=True, ensemble_mean=True, climatology=[1993, 2016], mask=None, domain=None, detrend=False, dropsel=None, load=True): 
     """
@@ -318,13 +323,13 @@ def get_one_GCM(dpath='/media/nicolasf/END19101/ICU/data/CDS/', GCM='ECMWF', var
     print(f"reading {len(lfiles_gcm)} files\n") 
     print(f"first: {str(lfiles_gcm[0])}\nlast: {str(lfiles_gcm[-1])}") 
  
-    dset_gcm = xr.open_mfdataset(lfiles_gcm, preprocess=preprocess_GCM, parallel=True)
+    dset_gcm = xr.open_mfdataset(lfiles_gcm, preprocess=preprocess_GCM, parallel=True, engine='netcdf4')
     
     # roll the longitudes if necessary 
     
     if dset_gcm['lon'][0] < 0: # test if the first longitude is negative 
         
-        dset_gcm = roll_longitudes(dset_gcm)
+        dset_gcm = utils.roll_longitudes(dset_gcm)
     
     # here dropsel 
     
@@ -457,5 +462,23 @@ def get_GCMs(dpath='/media/nicolasf/END19101/ICU/data/CDS/', GCM='ECMWF', varnam
         
     return dset_gcm
 
- 
- 
+
+def calc_percentiles(dset, percentiles=None, dims=['member','time']):
+    """
+    calculates the climatological percentiles, over dimensions 
+    ['member','time'] from a CDS hindcast dataset 
+    
+    Arguments
+    ---------
+    
+    Returns
+    -------
+    """
+    
+    import numpy as np
+    
+    if percentiles is None: 
+        # note: enter *manually* as a list because of rounding issues when using np.insert / np.arange 
+        percentiles = [0.02, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95]
+    
+    return dset.quantile(percentiles, dim=dims) 
