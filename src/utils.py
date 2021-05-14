@@ -214,12 +214,9 @@ def sanitize_name(name):
     name=name.replace(' ','_').replace(':','_')
     return name
 
-def detrend_dim(da, dim, deg=1):
+def detrend_dim(da, dim, deg=1, add_average=True):
     
     import xarray as xr 
-    
-    # calculates the average
-    average = da.mean(dim=dim)
     
     # detrend along a single dimension
     p = da.polyfit(dim=dim, deg=deg)
@@ -228,9 +225,14 @@ def detrend_dim(da, dim, deg=1):
     
     # return the detrended + average
     
-    return (da - fit) + average
+    if add_average: 
+    
+        return (da - fit) + da.mean(dim=dim)
 
-
+    else: 
+        
+        return (da - fit)
+        
 
 def pixel2poly(dset, varname=None, lon_name='lon', lat_name='lat'):
     """
