@@ -57,13 +57,13 @@ def main(dpath='/home/nicolasf/operational/ICU/ops/data/GPM_IMERG/daily/extended
 
     # update the dataset 
     
-    print(f"updating the GPM-IMERG dataset in {str(dpath)}")
+    print(f"updating the GPM-IMERG dataset in {str(dpath)}\n")
 
     GPM.update(opath=dpath, lag=lag)
     
     # get the list of files corresponding to the number of days passed in the argument `ndays`
     
-    print(f"getting the list of files to process for the past {ndays} days")
+    print(f"getting the list of files to process for the past {ndays} days\n")
 
     lfiles = GPM.get_files_list(dpath = dpath, ndays=ndays, lag=lag)
     
@@ -75,13 +75,13 @@ def main(dpath='/home/nicolasf/operational/ICU/ops/data/GPM_IMERG/daily/extended
     
     # calculate the accumulation 
     
-    print(f"\ncalculating accumulation for the {ndays} days period ending {last_date:%Y-%m-%d}")
+    print(f"calculating accumulation for the {ndays} days period ending {last_date:%Y-%m-%d}\n")
 
     dset_accum = GPM.calculate_realtime_accumulation(dset)
 
     # get the rain days statistics 
     
-    print(f"getting the rain days statistics for the {ndays} days period ending {last_date:%Y-%m-%d}")    
+    print(f"getting the rain days statistics for the {ndays} days period ending {last_date:%Y-%m-%d}\n")    
 
     dset_ndays = GPM.get_rain_days_stats(dset)
 
@@ -145,7 +145,7 @@ def main(dpath='/home/nicolasf/operational/ICU/ops/data/GPM_IMERG/daily/extended
     
     coastlines = geo.get_coastlines(dpath_shapes=dpath_shapes)
     
-    print("\nnow processing the individual countries / Island groups")
+    print("\nnow processing the individual countries / Island groups\n")
     
     dpath = pathlib.Path(dpath)
     
@@ -153,7 +153,7 @@ def main(dpath='/home/nicolasf/operational/ICU/ops/data/GPM_IMERG/daily/extended
     
     for country_name in coastlines.country_na.values: 
     
-        print(f"\n  --> processing {country_name}, EAR Watch then USDM")
+        print(f"   --> processing {country_name}, EAR Watch then USDM\n")
     
         coastline = coastlines.query(f"country_na == '{country_name}'")
     
