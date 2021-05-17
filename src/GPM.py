@@ -209,7 +209,7 @@ def convert_rainfall_OBS(dset, varin='precipitationCal', varout='precip', timeva
         
         return dset 
     
-def get_climatology(dpath=None, ndays=None, date=None, window_clim=2, lag=None): 
+def get_climatology(dpath=None, ndays=None, date=None, window_clim=2, lag=None, clim=[2001, 2020]): 
     """
     [summary]
 
@@ -257,7 +257,7 @@ def get_climatology(dpath=None, ndays=None, date=None, window_clim=2, lag=None):
         
         date =  datetime.utcnow() - timedelta(days=lag)
     
-    clim_file = dpath.joinpath(f'GPM_IMERG_daily.v06.2001.2019_precipitationCal_{ndays}d_runsum.nc')
+    clim_file = dpath.joinpath(f'GPM_IMERG_daily.v06.{clim[0]}.{clim[1]}_precipitationCal_{ndays}d_runsum.nc')
     
     dset_clim = xr.open_dataset(clim_file)
     
