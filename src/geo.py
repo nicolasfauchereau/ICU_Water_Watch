@@ -4,6 +4,26 @@ The `geo` module contains all functions related to reading, manipulating and wor
 
 from . import utils
 
+def dissolve(*geoms, buffer=0.05):
+    
+    """
+    to use instead of calling the geopandas method `dissolve` which fails on 
+    the EEZs shapefile with some weird error, usage
+    
+    >> EEZs = gpd.read_file('.....shapefiles/EEZs/ICU_geometries0_360_EEZ.shp') 
+    >> geoms = EEZs.geometry.values
+    >> EEZs_merged = dissolve(*geoms)
+    >> EEZs_merged_gdf = gpd.GeoDataFrame({'geometry':[EEZs_merged]}, crs="EPSG:4326")
+    >> EEZs_merged_gdf.index = ['EEZ'] 
+    >> EEZs_merged_gdf.to_file('.....shapefiles/ICU_geometries0_360_EEZ_merged.shp')
+    """
+    
+    from shapely.ops import cascaded_union
+    
+    return cascaded_union([
+        geom.buffer(buffer) if geom.is_valid else geom.buffer(buffer) for geom in geoms
+    ])
+
 def make_mask_from_polygon(polygon, lon, lat, wrap_lon=False): 
     """
     make a mask (xarray.DataArray) from a shapely polygon and 
@@ -198,7 +218,7 @@ def get_EEZs(dpath_shapes=None):
     
     EEZs = read_shapefiles(dpath_shapes.joinpath('EEZs'), filename='ICU_geometries0_360_EEZ.shp')
     
-    merged_EEZs = read_shapefiles(dpath_shapes.joinpath('EEZs'), filename='ICU_geometries0_360_EEZ.shp', merge=True, buffer=0.05)
+    merged_EEZs = read_shapefiles(dpath_shapes.joinpath('EEZs'), filename='ICU_geometries0_360_EEZ_merged.shp')
     
     return EEZs, merged_EEZs
 

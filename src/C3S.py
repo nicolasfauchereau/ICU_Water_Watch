@@ -1,9 +1,236 @@
-from . import utils
+from . import utils, geo
 
 # list of available GCMs here, not that operationally, we are only using the C3S GCMs: 
 # ['ECMWF', 'UKMO', 'METEO_FRANCE', 'DWD', 'CMCC', 'NCEP', 'JMA', 'ECCC']
 
 GCMs = ['ECMWF', 'UKMO', 'METEO_FRANCE', 'DWD', 'CMCC', 'NCEP', 'JMA', 'ECCC', 'KMA', 'NASA', 'MSC']
+
+def download(GCM='ECMWF', varname='t2m', year=None, month=None, leadtimes=[1,2,3,4,5], opath=None, domain=[20, 120, -50, 180], file_format='grib', level='surface', max_retry=3): 
+    """
+    downloads a forecast / hindcast from the CDS for a given GCM, year and month 
+
+    Parameters
+    ----------
+    GCM : str, optional
+        The name of the GCM [in 'ECMWF','UKMO,'METEO_FRANCE','CMCC, 'DWD', 'NCEP'], by default 'ECMWF'
+    varname : str, optional
+        Variable name in, by default 't2m'
+    year : int, optional
+        The year, by default None
+    month : int, optional
+        The month, by default None
+    leadtimes : list, optional
+        The list of lead times in months (0 being the initial time), by default [1,2,3]
+    opath : string or pathlib.Path, optional
+        The path were to save the forecast files (grib), by default None
+    domain : list, optional
+        The geographical domain. WARNING !: must be [latN, lonW, latS, lonE], by default [20, 120, -50, 180]
+    file_format : string, by default 'grib'
+        The file format the file will be downloaded into
+    level : str or int, default 'surface'
+        The level, either 'surface' (a string) or an int in [950, 500, 200] or appropriate level
+    max_retry : int, optional
+        The maximum number of retry for the download, by default 3
+    """
+    
+    # imports -----------------------
+    import pathlib
+    from datetime import datetime
+    import cdsapi
+    from collections import OrderedDict
+    # ------------------------------- 
+    
+    # defines a dictionnary that maps variable name 
+
+    dvar = OrderedDict()
+
+    if level == 'surface': 
+
+        dvar = OrderedDict()
+
+        # `raw` values, single levels 
+        dvar['t2m'] = ['seasonal-monthly-single-levels', '2m_temperature']
+        dvar['tprate'] = ['seasonal-monthly-single-levels','total_precipitation']
+        dvar['sst'] = ['seasonal-monthly-single-levels','sea_surface_temperature']
+        dvar['10m uwind'] = ['seasonal-monthly-single-levels','10m_u_component_of_wind']
+        dvar['10m vwind'] = ['seasonal-monthly-single-levels','10m_v_component_of_wind']
+        dvar['mslp'] = ['seasonal-monthly-single-levels','mean_sea_level_pressure']
+        dvar['latent heat flux'] = ['seasonal-monthly-single-levels','surface_latent_heat_flux']
+        dvar['solar radiation'] = ['seasonal-monthly-single-levels','surface_solar_radiation']
+
+        # anomalies, single levels
+        dvar['t2m anomaly'] = ['seasonal-postprocessed-single-levels', '2m_temperature_anomaly']
+        dvar['tprate anomaly'] = ['seasonal-postprocessed-single-levels', 'total_precipitation_anomalous_rate_of_accumulation']
+        dvar['sst anomaly'] = ['seasonal-postprocessed-single-levels', 'sea_surface_temperature_anomaly']
+        dvar['10m uwind anomaly'] = ['seasonal-postprocessed-single-levels','10m_u_component_of_wind_anomaly']
+        dvar['10m vwind anomaly'] = ['seasonal-postprocessed-single-levels','10m_v_component_of_wind_anomaly']
+        dvar['mslp anomaly'] = ['seasonal-postprocessed-single-levels','mean_sea_level_pressure_anomaly']
+        dvar['latent heat flux anomaly'] = ['seasonal-postprocessed-single-levels','surface_latent_heat_flux_anomalous_rate_of_accumulation']
+        dvar['solar radiation anomaly'] = ['seasonal-postprocessed-single-levels', 'surface_solar_radiation_anomalous_rate_of_accumulation']
+
+    else:
+        
+        dvar = OrderedDict()
+        
+        # `raw` values, pressure levels 
+        dvar['geopotential'] = ['seasonal-monthly-pressure-levels', 'geopotential']
+        dvar['temperature'] = ['seasonal-monthly-pressure-levels', 'temperature']
+        dvar['uwind'] = ['seasonal-monthly-pressure-levels', 'u_component_of_wind']
+        dvar['vwind'] = ['seasonal-monthly-pressure-levels', 'v_component_of_wind']
+        dvar['specific humidity'] = ['seasonal-monthly-pressure-levels', 'specific_humidity']
+        
+        # anomalies, pressure levels 
+        dvar['geopotential anomaly'] = ['seasonal-postprocessed-pressure-levels', 'geopotential']
+        dvar['temperature anomaly'] = ['seasonal-postprocessed-pressure-levels', 'temperature']
+        dvar['uwind anomaly'] = ['seasonal-postprocessed-pressure-levels', 'u_component_of_wind']
+        dvar['vwind anomaly'] = ['seasonal-postprocessed-pressure-levels', 'v_component_of_wind']
+        dvar['specific humidity anomaly'] = ['seasonal-postprocessed-pressure-levels', 'specific_humidity']
+
+
+    # if year and month are not passed, take the current year and month 
+    if year is None and month is None: 
+        
+        year = datetime.utcnow().year
+
+        month = datetime.utcnow().month
+    
+    # if the output path is not defined, will create a folder
+    # corresponding to the GCM in the CURRENT directory 
+    
+    if opath is None: 
+        
+        opath = pathlib.Path.cwd()
+        
+        opath = opath.joinpath(GCM)
+
+    else:
+
+    # if opath is defined, but is a string, we cast into pathlib.Path
+        
+        if not(isinstance(opath, pathlib.Path)): 
+            
+            opath = pathlib.Path(opath)
+    
+    # creates the path if not existing on disk
+    
+    if not(opath.exists()):
+        
+        opath.mkdir(parents=True)
+
+    # build the filename for output 
+
+    if level == 'surface': 
+
+        # if surface level
+
+        fname_out = opath.joinpath(f"ensemble_seas_forecasts_{varname.replace(' ','_')}_from_{year}_{str(month).zfill(2)}_{GCM}.{file_format}")
+
+        # if the filename has already been downloaded, skip and return the path 
+        
+        if fname_out.exists():
+            
+            print(f"\n{str(fname_out)} exists already on disk, skipping download and returning path\n") 
+
+            return fname_out
+
+        # else, connect to the CDS and retrieve file ...
+        
+        else: 
+            
+            count = 0
+
+            while not(fname_out.exists()) and count < max_retry:
+                
+                count += 1
+
+                try: 
+
+                    print(f"\nattempting to download {varname} for GCM {GCM}, for level {level}, year {year}, month {month}, in {file_format}, attempt {count} of {max_retry}\n")
+                    
+                    c = cdsapi.Client()
+
+                    data = c.retrieve(
+                    
+                    dvar[varname][0],
+                    {
+                        'format':file_format,
+                        'originating_centre':GCM.lower(),
+                        'variable':dvar[varname][1],
+                        'product_type':'monthly_mean',
+                        'year':str(year),
+                        'month':str(month).zfill(2),
+                        'leadtime_month': list(map(str, [x+1 for x in leadtimes])), 
+                        'area': domain,
+                    },
+                    fname_out)
+
+                    if fname_out.exists(): 
+                    
+                        data.delete()
+
+                        print(f"\n{fname_out} downloaded OK\n")
+
+                        return fname_out
+
+                except: 
+                    
+                    print(f"\nfailure to download or save {str(fname_out)}\n")
+        
+    else: 
+        
+        fname_out = opath.joinpath(f"ensemble_seas_forecasts_{varname.replace(' ','_')}_Z{str(level)}_from_{year}_{str(month).zfill(2)}_{GCM}.{file_format}")
+
+        # if the filename has already been downloaded, skip, and return the path 
+        
+        if fname_out.exists():
+
+            print(f"\n{str(fname_out)} exists already on disk, skipping download and returning path\n") 
+
+            return fname_out
+
+        # else, connect to the CDS and try retrieve file ...
+        
+        else: 
+            
+            count = 0
+
+            while not(fname_out.exists()) and count < max_retry: 
+
+                count += 1
+                        
+                try: 
+                    
+                    print(f"\nattempting to download {varname} for GCM {GCM}, for level {level}, year {year}, month {month}, in {file_format}, attempt {count} of {max_retry}\n")
+
+                    c = cdsapi.Client()
+
+                    data = c.retrieve(
+                    
+                    dvar[varname][0],
+                    {
+                        'format':file_format,
+                        'originating_centre':GCM.lower(),
+                        'variable':dvar[varname][1],
+                        'pressure_level': str(level), 
+                        'product_type':'monthly_mean',
+                        'year':str(year),
+                        'month':str(month).zfill(2),
+                        'leadtime_month': list(map(str, [x+1 for x in leadtimes])), 
+                        'area': domain,
+                    },
+                    fname_out)
+
+                    if fname_out.exists():
+                    
+                        data.delete()
+
+                        print(f"\n{fname_out} downloaded OK\n")
+
+                        return fname_out
+
+                except: 
+
+                    print(f"\nfailure to download or save {str(fname_out)}\n") 
 
 def convert_rainfall(dset, varin='tprate', varout='precip', leadvar='step', timevar='time', dropvar=True):
     """
@@ -92,23 +319,25 @@ def preprocess_GCM(dset, domain=[120, 245, -55, 30]):
     
         dset = dset.sortby('lat')
         
-    # roll longitudes 
+    # roll longitudes (if the first longitude is negative)
     
     if any (dset['lon'] < 0): 
         
         dset = utils.roll_longitudes(dset)
     
-    # selects the domain 
+    # selects the domain if a list [lonmin, lonmax, latmin, latmax] is passed
+    
     if domain is not None: 
         
         dset = dset.sel({'lon':slice(*domain[:2]), 'lat':slice(*domain[2:])})
     
-    # if not on a one degree grid, we interpolate (i.e. the JMA comes on a 2.5 * 2.5 deg grid originally)
+    # if not on a one degree grid we interpolate (e.g. the JMA comes on a 2.5 * 2.5 deg grid originally)
+    
     if (all(np.diff(dset['lon']) != 1)) or (all(np.diff(dset['lon']) != 1)): 
         
         target_grid = {}
-        target_grid['lon'] = np.arange(dset['lon'].data[0], dset['lon'].data[-1] + 1, 1.)
-        target_grid['lat'] = np.arange(dset['lat'].data[0], dset['lat'].data[-1] + 1, 1.)
+        target_grid['lon'] = np.arange(dset['lon'].data[0], dset['lon'].data[-1] + 1., 1.)
+        target_grid['lat'] = np.arange(dset['lat'].data[0], dset['lat'].data[-1] + 1., 1.)
         target_grid = xr.Dataset(target_grid)
         
         dset = dset.interp_like(target_grid)
@@ -117,17 +346,65 @@ def preprocess_GCM(dset, domain=[120, 245, -55, 30]):
     
     init_date = pd.to_datetime(dset.step.data[0]) - relativedelta(months=1)
     
-    # NOW replace the step from datetime to leadtime in month
+    # NOW replace the step from datetime to integer leadtime in month
     
     dset['step'] = (('step'), steps)
     
+    # add an extra time dimension, containing the initialisation time 
+    
     dset = dset.expand_dims(dim={'time':[init_date]}, axis=0) 
+    
+    # selects always the most recent system if present
     
     if 'system' in dset.dims:
         
         dset = dset.isel(system=-1, drop=True)
         
     return dset 
+
+def calc_climatological_percentiles(dset, percentiles=None, dims=['member','time']):
+    """
+    calculates the climatological percentiles, over dimensions 
+    ['member','time'] from a CDS hindcast dataset 
+
+    Parameters
+    ----------
+    dset : [type]
+        [description]
+    percentiles : [type], optional
+        [description], by default None
+    dims : list, optional
+        [description], by default ['member','time']
+
+    Returns
+    -------
+    xarray.Dataset
+        climatological quantiles
+        
+    Usage
+    -----
+    
+    Usually called inside the `map` method 
+    
+    e.g. with a xarray.Dataset named `clim`
+    
+    >> clim = clim.chunk({'time':-1, 'member':-1, 'step':1, 'lat':1, 'lon':1})
+    
+    >> terciles_climatology = clim.groupby(clim.time.dt.month).map(calc_percentiles, **{'percentiles':[0.3333, 0.6666]})
+
+    >> with ProgressBar():
+    >>    terciles_climatology = terciles_climatology.compute()
+
+    """
+    
+    import numpy as np
+    
+    if percentiles is None: 
+        
+        percentiles = [0.02, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95]
+    
+    return dset.quantile(percentiles, dim=dims) 
+
 
 def get_percentile_bounds(dset, name='quantile'): 
     """
@@ -350,7 +627,7 @@ def get_one_GCM(dpath='/media/nicolasf/END19101/ICU/data/CDS/', GCM='ECMWF', var
     # if we are reading the precip forecasts (variable 'tprate') we convert from m.s-1 to mm/month 
     if varname == 'tprate': 
         
-        dset_gcm = convert_rainfall_GCM(dset_gcm, varin='tprate', varout='precip', leadvar='step', timevar='time', dropvar=True)
+        dset_gcm = convert_rainfall(dset_gcm, varin='tprate', varout='precip', leadvar='step', timevar='time', dropvar=True)
 
     # if we are reading the sst forecasts (and the units is Kelvin) we convert to celsius
     if (varname == 'sst') and (dset_gcm['sst'].attrs['units'] == 'K'): 
@@ -366,7 +643,7 @@ def get_one_GCM(dpath='/media/nicolasf/END19101/ICU/data/CDS/', GCM='ECMWF', var
     # is we passed a GeoDataFrame as a mask, we use it to mask the data 
     if (mask is not None) and (type(mask) == gpd.geodataframe.GeoDataFrame): 
     
-        dset_gcm = make_mask_from_gpd(dset_gcm, mask, buffer=0.)
+        dset_gcm = geo.make_mask_from_gpd(dset_gcm, mask, buffer=0.)
         
         dset_gcm = dset_gcm[[vdict[varname]]] * dset_gcm['mask'] 
         
@@ -462,8 +739,8 @@ def get_GCMs(dpath='/media/nicolasf/END19101/ICU/data/CDS/', GCM='ECMWF', varnam
         
     return dset_gcm
 
-
 def calc_percentiles(dset, percentiles=None, dims=['member','time']):
+
     """
     calculates the climatological percentiles, over dimensions 
     ['member','time'] from a CDS hindcast dataset 
@@ -482,3 +759,52 @@ def calc_percentiles(dset, percentiles=None, dims=['member','time']):
         percentiles = [0.02, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95]
     
     return dset.quantile(percentiles, dim=dims) 
+
+def CDS_variables(): 
+    
+    """
+    This function just lists the available variables
+
+    [extended_summary]
+    """
+    
+    from collections import OrderedDict
+    from pprint import pprint
+    
+    dvar = OrderedDict()
+
+    # `raw` values, single levels 
+    dvar['t2m'] = ['seasonal-monthly-single-levels', '2m_temperature']
+    dvar['tprate'] = ['seasonal-monthly-single-levels','total_precipitation']
+    dvar['sst'] = ['seasonal-monthly-single-levels','sea_surface_temperature']
+    dvar['10m uwind'] = ['seasonal-monthly-single-levels','10m_u_component_of_wind']
+    dvar['10m vwind'] = ['seasonal-monthly-single-levels','10m_v_component_of_wind']
+    dvar['mslp'] = ['seasonal-monthly-single-levels','mean_sea_level_pressure']
+    dvar['latent heat flux'] = ['seasonal-monthly-single-levels','surface_latent_heat_flux']
+    dvar['solar radiation'] = ['seasonal-monthly-single-levels','surface_solar_radiation']
+
+    # anomalies, single levels
+    dvar['t2m anomaly'] = ['seasonal-postprocessed-single-levels', '2m_temperature_anomaly']
+    dvar['tprate anomaly'] = ['seasonal-postprocessed-single-levels', 'total_precipitation_anomalous_rate_of_accumulation']
+    dvar['sst anomaly'] = ['seasonal-postprocessed-single-levels', 'sea_surface_temperature_anomaly']
+    dvar['10m uwind anomaly'] = ['seasonal-postprocessed-single-levels','10m_u_component_of_wind_anomaly']
+    dvar['10m vwind anomaly'] = ['seasonal-postprocessed-single-levels','10m_v_component_of_wind_anomaly']
+    dvar['mslp anomaly'] = ['seasonal-postprocessed-single-levels','mean_sea_level_pressure_anomaly']
+    dvar['latent heat flux anomaly'] = ['seasonal-postprocessed-single-levels','surface_latent_heat_flux_anomalous_rate_of_accumulation']
+    dvar['solar radiation anomaly'] = ['seasonal-postprocessed-single-levels', 'surface_solar_radiation_anomalous_rate_of_accumulation']
+
+    # `raw` values, pressure levels 
+    dvar['geopotential'] = ['seasonal-monthly-pressure-levels', 'geopotential']
+    dvar['temperature'] = ['seasonal-monthly-pressure-levels', 'temperature']
+    dvar['uwind'] = ['seasonal-monthly-pressure-levels', 'u_component_of_wind']
+    dvar['vwind'] = ['seasonal-monthly-pressure-levels', 'v_component_of_wind']
+    dvar['specific humidity'] = ['seasonal-monthly-pressure-levels', 'specific_humidity']
+
+    # anomalies, pressure levels 
+    dvar['geopotential anomaly'] = ['seasonal-postprocessed-pressure-levels', 'geopotential']
+    dvar['temperature anomaly'] = ['seasonal-postprocessed-pressure-levels', 'temperature']
+    dvar['uwind anomaly'] = ['seasonal-postprocessed-pressure-levels', 'u_component_of_wind']
+    dvar['vwind anomaly'] = ['seasonal-postprocessed-pressure-levels', 'v_component_of_wind']
+    dvar['specific humidity anomaly'] = ['seasonal-postprocessed-pressure-levels', 'specific_humidity']
+    
+    pprint(dvar)
