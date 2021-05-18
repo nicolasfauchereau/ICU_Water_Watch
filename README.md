@@ -2,6 +2,16 @@
 
 Source code, scripts and notebooks for the NIWA Island Climate Update (ICU) "Water Watch": Drought monitoring and forecasting for the Southwest Pacific
 
+## Requirements 
+
+You can create a suitable conda environment by running: 
+
+```
+$ conda env create -f ICU.yml
+# conda activate ICU
+$ pip install palettable
+```
+
 ## Background 
 
 The aim of these modules, scripts and notebooks is to combine realtime rainfall monitoring in the Southwest Pacific, using the NASA GPM-IMERG satellite product, and probabilistic monthly and seasonal forecast data (from 6 GCMs) to highlight regions that are are and / or will be in potential "water-stress" conditions: i.e. 
