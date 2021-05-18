@@ -8,7 +8,7 @@ You can create a suitable conda environment by running:
 
 ```
 $ conda env create -f ICU.yml
-# conda activate ICU
+$ conda activate ICU
 $ pip install palettable
 ```
 
