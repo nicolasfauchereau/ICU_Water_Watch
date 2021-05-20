@@ -176,20 +176,29 @@ def make_cluster(n_workers=4, memory_limit=32):
     return print(f"dask dashboard available at {client.dashboard_link}") 
     
     
-def interp_to_1x(dset): 
+def interp_to_1x(dset, lon_name='lon', lat_name='lat'): 
     """
-    interpolate a GLOBAL dataset to 1deg X 1deg resolution corresponding
+    interpolate a dataset to 1deg X 1deg resolution corresponding
     to the GCMs (CDS) coordinate system 
     """
     
     import numpy as np
     import xarray as xr 
     
+    if dset[lon_name][0] < 0: 
+        dset = roll_longitudes(dset, lon_name=lon_name)
+
+    if dset[lat_name][0] > dset[lat_name][-1]: 
+        dset = dset.sort_by(lat_name)
+        
     d = {}
-    d['lat'] = np.arange(-90, 91, 1)
-    d['lon'] = np.arange(0, 361, 1)
+    d['lat'] = np.arange(float(dset[lat_name].data[0]), float(dset[lat_name].data[-1]) + 1, 1.)
+    d['lon'] = np.arange(float(dset[lon_name].data[0]), float(dset[lon_name].data[-1]) + 1, 1.)
+    
     d = xr.Dataset(d)
+    
     dset = dset.interp_like(d)
+    
     return dset 
 
 def sanitize_name(name): 

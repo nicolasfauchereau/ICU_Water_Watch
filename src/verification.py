@@ -14,6 +14,36 @@ from . import utils
 from . import GPM 
 from . import C3S 
 from . import geo
+from . import domains 
+
+# def get_era5(dpath='/media/nicolasf/END19101/data/', varname='precip', start=1993, end=2016, month_begin=True, chunks=None):  
+
+#     if not(type(dpath) == pathlib.PosixPath): 
+#         dpath = pathlib.Path(dpath)
+        
+#     dpath = dpath.joinpath(varname.upper())
+    
+#     lfiles = list(dpath.glob("*.nc"))
+    
+#     lfiles.sort()
+    
+# [x for x in lfiles if (int(x.name.split('_')[-2]) >= start) and (int(x.name.split('_')[-2]) <= end)]
+    
+def preprocess_era(dset): 
+    
+    dvars = {}
+    dvars['tp'] = 'precip'
+    
+    for k in dvars.keys(): 
+        if k in dset.data_vars: 
+            dset = dset.rename({k:dvars[k]})
+    
+    dset = dset.rename({'latitude':'lat', 'longitude':'lon'})
+    
+    dset = dset.sortby('lat')
+    
+    return dset
+
 
 def get_mswep(dpath='/media/nicolasf/END19101/data/MSWEP/data/global_monthly_1deg/', start=1993, end=2016, month_begin=True, chunks=None):
     
@@ -480,12 +510,14 @@ def enso_to_xarray(enso):
     enso = enso.rename({'index':'init'})
     return enso
 
-def make_ENSO_ACC_RMSE(MME, dset_obs, enso_index, GCM='MME', name='El Nino', plot_map=True, fname=None): 
+def make_ENSO_ACC_RMSE(MME, dset_obs, enso_index, GCM='MME', name='El Nino', plot_map=True, fname=None, cmap=None): 
 
     import numpy as np 
     import xarray as xr 
     import cartopy.crs as ccrs 
     from climpred import HindcastEnsemble
+    from dask.diagnostics import ProgressBar
+    from matplotlib import pyplot as plt
     
     if type(enso_index) != xr.core.dataset.Dataset: 
         
@@ -505,12 +537,16 @@ def make_ENSO_ACC_RMSE(MME, dset_obs, enso_index, GCM='MME', name='El Nino', plo
     
     if plot_map: 
     
+        if cmap is None: 
+            
+            cmap = plt.cm.Greens
+    
         fg = R_map['precip'].plot.contourf(col='lead', levels=np.arange(0, 1.1, 0.1), cmap=cmap, \
                                                   subplot_kws={'projection':ccrs.PlateCarree(central_longitude=180)}, 
                                                  transform=ccrs.PlateCarree(), cbar_kwargs={'shrink':0.5, 'orientation':'horizontal', 'aspect':50, 'label':"Pearson's R"}) 
 
 
-        [ax.coastlines() for ax in fg.axes.flat];
+        [ax.coastlines() for ax in fg.axes.flat]
 
         axes = fg.axes.flat
 

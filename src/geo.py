@@ -55,7 +55,7 @@ def make_mask_from_polygon(polygon, lon, lat, wrap_lon=False):
     mask = mask.where(np.isnan(mask), 1)
     return mask
 
-def make_mask_from_gpd(dset, gpd_dataframe, lon_name='lon', lat_name='lat', subset=True, insert=True, domain_buffer=0.1, shape_buffer=0.1, mask_name=None): 
+def make_mask_from_gpd(dset, gpd_dataframe, lon_name='lon', lat_name='lat', subset=True, insert=True, domain_buffer=0.1, mask_name=None): 
     """
     [summary]
 
@@ -154,7 +154,7 @@ def read_shapefiles(dpath=None, filename=None, crs=4326, merge=False, buffer=Non
         else: 
             raise ValueError(f"The shapefile {filename} in {str(dpath)} has no CRS and not CRS was provided (argument `crs` empty)")
         
-    if merge: 
+    if merge: # TODO: replace with call to custom function `dissolve`
         
         polygons.loc[:,'domain'] = 'domain'
         
@@ -380,7 +380,7 @@ def gpd_from_domain(lonmin=None, lonmax=None, latmin=None, latmax=None, crs='432
 
     can be called using gpd_from_domain(*[lonmin, lonmax, latmin, latmax])
     
-    can be passed to get_one_GCM() or get_GCMs() as a `mask` keyword argument
+    can be passed e.g. to get_one_GCM() or get_GCMs() as a `mask` keyword argument
  
     Parameters
     ----------
