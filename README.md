@@ -18,13 +18,13 @@ The aim of these modules, scripts and notebooks is to combine realtime rainfall 
 
 #### Data 
 
-1) The GPM-IMERG satellite rainfall estimates 
+*1) The GPM-IMERG satellite rainfall estimates*
 
 The past 30, 60, 90, 180 and 360 days rainfall accumulations, anomalies and percentile of scores are derived from the daily, [GPM-IMERG](https://gpm.nasa.gov/data/imerg) mission. The daily, near realtime (2 days lag) data is downloaded from https://gpm1.gesdisc.eosdis.nasa.gov/data/GPM_L3/GPM_3IMERGDL.06 
 
 The climatologies have been pre-computed from all the available data over the 2001 - 2019 period. 
 
-3) Monthly and seasonal rainfall forecasts from the CDS Multi-Model Ensemble (MME)
+*3) Monthly and seasonal rainfall forecasts from the C3S Multi-Model Ensemble (MME)* 
 
 Probabilistic forecasts are derived from a Multi-Model Ensemble (MME) including forecasts from the following 8 General Circulation Models: 
 
@@ -38,6 +38,8 @@ Probabilistic forecasts are derived from a Multi-Model Ensemble (MME) including 
 - ECCC 
 
 The forecast data (post 2017) for this MME contains in excess of 370 members.
+
+The data is available from the [Copernicus Climate Data Store](https://cds.climate.copernicus.eu/#!/home)
 
 ## Organisation of this repository
 
