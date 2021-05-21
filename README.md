@@ -26,7 +26,7 @@ The climatologies have been pre-computed from all the available data over the 20
 
 3) Monthly and seasonal rainfall forecasts from the CDS Multi-Model Ensemble (MME)
 
-Probabilistic forecasts are derived from a Multi-Model Ensemble (MME) including forecasts from the following General Circulation Models: 
+Probabilistic forecasts are derived from a Multi-Model Ensemble (MME) including forecasts from the following 8 General Circulation Models: 
 
 - ECMWF 
 - UKMO 
@@ -34,8 +34,10 @@ Probabilistic forecasts are derived from a Multi-Model Ensemble (MME) including 
 - DWD 
 - CMCC 
 - NCEP 
+- JMA 
+- ECCC 
 
-The forecast data (post 2017) for this MME contains between 
+The forecast data (post 2017) for this MME contains in excess of 370 members.
 
 ## Organisation of this repository
 
@@ -47,22 +49,22 @@ The forecast data (post 2017) for this MME contains between
     - src/C3S.py 
     - src/verification.py 
 
-- [notebooks](): contains all the notebooks 
+- [notebooks](): contains all the notebooks, organized in 3 folders: `GPM`, 'C3S` and `verification`  
 
 - [scripts](): contains the python scripts, designed to be run from the command line, with keywords arguments, as part of the operational suite 
 
-### Pre-requesites 
-
-### Dependencies 
-
 ### Credits 
 
-The development of this library was made possible by funding from NIWA's "core" (SSIF) funding 
+The development of this software was made possible by funding from NIWA's "core" (SSIF) funding under projects PRAS2101 and CAVA2101
 
 ### Acknowledgments 
 
-Thanks as well for support, feedbacks and advice from Doug Ramsay and Dr. Andrew Lorrey
+Thanks as well for support, feedbacks and advice from Doug Ramsay, Dr. Andrew Lorrey and Ben Noll from NIWA. 
 
-### Reference 
+### References 
+
+ - Fauchereau N., Ramsay D., Lorrey A.M., Noll B.E (in preparation): Open data and open source software for the development of a multi-model ensemble monthly and seasonal forecast system for the Pacific region. To be submitted to JOSS, and preprint on ESSOar.  
+
+ - Fauchereau N., Lorrey A.M, Noll B.E. (in preparation): On the predictability of New Zealand’s seasonal climate from General Circulation Models forecasts and observational indices. To be submitted to Weather and Climate.  
 
 ### Additional material 
