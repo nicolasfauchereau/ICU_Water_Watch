@@ -43,13 +43,14 @@ The data is available from the [Copernicus Climate Data Store](https://cds.clima
 
 ## Organisation of this repository
 
-- [src](): contains the source code, i.e. the collection of functions used for the data retrieval, processing, calculation and mapping of the various rainfall monitoring and forecasting products part of the ICU "Water Watch", the code is organized in N modules: 
+- [src](): contains the source code, i.e. the collection of functions used for the data retrieval, processing, calculation and mapping of the various rainfall monitoring and forecasting products part of the ICU "Water Watch", the code is organized in 6 main modules: 
 
-    - src/utils.py 
-    - src/geo.py 
-    - src/GPM.py 
-    - src/C3S.py 
-    - src/verification.py 
+    - src/utils.py: General utility functions 
+    - src/geo.py: Manipulation of geometries (from shapefiles)
+    - src/GPM.py: Functions related to the download, processing and the calculation of diagnostics from the near-realtime GPM-IMERG data 
+    - src/C3S.py: Functions related to the download, processing and derivation of probabilistic forecasts from the C3S Multi-Model Ensemble 
+    - src/verification.py: Functions related to the validation of the C3S individual GCMs and MME
+    - src/plot.py: Plotting and mapping functions 
 
 - [notebooks](): contains all the notebooks, organized in 3 folders: `GPM`, 'C3S` and `verification`  
 
