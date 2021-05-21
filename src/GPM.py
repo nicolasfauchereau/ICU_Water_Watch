@@ -263,7 +263,7 @@ def get_climatology(dpath=None, ndays=None, date=None, window_clim=2, lag=None, 
     
     dates_clim = [date + timedelta(days=shift) for shift in list(range(-window_clim, window_clim+1))]
     
-    time_clim = pd.to_datetime(dset_clim.time.data)
+    time_clim = dset_clim.time.to_index()
 
     time_clim = [time_clim[(time_clim.month == d.month) & (time_clim.day == d.day)] for d in dates_clim]
 
