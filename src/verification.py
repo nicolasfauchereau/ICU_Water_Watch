@@ -16,18 +16,34 @@ from . import C3S
 from . import geo
 from . import domains 
 
-# def get_era5(dpath='/media/nicolasf/END19101/data/', varname='precip', start=1993, end=2016, month_begin=True, chunks=None):  
+def get_era5(dpath='/media/nicolasf/END19101/data/', varname='precip', start=1993, end=2016, month_begin=True, chunks=None, interp=True):  
 
-#     if not(type(dpath) == pathlib.PosixPath): 
-#         dpath = pathlib.Path(dpath)
+    if not(type(dpath) == pathlib.PosixPath): 
+        dpath = pathlib.Path(dpath)
         
-#     dpath = dpath.joinpath(varname.upper())
+    dpath = dpath.joinpath(varname.upper())
     
-#     lfiles = list(dpath.glob("*.nc"))
+    lfiles = list(dpath.glob("*.nc"))
     
-#     lfiles.sort()
+    lfiles.sort()
     
-# [x for x in lfiles if (int(x.name.split('_')[-2]) >= start) and (int(x.name.split('_')[-2]) <= end)]
+    lfiles = [x for x in lfiles if (int(x.name.split('_')[-2]) >= start) and (int(x.name.split('_')[-2]) <= end)]
+
+    dset = xr.open_mfdataset(lfiles, parallel=True, concat_dim='time', preprocess=preprocess_era)
+    
+    if month_begin and np.alltrue(dset['time'].dt.day != 1):
+        
+        dset['time'] = dset['time'].to_index() - pd.offsets.MonthBegin()
+        
+    if interp: 
+        
+        dset = utils.interp_to_1x(dset)
+    
+    clim = dset.groupby(dset.time.dt.month).mean('time')
+    
+    dset_anomalies = dset.groupby(dset.time.dt.month) - clim
+    
+    return dset, dset_anomalies
     
 def preprocess_era(dset): 
     
