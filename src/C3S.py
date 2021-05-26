@@ -1,11 +1,10 @@
 from . import utils, geo
 
 # list of available GCMs here, not that operationally, we are only using the C3S GCMs: 
-# ['ECMWF', 'UKMO', 'METEO_FRANCE', 'DWD', 'CMCC', 'NCEP', 'JMA', 'ECCC']
 
 GCMs = ['ECMWF', 'UKMO', 'METEO_FRANCE', 'DWD', 'CMCC', 'NCEP', 'JMA', 'ECCC', 'KMA', 'NASA', 'MSC']
 
-def download(GCM='ECMWF', varname='t2m', year=None, month=None, leadtimes=[1,2,3,4,5], opath=None, domain=[20, 120, -50, 180], file_format='grib', level='surface', max_retry=3): 
+def download(GCM='ECMWF', varname='t2m', year=None, month=None, leadtimes=[1,2,3,4,5], opath=None, domain=None, file_format='grib', level='surface', max_retry=3): 
     """
     downloads a forecast / hindcast from the CDS for a given GCM, year and month 
 
@@ -93,6 +92,23 @@ def download(GCM='ECMWF', varname='t2m', year=None, month=None, leadtimes=[1,2,3
         year = datetime.utcnow().year
 
         month = datetime.utcnow().month
+        
+    if domain is not None: 
+        
+        # we assume it is passed as [lon_min, lon_max, lat_min, lat_max] (see domains.py)
+        # so we need to convert to the order accepted by the cdsapi 
+        
+        if domain[1] > 180: 
+            
+            domain[1] = -(360-domain[1])
+        
+        domain = [domain[-1], domain[0], domain[-2], domain[1]]
+    
+    else: 
+        
+        # we assume global
+        
+        domain = [90, 180, -90, -180]
     
     # if the output path is not defined, will create a folder
     # corresponding to the GCM in the CURRENT directory 
