@@ -14,7 +14,7 @@ $ pip install palettable
 
 ## Background 
 
-The aim of these modules, scripts and notebooks is to combine realtime rainfall monitoring in the Southwest Pacific, using the NASA GPM-IMERG satellite product, and probabilistic monthly and seasonal forecast data (from 8 different General Circulation Models, or *GCMs*) to highlight regions that are are and / or will be in potential "water-stress" conditions: i.e. 
+The aim of these modules, scripts and notebooks is to combine realtime rainfall monitoring in the Southwest Pacific, using the NASA GPM-IMERG satellite product, and probabilistic monthly and seasonal forecast data (from 8 different General Circulation Models, or *GCMs*) to highlight regions that are are and / or will be in potential "water-stress" conditions: i.e. - in a nutshell - where significant rainfall deficits have been recorded over the past few months, and the monthly or seasonal forecasts indicate high probability for dry conditions to persist or worsen. 
 
 #### Data 
 
@@ -46,15 +46,15 @@ The data is available from the [Copernicus Climate Data Store](https://cds.clima
 - [src](): contains the source code, i.e. the collection of functions used for the data retrieval, processing, calculation and mapping of the various rainfall monitoring and forecasting products part of the ICU "Water Watch", the code is organized in 6 main modules: 
 
     - [src/utils.py](https://github.com/nicolasfauchereau/ICU_Water_Watch/blob/main/src/utils.py): General utility functions 
-    - [src/geo.py](https://github.com/nicolasfauchereau/ICU_Water_Watch/blob/main/src/geo.py): Manipulation of geometries (from shapefiles)
+    - [src/geo.py](https://github.com/nicolasfauchereau/ICU_Water_Watch/blob/main/src/geo.py): Manipulation of geometries (from shapefiles), creation of masks, etc
     - [src/GPM.py](https://github.com/nicolasfauchereau/ICU_Water_Watch/blob/main/src/GPM.py): Functions related to the download, processing and the calculation of diagnostics from the near-realtime GPM-IMERG data 
     - [src/C3S.py](https://github.com/nicolasfauchereau/ICU_Water_Watch/blob/main/src/C3S.py): Functions related to the download, processing and derivation of probabilistic forecasts from the C3S Multi-Model Ensemble 
     - [src/verification.py](https://github.com/nicolasfauchereau/ICU_Water_Watch/blob/main/src/verification.py): Functions related to the validation of the C3S individual GCMs and MME
     - [src/plot.py](https://github.com/nicolasfauchereau/ICU_Water_Watch/blob/main/src/plot.py): Plotting and mapping functions 
 
-- [notebooks](): contains all the notebooks, organized in 3 folders: `GPM`, 'C3S` and `verification`  
+- [notebooks](https://github.com/nicolasfauchereau/ICU_Water_Watch/tree/main/notebooks): contains all the notebooks, organized in 3 folders: `GPM`, 'C3S` and `verification`, these notebooks illustrate the various processing steps, and also include the code used to calculate the various climatological quantities from the GPM-IMERG and C3S datasets.  
 
-- [scripts](): contains the python scripts, designed to be run from the command line, with keywords arguments, as part of the operational suite 
+- [scripts](https://github.com/nicolasfauchereau/ICU_Water_Watch/tree/main/scripts): contains the python scripts, designed to be run from the command line, with keywords arguments, as part of the operational suite 
 
 ### Credits 
 
@@ -70,4 +70,4 @@ Thanks as well for support, feedbacks and advice from Doug Ramsay, Dr. Andrew Lo
 
  - Fauchereau N., Lorrey A.M, Noll B.E. (in preparation): On the predictability of New Zealand’s seasonal climate from General Circulation Models forecasts and observational indices. To be submitted to *Weather and Climate*.  
 
-### Additional material 
+### Additional material and references
