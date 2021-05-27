@@ -291,6 +291,8 @@ def interpolate_NaN(data):
     
     # mask invalid values
     array = np.ma.masked_invalid(data)
+    
+    # get grid
     xx, yy = np.meshgrid(x, y)
     
     # get only the valid values
