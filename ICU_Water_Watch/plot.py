@@ -1328,3 +1328,87 @@ def plot_heatmap(mat, year = 2021, start_month=3, n_steps=5, cumsum=False, title
     ax.axhline(6, color='steelblue')
     
     return f, ax 
+
+def map_MME_probabilities(probs_mean, \
+                          nsteps=5, \
+                          pct_dim='percentile', \
+                          pct=None, \
+                          comp='below', \
+                          cmap=None, 
+                          varname='precip', \
+                          contours=[50, 70], \
+                          contours_colors=['r','#a3231a'], \
+                          shape=None, \
+                          domain = None): 
+
+    import numpy as np 
+    from calendar import month_abbr
+    from matplotlib import pyplot as plt
+    import palettable
+
+    # checks 
+    
+    if (not(pct_dim in ['tercile','decile','percentile'])) or (not(pct_dim in probs_mean.dims)): 
+        raise ValueError(f"{pct_dim} not valid, should be in ['tercile','decile','percentile'] and be a dimension in probs_mean") 
+        
+    # get month and year of the forecast (initial month)
+    
+    month = probs_mean.time.to_index().month[0]
+    year = probs_mean.time.to_index().year[0]
+    
+    # second step, depending on whether we want to have probability of being above or below a percentile value 
+    
+    percentile_bins = probs_mean.attrs['pct_values']
+    
+    max_cat = np.digitize(pct / 100, percentile_bins)
+    
+    if comp == 'above': 
+        
+        ptot = probs_mean.sel({pct_dim:slice(max_cat+1, None)}).sum(pct_dim)
+        
+    elif comp == 'below':  
+        
+        ptot = probs_mean.sel({pct_dim:slice(None, max_cat)}).sum(pct_dim)
+    
+    if cmap is None and palettable: 
+        
+        cmap = palettable.scientific.sequential.Bilbao_20.mpl_colormap
+    
+    # plot 
+    
+    f, axes = plt.subplots(nrows=nsteps, figsize=(4,14), subplot_kw={"projection": ccrs.PlateCarree(central_longitude=180)})
+    
+    for step in np.arange(nsteps) + 1: 
+        
+        ax = axes[step-1]
+        
+        p = ptot.sel({'step':step})['precip'].squeeze()
+        
+        ff = p.plot.contourf(ax=ax, x='lon',y='lat', levels=np.arange(10,100,5), add_colorbar=True, transform=ccrs.PlateCarree(), \
+                             cbar_kwargs={'shrink':0.9, 'label':'%', 'aspect':10, 'pad':0.01, 'extend':'neither'}, cmap=cmap)
+        
+        for i, ct in enumerate(contours): 
+            
+            fc = p.plot.contour(ax=ax, x='lon',y='lat',levels=[ct], colors=contours_colors[i], linewidths=0.7, transform=ccrs.PlateCarree())
+        
+        ax.set_title(f'prob. precip < {pct}th perc., {month_abbr[month + step]} {year}\n [ECMWF, Meteo-France, UKMO, DWD, CMCC, NCEP, JMA, ECCC]', fontsize=11)
+        
+        if step != 5: ax.set_xlabel('')
+            
+        if step != 5: ax.set_xticks([])
+
+        ax.coastlines(resolution='10m',lw=0.5)
+
+        if shape is not None: 
+        
+            shape.boundary.plot(ax=ax, transform=ccrs.PlateCarree(), color='0.4',lw=0.5)
+
+        if domain is not None: 
+        
+            ax.set_extent(domain, crs=ccrs.PlateCarree())
+    
+    f.set_figwidth(8)
+    
+    f.set_figheight(8 * (nsteps / 2.3))
+    
+    return f
