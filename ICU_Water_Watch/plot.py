@@ -1418,13 +1418,15 @@ def map_MME_probabilities(probs_mean, \
         
         contours = contours_l 
     
+    steps = probs_mean['step'].data
+    
     # plot 
     
     f, axes = plt.subplots(nrows=nsteps, figsize=(4,14), subplot_kw={"projection": ccrs.PlateCarree(central_longitude=180)})
     
-    for step in np.arange(nsteps) + 1: 
+    for i, step in enumerate(steps[:nsteps]): 
         
-        ax = axes[step-1]
+        ax = axes[i]
         
         p = ptot.sel({'step':step})[varname].squeeze()
         
