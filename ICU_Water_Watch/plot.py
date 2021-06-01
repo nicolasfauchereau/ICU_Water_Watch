@@ -1349,6 +1349,7 @@ def map_MME_probabilities(probs_mean, \
     # checks 
     
     if (not(pct_dim in ['tercile','decile','percentile'])) or (not(pct_dim in probs_mean.dims)): 
+        
         raise ValueError(f"{pct_dim} not valid, should be in ['tercile','decile','percentile'] and be a dimension in probs_mean") 
         
     # get month and year of the forecast (initial month)
@@ -1356,11 +1357,15 @@ def map_MME_probabilities(probs_mean, \
     month = probs_mean.time.to_index().month[0]
     year = probs_mean.time.to_index().year[0]
     
-    # second step, depending on whether we want to have probability of being above or below a percentile value 
+    # get the percentile bins  
     
     percentile_bins = probs_mean.attrs['pct_values']
     
+    # digitize, so we can get the corresponding category along the tercile, decile or percentile dimension 
+    
     max_cat = np.digitize(pct / 100, percentile_bins)
+    
+    # calculate the probability of being either below or above the given percentile 
     
     if comp == 'above': 
         
@@ -1370,9 +1375,48 @@ def map_MME_probabilities(probs_mean, \
         
         ptot = probs_mean.sel({pct_dim:slice(None, max_cat)}).sum(pct_dim)
     
-    if cmap is None and palettable: 
+    # if not colormap was passed, we get sensible defaults depending on whether we 
+    # want probabilities of being below a percentile values (warm colors) or above (cool colors)
+    
+    dops = {}
+    dops['below'] = '<'
+    dops['above'] = '>'
+     
+    if cmap is None: 
         
-        cmap = palettable.scientific.sequential.Bilbao_20.mpl_colormap
+        if comp == 'below': 
+            
+            if palettable:
+            
+                cmap = palettable.scientific.sequential.Bilbao_20.mpl_colormap
+                
+            else: 
+                
+                cmap = plt.cm.Oranges
+    
+        elif comp == 'above': 
+            
+            if palettable: 
+            
+                cmap = palettable.scientific.sequential.Davos_20_r.mpl_colormap
+            
+            else: 
+                
+                cmap = plt.cm.Blues
+
+    # we get the maximum probability from ptot 
+    
+    max_prob = float(ptot.max(['step','lat','lon']).squeeze()[varname].data)
+        
+    # if the contours that are passed are over the maximum probabilities, we define some 
+    
+    if max(contours) > max_prob: 
+        
+        contours_l = [int(max_prob * 0.70) // 10 * 10, int(max_prob * 0.80) // 10 * 10]
+        
+        print(f"\nWARNING: some of the passed contours [{','.join(list(map(str, contours)))}] are over the maximum probability ({max_prob:4.2f}), using [{','.join(list(map(str, contours_l)))}] instead\n")
+        
+        contours = contours_l 
     
     # plot 
     
@@ -1382,7 +1426,7 @@ def map_MME_probabilities(probs_mean, \
         
         ax = axes[step-1]
         
-        p = ptot.sel({'step':step})['precip'].squeeze()
+        p = ptot.sel({'step':step})[varname].squeeze()
         
         ff = p.plot.contourf(ax=ax, x='lon',y='lat', levels=np.arange(10,100,5), add_colorbar=True, transform=ccrs.PlateCarree(), \
                              cbar_kwargs={'shrink':0.9, 'label':'%', 'aspect':10, 'pad':0.01, 'extend':'neither'}, cmap=cmap)
@@ -1391,11 +1435,11 @@ def map_MME_probabilities(probs_mean, \
             
             fc = p.plot.contour(ax=ax, x='lon',y='lat',levels=[ct], colors=contours_colors[i], linewidths=0.7, transform=ccrs.PlateCarree())
         
-        ax.set_title(f'prob. precip < {pct}th perc., {month_abbr[month + step]} {year}\n [ECMWF, Meteo-France, UKMO, DWD, CMCC, NCEP, JMA, ECCC]', fontsize=11)
+        ax.set_title(f'prob. {varname} {dops[comp]} {pct}th perc., {month_abbr[month + step]} {year}\n [ECMWF, Meteo-France, UKMO, DWD, CMCC, NCEP, JMA, ECCC]', fontsize=11)        
         
-        if step != 5: ax.set_xlabel('')
+        if step != nsteps: ax.set_xlabel('')
             
-        if step != 5: ax.set_xticks([])
+        if step != nsteps: ax.set_xticks([])
 
         ax.coastlines(resolution='10m',lw=0.5)
 
