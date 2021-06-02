@@ -307,6 +307,8 @@ def convert_rainfall(dset, varin='tprate', varout='precip', leadvar='step', time
         dset = dset.drop(varin)
         
     dset = dset.drop('ndays')
+    
+    dset[varout].attrs = {'units':'mm/month'}
 
     return dset
 
