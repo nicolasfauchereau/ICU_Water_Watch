@@ -17,9 +17,9 @@ import palettable
 
 ### some top level definition 
 
-# domain to set_extent 
+# default domain to set_extent 
 
-domain = [125, 240, -35, 25] # domain to set_extent 
+domain = [125, 240, -35, 25] 
 
 # dictionnary for the precipitation accumulation plots 
 
@@ -1339,7 +1339,8 @@ def map_MME_probabilities(probs_mean, \
                           contours=[50, 70], \
                           contours_colors=['r','#a3231a'], \
                           shape=None, \
-                          domain = None): 
+                          domain=None, 
+                          mask=None): 
 
     import numpy as np 
     from calendar import month_abbr
@@ -1377,6 +1378,7 @@ def map_MME_probabilities(probs_mean, \
     
     # if not colormap was passed, we get sensible defaults depending on whether we 
     # want probabilities of being below a percentile values (warm colors) or above (cool colors)
+    # i.e. we assume the variable to plot is precip 
     
     dops = {}
     dops['below'] = '<'
@@ -1408,12 +1410,12 @@ def map_MME_probabilities(probs_mean, \
     
     max_prob = float(ptot.max(['step','lat','lon']).squeeze()[varname].data)
         
-    # if the contours that are passed are over the maximum probabilities, we define some 
+    # if the contours that are passed are over the maximum probabilities, we define some sensible defaults
     
     if max(contours) > max_prob: 
         
-        contours_l = [int(max_prob * 0.70) // 10 * 10, int(max_prob * 0.80) // 10 * 10]
-        
+        contours_l = [(int(max_prob * 0.80) // 10 * 10) -10,  int(max_prob * 0.80) // 10 * 10]
+                
         print(f"\nWARNING: some of the passed contours [{','.join(list(map(str, contours)))}] are over the maximum probability ({max_prob:4.2f}), using [{','.join(list(map(str, contours_l)))}] instead\n")
         
         contours = contours_l 
@@ -1430,6 +1432,10 @@ def map_MME_probabilities(probs_mean, \
         
         p = ptot.sel({'step':step})[varname].squeeze()
         
+        if (mask is not None) and (mask in probs_mean.data_vars):
+            
+            p = p * probs_mean[mask] 
+            
         ff = p.plot.contourf(ax=ax, x='lon',y='lat', levels=np.arange(10,100,5), add_colorbar=True, transform=ccrs.PlateCarree(), \
                              cbar_kwargs={'shrink':0.9, 'label':'%', 'aspect':10, 'pad':0.01, 'extend':'neither'}, cmap=cmap)
         
