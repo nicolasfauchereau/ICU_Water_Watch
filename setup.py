@@ -8,5 +8,5 @@ setup(name='ICU_Water_Watch',
     url = "https://github.com/nicolasfauchereau/ICU_Water_Watch",
     license = "LICENSE.txt",
     long_description = open('README.md').read(),
-    py_modules=['C3S','geo','GPM','plot','utils','verification', 'domains'],
+    packages=['ICU_Water_Watch'],
 )
