@@ -14,7 +14,7 @@ $ pip install palettable
 
 ## Background 
 
-The aim of these modules, scripts and notebooks is to combine realtime rainfall monitoring in the Southwest Pacific, using the [NASA GPM-IMERG](https://gpm.nasa.gov/data/imerg) satellite product, and probabilistic monthly and seasonal forecast data (from 8 different General Circulation Models, or *GCMs*) to highlight regions that are are and / or will be in potential "water-stress" conditions: i.e. - in a nutshell - where significant rainfall deficits have been recorded over the past few months, and the monthly or seasonal forecasts indicate high probability for dry conditions to persist or worsen. 
+The aim of these modules, scripts and notebooks is to combine realtime rainfall monitoring in the Southwest Pacific, using the [NASA GPM-IMERG](https://gpm.nasa.gov/data/imerg) satellite product, and probabilistic monthly and seasonal forecast data (from 8 different General Circulation Models, or *GCMs*) to highlight regions that are and / or will be in potential "water-stress" conditions: i.e. - in a nutshell - where significant rainfall deficits have been recorded over the past few months, and the monthly or seasonal forecasts indicate high probability for dry conditions to persist or worsen. 
 
 #### Data 
 
