@@ -14,7 +14,7 @@ $ pip install palettable
 
 ## Background 
 
-The aim of these modules, scripts and notebooks is to combine realtime rainfall monitoring in the Southwest Pacific, using the NASA GPM-IMERG satellite product, and probabilistic monthly and seasonal forecast data (from 8 different General Circulation Models, or *GCMs*) to highlight regions that are are and / or will be in potential "water-stress" conditions: i.e. - in a nutshell - where significant rainfall deficits have been recorded over the past few months, and the monthly or seasonal forecasts indicate high probability for dry conditions to persist or worsen. 
+The aim of these modules, scripts and notebooks is to combine realtime rainfall monitoring in the Southwest Pacific, using the [NASA GPM-IMERG](https://gpm.nasa.gov/data/imerg) satellite product, and probabilistic monthly and seasonal forecast data (from 8 different General Circulation Models, or *GCMs*) to highlight regions that are are and / or will be in potential "water-stress" conditions: i.e. - in a nutshell - where significant rainfall deficits have been recorded over the past few months, and the monthly or seasonal forecasts indicate high probability for dry conditions to persist or worsen. 
 
 #### Data 
 
@@ -22,7 +22,7 @@ The aim of these modules, scripts and notebooks is to combine realtime rainfall 
 
 The past 30, 60, 90, 180 and 360 days rainfall accumulations, anomalies and percentile of scores are derived from the daily, [GPM-IMERG](https://gpm.nasa.gov/data/imerg) mission. The daily, near realtime (2 days lag) data is downloaded from https://gpm1.gesdisc.eosdis.nasa.gov/data/GPM_L3/GPM_3IMERGDL.06 
 
-The climatologies have been pre-computed from all the available data over the 2001 - 2020 period. 
+The climatologies have been pre-computed from all the available data over the **2001 - 2020 period**. 
 
 **3) Monthly and seasonal rainfall forecasts from the C3S Multi-Model Ensemble (MME)** 
 
@@ -37,13 +37,15 @@ Probabilistic forecasts are derived from a Multi-Model Ensemble (MME) including 
 - JMA (JMA/MRI-CPS2)
 - ECCC (CanSIPSv2)
 
+The details for the different GCM can be found [here](https://confluence.ecmwf.int/display/CKB/Description+of+the+C3S+seasonal+multi-system)
+
 The forecast data (post 2017) for this MME contains in excess of 370 members.
 
 The data is available from the [Copernicus Climate Data Store](https://cds.climate.copernicus.eu/#!/home)
 
 ## Organisation of this repository
 
-- [ICU_Water_Watch](): contains the source code itself, i.e. the collection of functions used for the data retrieval, processing, calculation and mapping of the various rainfall monitoring and forecasting products part of the ICU "Water Watch", the code is organized in 6 main modules: 
+- [ICU_Water_Watch](https://github.com/nicolasfauchereau/ICU_Water_Watch/tree/main/ICU_Water_Watch): contains the source code itself, i.e. the collection of functions used for the data retrieval, processing, calculation and mapping of the various rainfall monitoring and forecasting products part of the ICU "Water Watch", the code is organized in 6 main modules: 
 
     - [utils.py](https://github.com/nicolasfauchereau/ICU_Water_Watch/blob/main/src/utils.py): General utility functions 
     - [geo.py](https://github.com/nicolasfauchereau/ICU_Water_Watch/blob/main/src/geo.py): Manipulation of geometries (from shapefiles), creation of masks, etc
@@ -52,7 +54,7 @@ The data is available from the [Copernicus Climate Data Store](https://cds.clima
     - [verification.py](https://github.com/nicolasfauchereau/ICU_Water_Watch/blob/main/src/verification.py): Functions related to the validation of the C3S individual GCMs and MME
     - [plot.py](https://github.com/nicolasfauchereau/ICU_Water_Watch/blob/main/src/plot.py): Plotting and mapping functions 
 
-- [notebooks](https://github.com/nicolasfauchereau/ICU_Water_Watch/tree/main/notebooks): contains all the notebooks, organized in 3 folders: `GPM`, 'C3S` and `verification`, these notebooks illustrate the various processing steps, and also include the code used to calculate the various climatological quantities from the GPM-IMERG and C3S datasets.  
+- [notebooks](https://github.com/nicolasfauchereau/ICU_Water_Watch/tree/main/notebooks): contains all the notebooks, organized in 3 folders: [`GPM`](https://github.com/nicolasfauchereau/ICU_Water_Watch/tree/main/notebooks/GPM), [`C3S`](https://github.com/nicolasfauchereau/ICU_Water_Watch/tree/main/notebooks/C3S) and [`verification`](), these notebooks illustrate the various processing steps, and also include the code used to calculate the various climatological quantities from the GPM-IMERG and C3S datasets.  
 
 - [scripts](https://github.com/nicolasfauchereau/ICU_Water_Watch/tree/main/scripts): contains the python scripts, designed to be run from the command line, with keywords arguments, as part of the operational suite 
 
