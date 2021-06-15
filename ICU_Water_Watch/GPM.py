@@ -93,7 +93,7 @@ def make_dataset(lfiles=None, dpath=None, varname='precipitationCal', ndays=None
         
         lfiles = get_files_list(dpath, ndays=ndays)
 
-    dset = xr.open_mfdataset(lfiles, concat_dim='time', combine='by_coords', parallel=True)[[varname]]
+    dset = xr.open_mfdataset(lfiles, concat_dim='time', combine='by_coords', parallel=True, engine='netcdf4')[[varname]]
     
     # get the last date in the dataset 
     
@@ -259,7 +259,7 @@ def get_climatology(dpath=None, ndays=None, date=None, window_clim=2, lag=None, 
     
     clim_file = dpath.joinpath(f'GPM_IMERG_daily.v06.{clim[0]}.{clim[1]}_precipitationCal_{ndays}d_runsum.nc')
     
-    dset_clim = xr.open_dataset(clim_file)
+    dset_clim = xr.open_dataset(clim_file, engine='netcdf4')
     
     dates_clim = [date + timedelta(days=shift) for shift in list(range(-window_clim, window_clim+1))]
     
@@ -577,7 +577,7 @@ def update(lag=1, opath='/home/nicolasf/operational/ICU/ops/data/GPM_IMERG/daily
 
             if stat_info.st_size > 800000:
 
-                dset_in = xr.open_dataset(opath.joinpath(fname))
+                dset_in = xr.open_dataset(opath.joinpath(fname), engine='netcdf4')
 
                 dset_in = dset_in[['HQprecipitation','precipitationCal']]
 
