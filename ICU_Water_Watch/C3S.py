@@ -1,10 +1,10 @@
 from . import utils, geo
 
-# list of available GCMs here, not that operationally, we are only using the C3S GCMs: 
+# list of available GCMs here, not that operationally, we are only using the C3S GCMs: 'ECMWF', 'UKMO', 'METEO_FRANCE', 'DWD', 'CMCC', 'NCEP', 'JMA', 'ECCC'
 
 GCMs = ['ECMWF', 'UKMO', 'METEO_FRANCE', 'DWD', 'CMCC', 'NCEP', 'JMA', 'ECCC', 'KMA', 'NASA', 'MSC']
 
-def download(GCM='ECMWF', varname='t2m', year=None, month=None, leadtimes=[1,2,3,4,5], opath=None, domain=None, file_format='grib', level='surface', max_retry=3): 
+def download(GCM='ECMWF', system=None, varname='t2m', year=None, month=None, leadtimes=[1,2,3,4,5], opath=None, domain=None, file_format='grib', level='surface', max_retry=3): 
     """
     downloads a forecast / hindcast from the CDS for a given GCM, year and month 
 
@@ -12,6 +12,8 @@ def download(GCM='ECMWF', varname='t2m', year=None, month=None, leadtimes=[1,2,3
     ----------
     GCM : str, optional
         The name of the GCM [in 'ECMWF','UKMO,'METEO_FRANCE','CMCC, 'DWD', 'NCEP'], by default 'ECMWF'
+    system : int, optional, by default None 
+        The GCM system number, see https://confluence.ecmwf.int/display/CKB/Description+of+the+C3S+seasonal+multi-system
     varname : str, optional
         Variable name in, by default 't2m'
     year : int, optional
@@ -19,12 +21,12 @@ def download(GCM='ECMWF', varname='t2m', year=None, month=None, leadtimes=[1,2,3
     month : int, optional
         The month, by default None
     leadtimes : list, optional
-        The list of lead times in months (0 being the initial time), by default [1,2,3]
-    opath : string or pathlib.Path, optional
-        The path were to save the forecast files (grib), by default None
+        The list of lead times in months (0 being the initial time), by default [1,2,3,4,5] for 1 to 5 months in the future
+     opath : string or pathlib.Path, optional
+        The path were to save the forecast files, by default None
     domain : list, optional
-        The geographical domain. WARNING !: must be [latN, lonW, latS, lonE], by default [20, 120, -50, 180]
-    file_format : string, by default 'grib'
+        The geographical domain. WARNING !: must be [latN, lonW, latS, lonE], by default None = global
+    file_format : string, by default 'grib', but can be 'netcdf' (experimental)
         The file format the file will be downloaded into
     level : str or int, default 'surface'
         The level, either 'surface' (a string) or an int in [950, 500, 200] or appropriate level
@@ -153,6 +155,32 @@ def download(GCM='ECMWF', varname='t2m', year=None, month=None, leadtimes=[1,2,3
         
         else: 
             
+            if system is not None: 
+            
+                dict_retrieve = {
+                            'format':file_format,
+                            'originating_centre':GCM.lower(),
+                            'system': str(system), 
+                            'variable':dvar[varname][1],
+                            'product_type':'monthly_mean',
+                            'year':str(year),
+                            'month':str(month).zfill(2),
+                            'leadtime_month': list(map(str, [x+1 for x in leadtimes])), 
+                            'area': domain
+                            }
+            else: 
+                
+                dict_retrieve = {
+                            'format':file_format,
+                            'originating_centre':GCM.lower(),
+                            'variable':dvar[varname][1],
+                            'product_type':'monthly_mean',
+                            'year':str(year),
+                            'month':str(month).zfill(2),
+                            'leadtime_month': list(map(str, [x+1 for x in leadtimes])), 
+                            'area': domain
+                            }
+                
             count = 0
 
             while not(fname_out.exists()) and count < max_retry:
@@ -165,20 +193,7 @@ def download(GCM='ECMWF', varname='t2m', year=None, month=None, leadtimes=[1,2,3
                     
                     c = cdsapi.Client()
 
-                    data = c.retrieve(
-                    
-                    dvar[varname][0],
-                    {
-                        'format':file_format,
-                        'originating_centre':GCM.lower(),
-                        'variable':dvar[varname][1],
-                        'product_type':'monthly_mean',
-                        'year':str(year),
-                        'month':str(month).zfill(2),
-                        'leadtime_month': list(map(str, [x+1 for x in leadtimes])), 
-                        'area': domain,
-                    },
-                    fname_out)
+                    data = c.retrieve(dvar[varname][0], dict_retrieve, fname_out)
 
                     if fname_out.exists(): 
                     
@@ -208,6 +223,34 @@ def download(GCM='ECMWF', varname='t2m', year=None, month=None, leadtimes=[1,2,3
         
         else: 
             
+            if system is not None: 
+                
+                dict_retrieve = {
+                        'format':file_format,
+                        'originating_centre':GCM.lower(),
+                        'system': str(system),
+                        'variable':dvar[varname][1],
+                        'pressure_level': str(level), 
+                        'product_type':'monthly_mean',
+                        'year':str(year),
+                        'month':str(month).zfill(2),
+                        'leadtime_month': list(map(str, [x+1 for x in leadtimes])), 
+                        'area': domain
+                        }
+            else: 
+                
+                dict_retrieve = {
+                        'format':file_format,
+                        'originating_centre':GCM.lower(),
+                        'variable':dvar[varname][1],
+                        'pressure_level': str(level), 
+                        'product_type':'monthly_mean',
+                        'year':str(year),
+                        'month':str(month).zfill(2),
+                        'leadtime_month': list(map(str, [x+1 for x in leadtimes])), 
+                        'area': domain
+                        }
+                
             count = 0
 
             while not(fname_out.exists()) and count < max_retry: 
@@ -220,21 +263,7 @@ def download(GCM='ECMWF', varname='t2m', year=None, month=None, leadtimes=[1,2,3
 
                     c = cdsapi.Client()
 
-                    data = c.retrieve(
-                    
-                    dvar[varname][0],
-                    {
-                        'format':file_format,
-                        'originating_centre':GCM.lower(),
-                        'variable':dvar[varname][1],
-                        'pressure_level': str(level), 
-                        'product_type':'monthly_mean',
-                        'year':str(year),
-                        'month':str(month).zfill(2),
-                        'leadtime_month': list(map(str, [x+1 for x in leadtimes])), 
-                        'area': domain,
-                    },
-                    fname_out)
+                    data = c.retrieve(dvar[varname][0], dict_retrieve, fname_out)
 
                     if fname_out.exists():
                     
@@ -374,7 +403,7 @@ def preprocess_GCM(dset, domain=[120, 245, -55, 30]):
     
     # selects always the most recent system if present
     
-    if 'system' in dset.dims:
+    if ('system' in dset.dims):
         
         dset = dset.isel(system=-1, drop=True)
         
