@@ -16,7 +16,7 @@ from . import C3S
 from . import geo
 from . import domains 
 
-def get_era5(dpath='/media/nicolasf/END19101/data/', varname='precip', start=1993, end=2016, month_begin=True, chunks=None, interp=True):  
+def get_era5(dpath='/media/nicolasf/END19101/data/REANALYSIS/downloads', varname='precip', start=1993, end=2016, month_begin=True, chunks=None, interp=True):  
 
     if not(type(dpath) == pathlib.PosixPath): 
         dpath = pathlib.Path(dpath)
@@ -30,6 +30,11 @@ def get_era5(dpath='/media/nicolasf/END19101/data/', varname='precip', start=199
     lfiles = [x for x in lfiles if (int(x.name.split('_')[-2]) >= start) and (int(x.name.split('_')[-2]) <= end)]
 
     dset = xr.open_mfdataset(lfiles, parallel=True, concat_dim='time', preprocess=preprocess_era)
+    
+    if varname == 'precip': 
+        
+        dset['precip'] = dset['precip'] * 1000.
+        dset['precip'].attrs['unit'] = 'mm'
     
     if month_begin and np.alltrue(dset['time'].dt.day != 1):
         
@@ -58,8 +63,13 @@ def preprocess_era(dset):
     
     dset = dset.sortby('lat')
     
+    # if the longitude 
+    
+    if dset['lon'][0] < 0: 
+        
+        dset = utils.roll_longitudes(dset)
+    
     return dset
-
 
 def get_mswep(dpath='/media/nicolasf/END19101/data/MSWEP/data/global_monthly_1deg/', start=1993, end=2016, month_begin=True, chunks=None):
     
