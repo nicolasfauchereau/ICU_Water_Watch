@@ -68,7 +68,7 @@ The data is available from the [Copernicus Climate Data Store](https://cds.clima
 
 ### Credits 
 
-The development of this software was made possible by funding from NIWA's "core" (SSIF) funding under projects PRAS2101 and CAVA2101
+The development of this software was made possible by funding from NIWA's "core" (SSIF) funding under projects PRAS2101 and CAVA2101, as well as co-funding from MBIE project C01X1813. 
 
 ### Acknowledgments 
 
