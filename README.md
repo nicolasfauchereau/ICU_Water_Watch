@@ -62,7 +62,7 @@ The data is available from the [Copernicus Climate Data Store](https://cds.clima
     - [verification.py](https://github.com/nicolasfauchereau/ICU_Water_Watch/blob/main/src/verification.py): Functions related to the validation of the C3S individual GCMs and MME
     - [plot.py](https://github.com/nicolasfauchereau/ICU_Water_Watch/blob/main/src/plot.py): Plotting and mapping functions 
 
-- [notebooks](https://github.com/nicolasfauchereau/ICU_Water_Watch/tree/main/notebooks): contains all the notebooks, organized in 3 folders: [`GPM`](https://github.com/nicolasfauchereau/ICU_Water_Watch/tree/main/notebooks/GPM), [`C3S`](https://github.com/nicolasfauchereau/ICU_Water_Watch/tree/main/notebooks/C3S) and [`verification`](), these notebooks illustrate the various processing steps, and also include the code used to calculate the various climatological quantities from the GPM-IMERG and C3S datasets.  
+- [notebooks](https://github.com/nicolasfauchereau/ICU_Water_Watch/tree/main/notebooks): contains all the notebooks, organized in 3 folders: [`GPM`](https://github.com/nicolasfauchereau/ICU_Water_Watch/tree/main/notebooks/GPM), [`C3S`](https://github.com/nicolasfauchereau/ICU_Water_Watch/tree/main/notebooks/C3S) and [`verification`](https://github.com/nicolasfauchereau/ICU_Water_Watch/tree/main/notebooks/verification), these notebooks illustrate the various processing steps, and also include the code used to calculate the various climatological quantities from the GPM-IMERG and C3S datasets.  
 
 - [scripts](https://github.com/nicolasfauchereau/ICU_Water_Watch/tree/main/scripts): contains the python scripts, designed to be run from the command line, with keywords arguments, as part of the operational suite 
 
