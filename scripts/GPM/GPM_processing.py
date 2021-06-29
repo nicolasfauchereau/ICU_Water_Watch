@@ -1,4 +1,4 @@
-#!/home/nicolasf/anaconda3/envs/pangeo/bin/python
+#!/home/nicolasf/mambaforge/envs/ICU/bin/python
 # coding: utf-8
 
 """
@@ -53,7 +53,7 @@ def main(dpath='/home/nicolasf/operational/ICU/ops/data/GPM_IMERG/daily/extended
 
     sys.path.append('../../')
 
-    from src import plot, GPM, geo, utils
+    from ICU_Water_Watch import plot, GPM, geo, utils
 
     # update the dataset 
     
