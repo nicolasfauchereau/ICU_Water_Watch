@@ -497,6 +497,25 @@ def get_GCMs(dpath='/media/nicolasf/END19101/ICU/data/CDS/', GCM='ECMWF', varnam
     return dset_gcm
 
 def read_config(basepath, fname): 
+    """
+    read a YAML configuration file 
+    containing one document, and return a 
+    dictionnay (mapping key --> value)
+
+    see https://pynative.com/python-yaml/
+
+    Parameters
+    ----------
+    basepath : str
+        The basepath 
+    fname : str
+        The filename
+
+    Returns
+    -------
+    dictionnary 
+        The dictionnary with key (parameter) mapping to value
+    """
     
     import pathlib
     import yaml
