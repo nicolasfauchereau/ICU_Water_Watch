@@ -495,3 +495,13 @@ def get_GCMs(dpath='/media/nicolasf/END19101/ICU/data/CDS/', GCM='ECMWF', varnam
         raise ValueError(f"GCM should be either a GCM in {', '.join(GCMs)}, MME for the MME, or a list of GCMs in {', '.join(GCMs)}")
         
     return dset_gcm
+
+def read_config(basepath, fname): 
+    
+    import pathlib
+    import yaml
+    from yaml import BaseLoader as Loader
+    
+    with open(pathlib.Path(basepath).joinpath(fname), 'r') as f:
+        mapping = yaml.load(f, Loader=Loader)
+    return mapping 
