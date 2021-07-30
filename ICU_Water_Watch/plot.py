@@ -1464,3 +1464,67 @@ def map_MME_probabilities(probs_mean, \
     f.set_figheight(8 * (nsteps / 2.3))
     
     return f
+
+def plot_virtual_station(df, station_name=None, lon=None, lat=None): 
+    
+    from matplotlib import pyplot as plt
+    import numpy as np 
+    
+    # some parameters we'll use later 
+    
+    ndays = len(df) 
+    last_day = f"{df.index[-1]:%d %B %Y}"
+    sums = df.sum()
+    
+    # initialise the figure 
+    
+    f = plt.figure(figsize=(12,6))
+
+    # first axes: time-series of past N days daily rainfall, and climatology
+    
+    ax1 = f.add_axes([0.1,0.25,0.7,0.65])
+
+    ax1.plot(df['climatology'].index, df['climatology'], color='g', label="")
+    ax1.plot(df['observed'].index, df['observed'], color='b', label="")
+
+    ax1.fill_between(df['climatology'].index, 0, df['climatology'], color='g', alpha=0.6, label='climatology (GPM/IMERG)')
+    ax1.fill_between(df['observed'].index, 0, df['observed'], color='b', alpha=0.6, label='estimated (GPM/IMERG)')
+
+    [l.set_rotation(90) for l in ax1.xaxis.get_ticklabels()]
+    [l.set_fontsize(12) for l in ax1.xaxis.get_ticklabels()]
+    [l.set_fontsize(12) for l in ax1.yaxis.get_ticklabels()]
+
+    ax1.legend(fontsize=12, loc=2)
+
+    ax1.set_xlim(df.index[0], df.index[-1])
+
+    ax1.set_ylim(0, None)
+
+    ax1.set_ylabel("mm", fontsize=12)
+    
+    ax1.grid(ls=':')
+
+    if station_name is not None: 
+        
+        ax1.set_title(f"Last {ndays} days to {last_day}, GPM-IMERG virtual station for {station_name} [{lon:4.2f}E, {lat:4.2f}S]")
+        
+    else: 
+        
+        ax1.set_title(f"Last {ndays} days to {last_day}, GPM-IMERG virtual station for coordinates [{lon:4.2f}E, {lat:4.2f}S]")
+    
+    
+    # second axes: cumulative rainfall as barplots, with percentage of normal over the past N days
+
+    ax2 = f.add_axes([0.8,0.25,0.14,0.65])
+    ax2.bar(np.arange(0.5,2.5), sums.values, width=0.7, color=['b','g'], alpha=0.6, align='center')
+    ax2.set_xticks([0.5, 1.5])
+    ax2.set_xticklabels(['obs.', 'clim.'], fontsize=12)
+    ax2.yaxis.tick_right()
+    ax2.set_ylabel("mm", fontsize=12)
+    ax2.yaxis.set_label_position("right")
+
+    ax2.set_title(f"{np.divide(*sums.values) * 100:4.1f} % of normal", fontdict={'weight':'bold'})
+
+    [l.set_fontsize(12) for l in ax2.yaxis.get_ticklabels()]
+
+    return f

@@ -658,6 +658,73 @@ def save(dset, opath=None, kind='accum', complevel=4):
     dset.to_netcdf(opath.joinpath(filename), encoding=dset.encoding.update({'zlib':True, 'complevel':complevel}))
     
     print(f"\nsaving {filename} in {str(opath)}")
+  
+
+def get_virtual_station(dset, lat=None, lon=None, varname='precipitationCal'): 
+    """
+    get a time-series from the GPM-IMERG accumulation dataset 
+
+    [extended_summary]
+
+    Parameters
+    ----------
+    dset : xarray.Dataset
+        The input dataset
+    lat : [type], optional
+        [description], by default None
+    lon : [type], optional
+        [description], by default None
+    varname : str, optional
+        [description], by default 'precipitationCal'
+
+    Returns
+    -------
+    [type]
+        [description]
+    """
     
+    # this to ignore the runtime warning when converting the CFTimeindex to a datetime index 
+    import warnings
+    warnings.filterwarnings("ignore")
+    
+    sub = dset.sel(lat=lat, lon=lon, method='nearest')
+    
+    index = sub.time.to_index().to_datetimeindex()
+    
+    extracted_lat = float(sub.lat.data)
+    extracted_lon = float(sub.lon.data)
+    
+    dist = utils.haversine((lon, lat), (extracted_lon, extracted_lat))
+    
+    sub = sub[varname].load()
+    
+    sub = sub.to_dataframe()[[varname]]
+    
+    sub.index = index
+    
+    sub = sub.rename({varname:'observed'}, axis=1)
+    
+    return sub, (extracted_lon, extracted_lat), dist
+
+def get_virtual_station_climatology(dpath=None, fname="daily_climatology_5days_rm_2001_2020.nc", lat=None, lon=None, varname='precipitationCal'): 
+    
+    import pathlib
+    import xarray as xr
+    
+    if not isinstance(dpath, pathlib.PosixPath): 
+        
+        dpath = pathlib.Path(dpath)
+        
+    clim = xr.open_dataset(dpath.joinpath(fname))
+    
+    clim = clim.sel(lon=lon, lat=lat, method='nearest')
+    
+    return clim[varname]
+
+def join_clim(df, clim): 
+    
+    df['climatology'] = clim.sel(dayofyear = df.index.day_of_year).data
+    
+    return df 
     
     
