@@ -416,3 +416,112 @@ def gpd_from_domain(lonmin=None, lonmax=None, latmin=None, latmax=None, crs='432
     shape_gpd = shape_gpd.set_crs(f'EPSG:{crs}')
     
     return shape_gpd
+
+def filter_by_area(shape, min_area = 1e9):
+    """
+    filter a geopandas dataframe (assumed to be in lat / lon) containing
+    a MultiPolygon geometry by retaining only Polygons with area >= min_area
+
+    Parameters
+    ----------
+    shape : geopandas.GeoDataFrame
+        The geopandas dataframe
+    min_area : float, optional
+        The minimum area in m**2, by default 1e9
+
+    Returns
+    -------
+    geopandas.GeoDataFrame
+        The filtered geopandas dataframe
+    """
+    
+    import geopandas as gpd
+    from shapely.geometry.multipolygon import MultiPolygon
+    
+    shape_m = shape.to_crs('EPSG:3395')
+    
+    Polygons = list(shape_m.geometry.values[0])
+    
+    Filtered_Polygons = [x for x in Polygons if x > min_area]
+    
+    Filtered_Polygons = MultiPolygon(Filtered_Polygons)
+    
+    new_shape = gpd.geodataframe.GeoDataFrame({'geometry':[Filtered_Polygons]}, crs="EPSG:3395")
+    
+    new_shape = new_shape.to_crs(crs="+proj=longlat +ellps=WGS84 +pm=-180 +datum=WGS84 +no_defs")
+    
+    new_shape = shift_geom(-180., new_shape)
+    
+    new_shape = gpd.geodataframe.GeoDataFrame({'geometry':[MultiPolygon(list(new_shape.geometry.values))]}, crs="EPSG:4326")
+    
+    return new_shape
+
+def mask_dataset(dset, shape, varname='precip', lat_name='lat', lon_name='lon', domain_buffer=1, coastline_buffer=15, interp_factor=5): 
+    
+    import numpy as np 
+    import regionmask 
+    from dask.diagnostics import ProgressBar
+    
+    # get the bounds (lat and lon) from the shape (Polygon or Multipolygon)
+    
+    bounds = shape.bounds.values.flatten()
+    
+    # apply domain_buffer (in degrees)
+
+    domain = [bounds[0] - domain_buffer, bounds[2] + domain_buffer, bounds[1] - domain_buffer, bounds[3] + domain_buffer]
+
+    # extract a rectangular domain from the dataset
+    
+    dset = dset.sel(lat=slice(*domain[2:]), lon=slice(*domain[:2]))
+        
+    # apply coastline buffer (expressed in km)
+        
+    shape_buffer = shape.to_crs('EPSG:3395')
+
+    shape_buffer = shape_buffer.buffer(coastline_buffer*1e3)
+
+    shape_buffer = shape_buffer.to_crs('EPSG:4326')
+
+    shape_buffer = shape_buffer.to_frame(name='geometry')
+
+    shape_buffer = shape_buffer.to_crs(crs="+proj=longlat +ellps=WGS84 +pm=-180 +datum=WGS84 +no_defs")
+
+    # make sure we shift the geometries
+    
+    shape_buffer = shift_geom(-180., shape_buffer)
+    
+    # interpolate the dataset 
+    
+    dset = utils.interp(dset, interp_factor=5)
+    
+    # now get the interpolated lats and lons 
+    
+    lat, lon = dset[lat_name].data, dset[lon_name].data
+    
+    # create the mask 
+    
+    mask = regionmask.mask_geopandas(shape_buffer, lon, lat)
+    
+    mask = mask.where(np.isnan(mask), 1)
+    
+    # insert the mask in the interpolated dataset 
+    
+    dset['mask'] = mask
+    
+    # count the number of valid grid cells and add that to the mask attributes
+    
+    dset['mask'].attrs['cells'] = int(dset['mask'].stack(z=('lat','lon')).sum('z'))
+    
+    # apply the mask 
+    
+    dset[varname] = dset[varname] * dset['mask']
+    
+    # compute 
+    
+    with ProgressBar(): 
+        
+        dset = dset.compute()
+    
+    # return the masked dataset 
+    
+    return dset, domain
