@@ -1347,7 +1347,13 @@ def map_MME_probabilities(probs_mean, \
     from matplotlib import pyplot as plt
     import palettable
 
-    # checks 
+    # munging on the month abbreviations to account for periods straddling 2 years 
+    
+    month_abbr = list(month_abbr)
+    
+    month_abbr = month_abbr + month_abbr[1:]
+
+    # some checks 
     
     if (not(pct_dim in ['tercile','decile','percentile'])) or (not(pct_dim in probs_mean.dims)): 
         
@@ -1443,7 +1449,7 @@ def map_MME_probabilities(probs_mean, \
             
             fc = p.plot.contour(ax=ax, x='lon',y='lat',levels=[ct], colors=contours_colors[i], linewidths=0.7, transform=ccrs.PlateCarree())
         
-        ax.set_title(f'prob. {varname} {dops[comp]} {pct}th perc., {month_abbr[month + step]} {year}\n [ECMWF, Meteo-France, UKMO, DWD, CMCC, NCEP, JMA, ECCC]', fontsize=11)        
+        # ax.set_title(f'prob. {varname} {dops[comp]} {pct}th perc., {month_abbr[month + step]} {year}\n [ECMWF, Meteo-France, UKMO, DWD, CMCC, NCEP, JMA, ECCC]', fontsize=11)        
         
         if step != nsteps: ax.set_xlabel('')
             
@@ -1458,6 +1464,8 @@ def map_MME_probabilities(probs_mean, \
         if domain is not None: 
         
             ax.set_extent(domain, crs=ccrs.PlateCarree())
+            
+        ax.set_title(f'prob. {varname} {dops[comp]} {pct}th perc., {month_abbr[month + step]} {year}\n [ECMWF, Meteo-France, UKMO, DWD, CMCC, NCEP, JMA, ECCC]', fontsize=11)        
     
     f.set_figwidth(8)
     
@@ -1506,11 +1514,11 @@ def plot_virtual_station(df, station_name=None, lon=None, lat=None):
 
     if station_name is not None: 
         
-        ax1.set_title(f"Last {ndays} days to {last_day}, GPM-IMERG virtual station for {station_name} [{lon:4.2f}E, {lat:4.2f}S]")
+        ax1.set_title(f"Last {ndays} days to {last_day}, GPM-IMERG virtual station for {station_name} [{lon:5.3f}E, {lat:5.3f}S]")
         
     else: 
         
-        ax1.set_title(f"Last {ndays} days to {last_day}, GPM-IMERG virtual station for coordinates [{lon:4.2f}E, {lat:4.2f}S]")
+        ax1.set_title(f"Last {ndays} days to {last_day}, GPM-IMERG virtual station for coordinates [{lon:5.3f}E, {lat:5.3f}S]")
     
     
     # second axes: cumulative rainfall as barplots, with percentage of normal over the past N days
