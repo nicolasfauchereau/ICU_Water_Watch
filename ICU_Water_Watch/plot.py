@@ -1298,6 +1298,12 @@ def plot_heatmap(mat, year = 2021, start_month=3, n_steps=5, cumsum=False, title
     import seaborn as sns
     from calendar import month_abbr
     
+    # munging on month_abbr to account for period straddling 2 calendar years 
+    
+    month_abbr = list(month_abbr)
+    
+    month_abbr = month_abbr + month_abbr[1:]
+    
     xtick_labels = month_abbr[start_month: start_month + n_steps]
     
     if cumsum: 
@@ -1448,9 +1454,7 @@ def map_MME_probabilities(probs_mean, \
         for i, ct in enumerate(contours): 
             
             fc = p.plot.contour(ax=ax, x='lon',y='lat',levels=[ct], colors=contours_colors[i], linewidths=0.7, transform=ccrs.PlateCarree())
-        
-        # ax.set_title(f'prob. {varname} {dops[comp]} {pct}th perc., {month_abbr[month + step]} {year}\n [ECMWF, Meteo-France, UKMO, DWD, CMCC, NCEP, JMA, ECCC]', fontsize=11)        
-        
+                
         if step != nsteps: ax.set_xlabel('')
             
         if step != nsteps: ax.set_xticks([])
