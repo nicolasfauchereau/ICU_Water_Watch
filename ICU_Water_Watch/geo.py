@@ -442,7 +442,7 @@ def filter_by_area(shape, min_area = 1e9):
     
     Polygons = list(shape_m.geometry.values[0])
     
-    Filtered_Polygons = [x for x in Polygons if x > min_area]
+    Filtered_Polygons = [x for x in Polygons if x.area > min_area]
     
     Filtered_Polygons = MultiPolygon(Filtered_Polygons)
     
@@ -525,3 +525,20 @@ def mask_dataset(dset, shape, varname='precip', lat_name='lat', lon_name='lon', 
     # return the masked dataset 
     
     return dset, domain
+
+def get_shape_bounds(shape):
+    
+    """
+    get the domain (lonmin, lonmax, latmin, latmax)
+    from the bounds of a shape (geopandas dataframe)
+    containing a column named "geometry"
+
+    Returns
+    -------
+    list
+        list with [lonmin, lonmax, latmin, latmax]
+    """
+    
+    domain = [float(shape.geometry.bounds.minx), float(shape.geometry.bounds.maxx), float(shape.geometry.bounds.miny), float(shape.geometry.bounds.maxy)]
+    
+    return domain 
