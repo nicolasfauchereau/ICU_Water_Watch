@@ -427,7 +427,7 @@ def filter_by_area(shape, min_area = 1e9):
     shape : geopandas.GeoDataFrame
         The geopandas dataframe
     min_area : float, optional
-        The minimum area in m**2, by default 1e9
+        The minimum area in square kilometers, by default 1000
 
     Returns
     -------
@@ -438,15 +438,17 @@ def filter_by_area(shape, min_area = 1e9):
     import geopandas as gpd
     from shapely.geometry.multipolygon import MultiPolygon
     
-    shape_m = shape.to_crs('EPSG:3395')
+    # project to pseudo mercator to be able to get area in square km
+    
+    shape_m = shape.to_crs('EPSG:3857')
     
     Polygons = list(shape_m.geometry.values[0])
     
-    Filtered_Polygons = [x for x in Polygons if x.area > min_area]
+    Filtered_Polygons = [x for x in Polygons if (x.area / 10**6) > min_area]
     
     Filtered_Polygons = MultiPolygon(Filtered_Polygons)
     
-    new_shape = gpd.geodataframe.GeoDataFrame({'geometry':[Filtered_Polygons]}, crs="EPSG:3395")
+    new_shape = gpd.geodataframe.GeoDataFrame({'geometry':[Filtered_Polygons]}, crs="EPSG:3857")
     
     new_shape = new_shape.to_crs(crs="+proj=longlat +ellps=WGS84 +pm=-180 +datum=WGS84 +no_defs")
     
@@ -476,7 +478,7 @@ def mask_dataset(dset, shape, varname='precip', lat_name='lat', lon_name='lon', 
         
     # apply coastline buffer (expressed in km)
         
-    shape_buffer = shape.to_crs('EPSG:3395')
+    shape_buffer = shape.to_crs('EPSG:3857')
 
     shape_buffer = shape_buffer.buffer(coastline_buffer*1e3)
 

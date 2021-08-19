@@ -220,7 +220,9 @@ def sanitize_name(name):
     name = name.replace('/','')
     name = name.replace('  ','_')
     name = name.replace('&','')
-    name=name.replace(' ','_').replace(':','_')
+    name= name.replace(' ','_')
+    name = name.replace(':','_')
+    name = name.replace('__','_')
     return name
 
 def detrend_dim(da, dim, deg=1, add_average=True):
