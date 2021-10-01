@@ -526,3 +526,20 @@ def read_config(basepath, fname):
     with open(pathlib.Path(basepath).joinpath(fname), 'r') as f:
         mapping = yaml.load(f, Loader=Loader)
     return mapping 
+
+def round_to_100_percent(number_set, digit_after_decimal=2):
+    """
+    This function take a list of number and return a list of percentage, which represents the portion of each number in sum of all numbers
+    Moreover, those percentages are adding up to 100%!!!
+    Notice: the algorithm we are using here is 'Largest Remainder'
+    The down-side is that the results won't be accurate, but they are never accurate anyway:)
+    """
+    unround_numbers = [x / float(sum(number_set)) * 100 * 10 ** digit_after_decimal for x in number_set]
+    decimal_part_with_index = sorted([(index, unround_numbers[index] % 1) for index in range(len(unround_numbers))], key=lambda y: y[1], reverse=True)
+    remainder = 100 * 10 ** digit_after_decimal - sum([int(x) for x in unround_numbers])
+    index = 0
+    while remainder > 0:
+        unround_numbers[decimal_part_with_index[index][0]] += 1
+        remainder -= 1
+        index = (index + 1) % len(number_set)
+    return [int(x) / float(10 ** digit_after_decimal) for x in unround_numbers]

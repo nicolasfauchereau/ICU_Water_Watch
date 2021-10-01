@@ -807,6 +807,57 @@ def calc_percentiles(dset, percentiles=None, dims=['member','time']):
     
     return dset.quantile(percentiles, dim=dims) 
 
+
+def calc_parametrized_quantiles(dset, distribution='gamma', method='PWM', quantiles=[0.3333, 0.6666], varname='precip'): 
+    """
+    calculate parametrized quantiles from an xarray dataarray, which MUST be 
+    varying along a `time` dimension that contains all the instances (observations)
+    used to fit the data to the distribution, so for example, if one is calculating 
+    the quantiles over the dimensions `time` AND `member` from an ensemble, this needs to happen: 
+    
+    >> dset_c = dset.copy()
+    >> dset_c dset.stack(z=('time','member'))
+    >> dset_c = dset_c.dropna('z')
+    >> dset['time'] = dset.z.time
+    >> dset_c = dset_c.rename({"z":"time"})
+    
+    and (for example): 
+    
+    >> clim_p = dset_c['precip'].groupby(dset_c.time.dt.month).apply(calc_parametrized_quantiles)
+
+    Parameters
+    ----------
+    dset : xarray.Dataset
+        Xarray dataset with one `time` dimension holding all the instances (see above)
+    distribution : str, optional
+        The distribution to fit the data to, by default 'gamma'
+    method : str, optional
+        The fitting method, can be either 'ML' (Maximum Likelihood), 
+        or 'PWM' (Probability Weighted Moments), by default 'PWM'
+    quantiles : list, optional
+        The list of quantiles to derive, by default [0.3333, 0.6666] for terciles 
+    varname : str, optional
+        The variable name to extract in the xarray Dataset, by default 'precip'
+
+    Returns
+    -------
+    xarray.Dataset
+        An xarray.Dataset with a dimension "
+    """
+    
+    from dask.diagnostics import ProgressBar
+    from xclim.indices.stats import fit, parametric_quantile
+        
+    params = fit(dset, dist=distribution, method=method)
+    
+    q_xclim = parametric_quantile(params, quantiles)
+    
+    with ProgressBar(): 
+        
+        q_xclim = q_xclim.compute()
+    
+    return q_xclim.to_dataset(name=varname)
+
 def CDS_variables(): 
     
     """

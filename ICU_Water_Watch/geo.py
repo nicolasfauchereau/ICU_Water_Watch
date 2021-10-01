@@ -353,7 +353,7 @@ def make_point_buffer_gdf(lon, lat, radius=2000, radius_unit='km'):
     point_gdf = point_gdf.set_crs('EPSG:4326') 
     
     if radius_unit in ['km','m']: 
-        point_gdf = point_gdf.to_crs('EPSG:3395') 
+        point_gdf = point_gdf.to_crs('EPSG:3857') 
         if radius_unit == 'km': 
             # if in km, we multiply by 1000.
             radius *= 1e3 
@@ -417,7 +417,7 @@ def gpd_from_domain(lonmin=None, lonmax=None, latmin=None, latmax=None, crs='432
     
     return shape_gpd
 
-def filter_by_area(shape, min_area = 1e9):
+def filter_by_area(shape, min_area = 1000):
     """
     filter a geopandas dataframe (assumed to be in lat / lon) containing
     a MultiPolygon geometry by retaining only Polygons with area >= min_area
@@ -444,7 +444,7 @@ def filter_by_area(shape, min_area = 1e9):
     
     Polygons = list(shape_m.geometry.values[0])
     
-    Filtered_Polygons = [x for x in Polygons if (x.area / 10**6) > min_area]
+    Filtered_Polygons = [x for x in Polygons if (x.area / 10**6) >= min_area]
     
     Filtered_Polygons = MultiPolygon(Filtered_Polygons)
     

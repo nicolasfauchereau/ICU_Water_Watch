@@ -187,22 +187,7 @@ def make_gridlines(ax, lon_step=5, lat_step=5, left_labels=True, bottom_labels=T
     >> fg = dset['varname'].plot.pcolormesh(x='lon',y='lat',col='step')
     >> [make_gridlines(x, lon_step=20, lat_step=10) for x in fg.axes[0]]
     
-    """
-    
-    gl = ax.gridlines(draw_labels=True, linestyle=':', \
-        xlocs=np.arange(-180, 180 + lon_step, lon_step), \
-            ylocs=np.arange(-90, 90 + lat_step, lat_step), \
-                crs=ccrs.PlateCarree())
-    
-    gl.top_labels = False
-    gl.right_labels = False
-    
-    if not left_labels: 
-        gl.left_labels = False
-        
-    if not bottom_labels: 
-        gl.bottom_labels = False
-    
+    """   
 
 def cmap_discretize(cmap, N):
     """
@@ -348,18 +333,21 @@ def map_precip_accum(dset, varname='precipitationCal', mask=None, geoms=None, cm
         
     # min, max and steps are defined in a dictionnary, with keys being the number of days
     
-    vmax = dict_max[last_day.month][ndays]['vmax']
-    step = dict_max[last_day.month][ndays]['step']
+    # vmax = dict_max[last_day.month][ndays]['vmax']
+    # step = dict_max[last_day.month][ndays]['step']
     
-    levels = np.arange(0,vmax + step,step)
+    # levels = np.arange(0,vmax + step,step)
         
-    if cmap is None and palettable: 
+    # if cmap is None and palettable: 
         
-        cmap = palettable.scientific.sequential.Davos_20_r.mpl_colormap
+    #     cmap = palettable.scientific.sequential.Davos_20_r.mpl_colormap
     
-    else: 
+    # else: 
         
-        cmap = plt.cm.viridis
+    #     cmap = plt.cm.viridis
+        
+    levels = [50, 100, 250, 500, 750, 1000]
+    
         
     cbar_kwargs={'shrink':0.7, 'pad':0.01, 'label':'mm', 'ticks':levels}
     
