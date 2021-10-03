@@ -28,7 +28,7 @@ The aim of these modules, scripts and notebooks is to combine realtime rainfall 
 
 **1) The GPM-IMERG satellite rainfall estimates**
 
-The past 30, 60, 90, 180 and 360 days rainfall accumulations, anomalies and percentile of scores are derived from the daily, [GPM-IMERG](https://gpm.nasa.gov/data/imerg) mission. The daily, near realtime (2 days lag) data is downloaded from https://gpm1.gesdisc.eosdis.nasa.gov/data/GPM_L3/GPM_3IMERGDL.06 
+The past 30, 60, 90, 180 and 360 days rainfall accumulations, anomalies, percentile of scores and Standardized Precipitation Index (SPI) are derived from the daily, [GPM-IMERG](https://gpm.nasa.gov/data/imerg) mission. The daily, near realtime (2 days lag) data is downloaded from https://gpm1.gesdisc.eosdis.nasa.gov/data/GPM_L3/GPM_3IMERGDL.06 
 
 The climatologies have been pre-computed from all the available data over the **2001 - 2020 period**. 
 
@@ -76,7 +76,7 @@ Thanks as well for support, feedbacks and advice from Doug Ramsay, Dr. Andrew Lo
 
 ### References 
 
- - Fauchereau N., Ramsay D., Lorrey A.M., Noll B.E (in preparation): Open data and open source software for the development of a multi-model ensemble monthly and seasonal forecast system for the Pacific region. To be submitted to *JOSS*, and preprint on *ESSOar*.  
+ - Fauchereau N., Ramsay D., Lorrey A.M., Noll B.E (in preparation): Open data and open source software for the development of a multi-model ensemble monthly and seasonal forecast system for the Pacific region. To be submitted to *Climate Services*, and preprint on *ESSOar*.  
 
  - Fauchereau N., Lorrey A.M, Noll B.E. (in preparation): On the predictability of New Zealand’s seasonal climate from General Circulation Models forecasts and observational indices. To be submitted to *Weather and Climate*.  
 
