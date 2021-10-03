@@ -808,7 +808,7 @@ def calc_percentiles(dset, percentiles=None, dims=['member','time']):
     return dset.quantile(percentiles, dim=dims) 
 
 
-def calc_parametrized_quantiles(dset, distribution='gamma', method='PWM', quantiles=[0.3333, 0.6666], varname='precip'): 
+def calc_parametrized_quantiles(dset, distribution='gamma', method='PWM', quantiles=[0.3333, 0.6666], varname='precip', dims=('time','member')): 
     """
     calculate parametrized quantiles from an xarray dataarray, which MUST be 
     varying along a `time` dimension that contains all the instances (observations)
@@ -847,6 +847,15 @@ def calc_parametrized_quantiles(dset, distribution='gamma', method='PWM', quanti
     
     from dask.diagnostics import ProgressBar
     from xclim.indices.stats import fit, parametric_quantile
+    
+    # first step, we need to go stack the dimensions if needed and set the time dimension 
+    
+    if (type(dims) == tuple) and ('time' in dims):
+        
+        dset = dset.stack(z=dims)
+        dset = dset.dropna('z')
+        dset['z'] = dset['z']['time']
+        dset = dset.rename({"z":"time"})
         
     params = fit(dset, dist=distribution, method=method)
     
