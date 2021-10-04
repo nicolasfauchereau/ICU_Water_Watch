@@ -299,11 +299,11 @@ def map_decile(dset, varname='pctscore', mask=None, cmap=None, geoms=None, tickl
     
     # ax.set_title(title, fontsize=13, color='k')
     
-    title = f"Percentile value for the last {ndays} days\n to {last_day:%d %B %Y} [UTC]"
+    title = f"Percentile value for the last {ndays} days"
     
     ax.set_title("") # to get rid of the default title
     
-    ax.text(0.99, 0.94, title, fontsize=13, fontdict={'color':'green'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
+    ax.text(0.99, 0.94, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
     
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
@@ -330,38 +330,42 @@ def map_precip_accum(dset, varname='precipitationCal', mask=None, geoms=None, cm
     if (mask is not None) and (mask in dset.data_vars): 
         
         dataarray = dataarray * dset[mask] 
-        
-    # min, max and steps are defined in a dictionnary, with keys being the number of days
+            
+    thresholds = [-100, 50, 100, 250, 500, 750, 1000, 1500]
     
-    # vmax = dict_max[last_day.month][ndays]['vmax']
-    # step = dict_max[last_day.month][ndays]['step']
+    hexes = ['#01665e', '#01665e', '#5ab4ac', '#c7eae5', '#FFFFFF', '#f6e8c3', '#d8b365', '#8c510a']
     
-    # levels = np.arange(0,vmax + step,step)
-        
-    # if cmap is None and palettable: 
-        
-    #     cmap = palettable.scientific.sequential.Davos_20_r.mpl_colormap
+    hexes.reverse()
     
-    # else: 
-        
-    #     cmap = plt.cm.viridis
-        
-    levels = [50, 100, 250, 500, 750, 1000]
+    cbar_ticklabels = ['>1000 mm', '750 – 1000', '500 – 750',  '250 – 500',  '100 – 250',  '50 – 100', '< 50 mm']
     
-        
-    cbar_kwargs={'shrink':0.7, 'pad':0.01, 'label':'mm', 'ticks':levels}
+    cbar_ticklabels.reverse()
+    
+    ticks_marks = np.diff(np.array(thresholds)) / 2.
+
+    ticks = [thresholds[i] + ticks_marks[i] for i in range(len(thresholds) - 1)]
+
+    # arguments for the colorbar 
+
+    cbar_kwargs={'shrink':0.5, 'pad':0.01, 'extend':'neither', 'drawedges':True, 'ticks':ticks, 'aspect':15}
+
+    cmap = matplotlib.colors.ListedColormap(hexes, name='accumulations')
     
     # plot starts here ---------------------------------------------------------------------------------
     
     f, ax = plt.subplots(figsize=(13, 8), subplot_kw={'projection':ccrs.PlateCarree(central_longitude=180)})
 
-    im = dataarray.plot.contourf(ax=ax, levels=levels, transform=ccrs.PlateCarree(), add_colorbar=False, cmap=cmap)
+    im = dataarray.plot.contourf(ax=ax, levels=thresholds, transform=ccrs.PlateCarree(), add_colorbar=False, cmap=cmap)
 
-    cbar_ax = ax.axes.inset_axes([0.91, 0.275, 0.025, 0.6])
+    cbar_ax = ax.axes.inset_axes([0.85, 0.4875, 0.025, 0.42])
 
     cb = plt.colorbar(im, cax=cbar_ax, **cbar_kwargs)
     
     cb.ax.minorticks_off()
+    
+    # plots the ticklabels 
+    
+    cbar_ax.set_yticklabels(cbar_ticklabels)
     
     ax.coastlines(resolution='10m')
     
@@ -375,9 +379,9 @@ def map_precip_accum(dset, varname='precipitationCal', mask=None, geoms=None, cm
 
     ax.set_title('')
     
-    title = f"Last {ndays} days cumulative rainfall (mm)\n(to {last_day:%d %B %Y} [UTC])"
+    title = f"Last {ndays} days\ncumulative rainfall (mm)"
     
-    ax.text(0.99, 0.94, title, fontsize=13, fontdict={'color':'green'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
+    ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
 
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
@@ -445,9 +449,9 @@ def map_precip_anoms(dset, varname='anoms', mask=None, cmap=None, geoms=None, fp
         
     ax.set_title("") # to get rid of default title
 
-    title = f"Last {ndays} days cumulative rainfall anomalies (mm)\nto {last_day:%d %B %Y} [UTC]" 
+    title = f"Last {ndays} days cumulative rainfall anomalies (mm)" 
 
-    ax.text(0.99, 0.94, title, fontsize=13, fontdict={'color':'green'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
+    ax.text(0.99, 0.94, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
     
     ax.set_extent(domain, crs = ccrs.PlateCarree())
 
@@ -475,29 +479,49 @@ def map_dry_days_Pacific(dset, varname='dry_days', mask=None, cmap=None, geoms=N
         
         dataarray = dataarray * dset[mask]
         
-    # defines the levels 
+    # defines the levels if the number of days is 90 
     
-    if ndays in [30, 60]: 
+    if ndays == 90: 
         
-        levels = np.arange(0, ndays + 5, 5)
+        levels = [0, 25, 40, 50, 60, 70, 80, 90]
+        
+        hexes = ['#01665e', '#5ab4ac', '#c7eae5', '#FFFFFF', '#f6e8c3', '#d8b365', '#8c510a']
+        
+        cbar_ticklabels = ['< 25 days', '25 -40', '40 - 50', '50 - 60', '60 - 70', '70 - 80', '> 80 days']
+        
+        ticks_marks = np.diff(np.array(levels)) / 2.
+
+        ticks = [levels[i] + ticks_marks[i] for i in range(len(levels) - 1)]
+
+        # arguments for the colorbar 
+
+        cbar_kwargs={'shrink':0.5, 'pad':0.01, 'extend':'neither', 'drawedges':True, 'ticks':ticks, 'aspect':15}
+
+        cmap = matplotlib.colors.ListedColormap(hexes, name='accumulations')
         
     else: 
+    
+        if ndays in [30, 60]: 
         
-        levels = levels = np.arange(0, ndays + 10, 10)
-            
-    # colorbar keyword arguments 
+            levels = np.arange(0, ndays + 5, 5)
+        
+        else:  
+        
+            levels = np.arange(0, ndays + 10, 10)
+        
+        # colorbar keyword arguments 
     
-    cbar_kwargs = {'shrink':0.7, 'pad':0.01, 'extend':'max', 'drawedges':True, 'label':'days', 'ticks':levels}
+        cbar_kwargs = {'shrink':0.7, 'pad':0.01, 'extend':'max', 'drawedges':True, 'label':'days', 'ticks':levels}
     
-    # colormap 
+        # colormap 
 
-    if cmap is None and palettable: 
+        if cmap is None and palettable: 
+            
+            cmap = palettable.colorbrewer.diverging.BrBG_11_r.mpl_colormap
         
-        cmap = palettable.colorbrewer.sequential.Oranges_9.mpl_colormap
-    
-    else:
-         
-        cmap = cm.Oranges
+        else:
+            
+            cmap = cm.Oranges
     
     # plot starts here --------------------------------------------------------------------------------- 
     
@@ -505,7 +529,9 @@ def map_dry_days_Pacific(dset, varname='dry_days', mask=None, cmap=None, geoms=N
 
     im = dataarray.plot.contourf(ax=ax, levels=levels, transform=ccrs.PlateCarree(), add_colorbar=False, cmap=cmap)
     
-    cbar_ax = ax.axes.inset_axes([0.9, 0.3, 0.025, 0.55])
+    # cbar_ax = ax.axes.inset_axes([0.88, 0.35, 0.025, 0.55])
+    
+    cbar_ax = ax.axes.inset_axes([0.85, 0.4875, 0.025, 0.42])
     
     cb = plt.colorbar(im, cax=cbar_ax, **cbar_kwargs)
     
@@ -514,6 +540,10 @@ def map_dry_days_Pacific(dset, varname='dry_days', mask=None, cmap=None, geoms=N
     if geoms is not None: 
         
         add_geom(ax=ax, geoms=geoms)
+        
+    if ndays == 90: 
+        
+        cbar_ax.set_yticklabels(cbar_ticklabels)
     
     ax.coastlines(resolution='50m')
     
@@ -523,9 +553,9 @@ def map_dry_days_Pacific(dset, varname='dry_days', mask=None, cmap=None, geoms=N
 
     ax.set_title('', fontsize=13, color='k') # get rid of default title
 
-    title = f"Number of dry days over the last {ndays} days\n(to {last_day:%d %B %Y} [UTC])"
+    title = f"Number of dry days\nover the last {ndays} days"
     
-    ax.text(0.99, 0.94, title, fontsize=13, fontdict={'color':'green'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
+    ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
 
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
@@ -762,7 +792,8 @@ def map_EAR_Watch_Pacific(dset, varname='pctscore', mask=None, geoms=None, fpath
 
     thresholds = [0, 5, 10, 25, 90.01, 100]
 
-    rgbs = ['#8a0606', '#fc0b03','#fcf003','#ffffff', '#0335ff']
+    # rgbs = ['#8a0606', '#fc0b03','#fcf003','#ffffff', '#0335ff']
+    rgbs = ['#F04E37', '#F99D1C','#FFDE40','#FFFFFF', '#33BBED']
     
     ticks_marks = np.diff(np.array(thresholds)) / 2.
     
@@ -808,13 +839,13 @@ def map_EAR_Watch_Pacific(dset, varname='pctscore', mask=None, geoms=None, fpath
         
         make_gridlines(ax=ax, lon_step=20, lat_step=10)
 
-    title = f"GPM-IMERG, \"EAR\" Watch alert levels\n{ndays} days to {last_day:%d %B %Y} [UTC]"
+    title = f"GPM-IMERG, \"EAR\" Watch alert levels"
 
     # ax.set_title(title, fontsize=13, color='k')
     
     ax.set_title("") # to get rid of the default title
     
-    ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'green'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
+    ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
 
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
@@ -891,13 +922,13 @@ def map_USDM_Pacific(dset, mask=None, geoms=None, fpath=None, close=True, gridli
         
         make_gridlines(ax=ax, lon_step=20, lat_step=10)
 
-    title = f"\"US Drought Monitor\" (see https://droughtmonitor.unl.edu/)\n{ndays} days to {last_day:%d %B %Y} [UTC]"
+    title = f"\"US Drought Monitor\" (see https://droughtmonitor.unl.edu/)"
 
     # ax.set_title(title, fontsize=13, color='k')
     
     ax.set_title("") # to get rid of the default title
     
-    ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'green'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
+    ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
 
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
@@ -1429,6 +1460,8 @@ def map_MME_probabilities(probs_mean, \
     for i, step in enumerate(steps[:nsteps]): 
         
         ax = axes[i]
+        
+        ax.set_extent(domain, crs=ccrs.PlateCarree())
         
         p = ptot.sel({'step':step})[varname].squeeze()
         
