@@ -15,6 +15,7 @@ import matplotlib.cm as cm
 import matplotlib.colors as mcolors
 
 import palettable
+from rasterio.dtypes import validate_dtype
 from xarray.core.duck_array_ops import pd_timedelta_to_float
 
 # import local utils and geo module, for interpolation and masking
@@ -1367,8 +1368,6 @@ def map_MME_forecast(probs_mean, \
                           pct_dim='percentile', \
                           pct=None, \
                           comp='below', \
-                          contours=[50, 70], \
-                          contours_colors=['r','#a3231a'], \
                           interp=True, \
                           mask=None, \
                           geoms=None, \
@@ -1378,6 +1377,7 @@ def map_MME_forecast(probs_mean, \
                           gridlines=False): 
 
     import numpy as np 
+    from dateutil.relativedelta import relativedelta
     from calendar import month_abbr
     import matplotlib
     from matplotlib import pyplot as plt
@@ -1388,7 +1388,6 @@ def map_MME_forecast(probs_mean, \
     
     month_abbr = month_abbr + month_abbr[1:]
 
-
     # some checks 
     
     if (not(pct_dim in ['tercile','decile','percentile'])) or (not(pct_dim in probs_mean.dims)): 
@@ -1396,6 +1395,10 @@ def map_MME_forecast(probs_mean, \
         raise ValueError(f"{pct_dim} not valid, should be in ['tercile','decile','percentile'] and be a dimension in probs_mean") 
         
     # get month and year of the forecast (initial month)
+    
+    # valid time
+    
+    valid_time = probs_mean.time.to_index()[0] + relativedelta(months=step)
     
     month = probs_mean.time.to_index().month[0]
     year = probs_mean.time.to_index().year[0]
@@ -1458,9 +1461,9 @@ def map_MME_forecast(probs_mean, \
     
     f, ax = plt.subplots(figsize=(14,8), subplot_kw={"projection": ccrs.PlateCarree(central_longitude=180)})
 
-    for i, ct in enumerate(contours): 
+    # for i, ct in enumerate(contours): 
 
-        fc = ptot.plot.contour(ax=ax, x='lon',y='lat', levels=[ct], colors=contours_colors[i], linewidths=0.7, transform=ccrs.PlateCarree())
+    #     fc = ptot.plot.contour(ax=ax, x='lon',y='lat', levels=[ct], colors=contours_colors[i], linewidths=0.7, transform=ccrs.PlateCarree())
 
     ff = ptot.plot.contourf(ax=ax, x='lon',y='lat', levels=thresholds, transform=ccrs.PlateCarree(), cmap=cmap, add_colorbar=False)
 
@@ -1486,9 +1489,11 @@ def map_MME_forecast(probs_mean, \
     
     ax.set_title("")
 
-    title = f"C3S MME, probability for rainfall {dops[comp]} {pct} percentile"
+    title = f"C3S MME, probability for rainfall {dops[comp]} {pct}th percentile"
 
     ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
+
+    ax.text(0.99, 0.02, f"valid {valid_time:%Y-%m}", fontsize=10, fontdict={'color':'0.4'}, horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
 
     if domain is not None: 
     
@@ -1502,19 +1507,11 @@ def map_MME_forecast(probs_mean, \
             
             fpath = pathlib.Path(fpath)
 
-        f.savefig(fpath.joinpath(f"C3S_MME_{comp}_{pct}_.png"), dpi=200, bbox_inches='tight')
+        f.savefig(fpath.joinpath(f"C3S_MME_{comp}_{pct}_{year}_{month}.png"), dpi=200, bbox_inches='tight')
     
     if close: 
         
         plt.close(f)
-
-    
-    
-        
-        
-
-
-
 
 def map_MME_probabilities(probs_mean, \
                           nsteps=5, \
