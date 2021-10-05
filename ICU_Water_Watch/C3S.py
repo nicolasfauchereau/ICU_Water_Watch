@@ -857,15 +857,21 @@ def calc_parametrized_quantiles(dset, distribution='gamma', method='PWM', quanti
         dset['z'] = dset['z']['time']
         dset = dset.rename({"z":"time"})
         
-    params = fit(dset, dist=distribution, method=method)
+    elif (type(dims) == str) and (dims != 'time'):
+        
+         dset = dset.rename({dims:"time"})
+        
+    params = fit(dset[varname], dist=distribution, method=method)
     
     q_xclim = parametric_quantile(params, quantiles)
     
     with ProgressBar(): 
         
         q_xclim = q_xclim.compute()
+        
+    q_xclim = q_xclim.to_dataset(name=varname)
     
-    return q_xclim.to_dataset(name=varname)
+    return q_xclim
 
 def CDS_variables(): 
     

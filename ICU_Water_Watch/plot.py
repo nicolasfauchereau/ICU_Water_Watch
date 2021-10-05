@@ -1,3 +1,4 @@
+from geopandas import geodataframe
 import matplotlib
 
 import pathlib
@@ -14,6 +15,12 @@ import matplotlib.cm as cm
 import matplotlib.colors as mcolors
 
 import palettable
+from xarray.core.duck_array_ops import pd_timedelta_to_float
+
+# import local utils and geo module, for interpolation and masking
+
+from . import utils
+from . import geo
 
 ### some top level definition 
 
@@ -1353,6 +1360,161 @@ def plot_heatmap(mat, year = 2021, start_month=3, n_steps=5, cumsum=False, title
     ax.axhline(6, color='steelblue')
     
     return f, ax 
+
+def map_MME_forecast(probs_mean, \
+                          varname='precip',
+                          step=1, \
+                          pct_dim='percentile', \
+                          pct=None, \
+                          comp='below', \
+                          contours=[50, 70], \
+                          contours_colors=['r','#a3231a'], \
+                          interp=True, \
+                          mask=None, \
+                          geoms=None, \
+                          domain=None, \
+                          fpath=None, \
+                          close=True, \
+                          gridlines=False): 
+
+    import numpy as np 
+    from calendar import month_abbr
+    import matplotlib
+    from matplotlib import pyplot as plt
+
+    # munging on the month abbreviations to account for periods straddling 2 years 
+    
+    month_abbr = list(month_abbr)
+    
+    month_abbr = month_abbr + month_abbr[1:]
+
+
+    # some checks 
+    
+    if (not(pct_dim in ['tercile','decile','percentile'])) or (not(pct_dim in probs_mean.dims)): 
+        
+        raise ValueError(f"{pct_dim} not valid, should be in ['tercile','decile','percentile'] and be a dimension in probs_mean") 
+        
+    # get month and year of the forecast (initial month)
+    
+    month = probs_mean.time.to_index().month[0]
+    year = probs_mean.time.to_index().year[0]
+    
+    # selects the step 
+    
+    probs_mean = probs_mean.sel(step=step).squeeze()
+    
+    # get the percentile bins  
+    
+    percentile_bins = probs_mean.attrs['pct_values']
+    
+    # digitize, so we can get the corresponding category along the tercile, decile or percentile dimension 
+    
+    max_cat = np.digitize(pct / 100, percentile_bins)
+    
+    # calculate the probability of being either below or above the given percentile 
+    
+    if comp == 'above': 
+        
+        ptot = probs_mean.sel({pct_dim:slice(max_cat+1, None)}).sum(pct_dim)
+        
+    elif comp == 'below':  
+        
+        ptot = probs_mean.sel({pct_dim:slice(None, max_cat)}).sum(pct_dim)
+    
+    dops = {}
+    dops['below'] = '<'
+    dops['above'] = '>'
+    
+    # we get the maximum probability from ptot 
+    
+    max_prob = float(ptot.max(['lat','lon']).squeeze()[varname].data)
+    
+    if interp: 
+        
+        ptot = utils.interp(ptot)
+        
+    if (mask is not None) and (type(mask) == gpd.geodataframe.GeoDataFrame): 
+        
+        ptot = geo.make_mask_from_gpd(ptot, mask, subset=False, insert=True, mask_name='EEZ')
+        
+        ptot = ptot[varname] * ptot['EEZ']
+
+    # set the parameters for plotting 
+
+    thresholds = [0, 25, 50, 60, 70, 80, 90, 100]
+    
+    hexes = ['#41ae76', '#99d8c9', '#e5f5f9', '#f7f7f7', '#e7d4e8', '#af8dc3', '#762a83']
+
+    ticks_marks = np.diff(np.array(thresholds)) / 2.
+
+    ticks = [thresholds[i] + ticks_marks[i] for i in range(len(thresholds) - 1)]
+
+    cbar_ticklabels = ["< 25%", "25-50%", "50-60%", "60-70%", "70-80%", "80-90%", "> 90%"]
+    
+    cmap = matplotlib.colors.ListedColormap(hexes, name='probabilities')
+    
+    # starts the plot
+    
+    f, ax = plt.subplots(figsize=(14,8), subplot_kw={"projection": ccrs.PlateCarree(central_longitude=180)})
+
+    for i, ct in enumerate(contours): 
+
+        fc = ptot.plot.contour(ax=ax, x='lon',y='lat', levels=[ct], colors=contours_colors[i], linewidths=0.7, transform=ccrs.PlateCarree())
+
+    ff = ptot.plot.contourf(ax=ax, x='lon',y='lat', levels=thresholds, transform=ccrs.PlateCarree(), cmap=cmap, add_colorbar=False)
+
+    cbar_kwargs={'shrink':0.5, 'pad':0.01, 'extend':'neither', 'drawedges':True, 'ticks':ticks, 'aspect':15}
+
+    cbar_ax = ax.axes.inset_axes([0.80, 0.525, 0.025, 0.38])
+
+    cb = plt.colorbar(ff, cax=cbar_ax, **cbar_kwargs)
+
+    cb.ax.minorticks_off()
+
+    cbar_ax.set_yticklabels(cbar_ticklabels)
+
+    ax.coastlines(resolution='10m',lw=0.5)
+
+    if geoms is not None:
+        
+        add_geom(ax=ax, geoms=geoms)
+    
+    if gridlines: 
+        
+        make_gridlines(ax=ax, lon_step=20, lat_step=10)
+    
+    ax.set_title("")
+
+    title = f"C3S MME, probability for rainfall {dops[comp]} {pct} percentile"
+
+    ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
+
+    if domain is not None: 
+    
+        ax.set_extent(domain, crs = ccrs.PlateCarree())
+    
+    f.patch.set_facecolor('white')
+    
+    if fpath is not None: 
+        
+        if type(fpath) != pathlib.PosixPath: 
+            
+            fpath = pathlib.Path(fpath)
+
+        f.savefig(fpath.joinpath(f"C3S_MME_{comp}_{pct}_.png"), dpi=200, bbox_inches='tight')
+    
+    if close: 
+        
+        plt.close(f)
+
+    
+    
+        
+        
+
+
+
 
 def map_MME_probabilities(probs_mean, \
                           nsteps=5, \
