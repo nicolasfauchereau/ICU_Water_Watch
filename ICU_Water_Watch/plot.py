@@ -196,7 +196,22 @@ def make_gridlines(ax, lon_step=5, lat_step=5, left_labels=True, bottom_labels=T
     >> [make_gridlines(x, lon_step=20, lat_step=10) for x in fg.axes[0]]
     
     """   
-
+    import numpy as np 
+    
+    gl = ax.gridlines(draw_labels=True, linestyle=':', xlocs=np.arange(-180,180+lon_step,lon_step), ylocs=np.arange(-90, 90+lat_step, lat_step))
+    
+    gl.top_labels = False
+    
+    gl.right_labels = False
+    
+    if not(left_labels): 
+        
+        gl.left_labels = False
+        
+    if not(bottom_labels): 
+        
+        gl.bottom_labels = False
+    
 def cmap_discretize(cmap, N):
     """
     Return a discrete colormap from the continuous colormap cmap.
@@ -338,8 +353,16 @@ def map_precip_accum(dset, varname='precipitationCal', mask=None, geoms=None, cm
     if (mask is not None) and (mask in dset.data_vars): 
         
         dataarray = dataarray * dset[mask] 
+        
+    if ndays == 90: 
             
-    thresholds = [-100, 50, 100, 250, 500, 750, 1000, 1500]
+        thresholds = [-100, 50, 100, 250, 500, 750, 1000, 1500]
+        cbar_ticklabels = ['< 50 mm', '50 – 100', '100 – 250', '250 – 500', '500 – 750', '750 – 1000', '>1000 mm']
+        
+    elif ndays == 30: 
+    
+        thresholds = [-100, 10, 20, 50, 100, 250, 500, 750]
+        cbar_ticklabels = ['< 10 mm', '10 – 20', '20 – 50', '50 – 100', '100 – 250', '250 – 500', '>500 mm']
     
     hexes = ['#01665e', '#01665e', '#5ab4ac', '#c7eae5', '#FFFFFF', '#f6e8c3', '#d8b365', '#8c510a']
     
@@ -847,7 +870,7 @@ def map_EAR_Watch_Pacific(dset, varname='pctscore', mask=None, geoms=None, fpath
         
         make_gridlines(ax=ax, lon_step=20, lat_step=10)
 
-    title = f"GPM-IMERG, \"EAR\" Watch alert levels"
+    title = f"\"EAR\" Watch alert levels\n({ndays} day cumulative rainfall)"
 
     # ax.set_title(title, fontsize=13, color='k')
     
@@ -930,7 +953,7 @@ def map_USDM_Pacific(dset, mask=None, geoms=None, fpath=None, close=True, gridli
         
         make_gridlines(ax=ax, lon_step=20, lat_step=10)
 
-    title = f"\"US Drought Monitor\" (see https://droughtmonitor.unl.edu/)"
+    title = f"US Drought Monitor\n({ndays} day cumulative rainfall)"
 
     # ax.set_title(title, fontsize=13, color='k')
     
@@ -1402,7 +1425,17 @@ def map_MME_forecast(probs_mean, \
     
     month = probs_mean.time.to_index().month[0]
     year = probs_mean.time.to_index().year[0]
+
+    # get the period attribute if present in the dictionnary 
     
+    if 'period' in probs_mean.attrs.keys(): 
+        
+        period = probs_mean.attrs['period']
+        
+    else: 
+        
+        period = None
+
     # selects the step 
     
     probs_mean = probs_mean.sel(step=step).squeeze()
@@ -1469,7 +1502,7 @@ def map_MME_forecast(probs_mean, \
 
     cbar_kwargs={'shrink':0.5, 'pad':0.01, 'extend':'neither', 'drawedges':True, 'ticks':ticks, 'aspect':15}
 
-    cbar_ax = ax.axes.inset_axes([0.80, 0.525, 0.025, 0.38])
+    cbar_ax = ax.axes.inset_axes([0.9, 0.525, 0.025, 0.38])
 
     cb = plt.colorbar(ff, cax=cbar_ax, **cbar_kwargs)
 
@@ -1493,7 +1526,13 @@ def map_MME_forecast(probs_mean, \
 
     ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
 
-    ax.text(0.99, 0.02, f"valid {valid_time:%Y-%m}", fontsize=10, fontdict={'color':'0.4'}, horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
+    if period is not None: 
+        
+        ax.text(0.99, 0.02, f"{period} forecast, valid to end {valid_time:%Y-%m}", fontsize=10, fontdict={'color':'0.4'}, horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
+
+    else: 
+
+        ax.text(0.99, 0.02, f"valid {valid_time:%Y-%m}", fontsize=10, fontdict={'color':'0.4'}, horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
 
     if domain is not None: 
     
@@ -1507,7 +1546,13 @@ def map_MME_forecast(probs_mean, \
             
             fpath = pathlib.Path(fpath)
 
-        f.savefig(fpath.joinpath(f"C3S_MME_{comp}_{pct}_{year}_{month}.png"), dpi=200, bbox_inches='tight')
+        if period is not None: 
+
+            f.savefig(fpath.joinpath(f"C3S_{period}_MME_{comp}_{pct}_{year}_{month}.png"), dpi=200, bbox_inches='tight')
+            
+        else: 
+            
+            f.savefig(fpath.joinpath(f"C3S_MME_{comp}_{pct}_{year}_{month}.png"), dpi=200, bbox_inches='tight')
     
     if close: 
         

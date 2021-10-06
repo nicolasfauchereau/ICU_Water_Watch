@@ -727,4 +727,94 @@ def join_clim(df, clim):
     
     return df 
     
+def subset_daily_clim(dset, last_day, clim_period=[2001, 2020], buffer=3): 
+    """
+    takes a (multiple files) daily dataset, and extract N days (parameter `buffer`)
+    around each day of year for a climatological period (parameter `clim_period`)
+    centered around `last_day`
+    """
     
+    from datetime import datetime
+    from dateutil.relativedelta import relativedelta
+    import numpy as np
+    
+    import warnings
+    warnings.filterwarnings("ignore")
+    
+    ldates = []
+    
+    for y in np.arange(clim_period[0], clim_period[-1] + 1): 
+        
+        d = datetime(y, last_day.month, last_day.day)
+        d = [d + relativedelta(days=x) for x in range(-buffer, buffer+1)]
+        ldates += d
+    
+    ldates = np.array(ldates)
+    dates = pd.Index(ldates)
+    dates = dates.to_series()
+    
+    clim = dset.sel(time=slice(*map(str, clim_period)))
+    
+    clim['time'] = clim.indexes['time'].to_datetimeindex()
+    
+    dates = dates.loc[clim.time.to_index()[0]:clim.time.to_index()[-1],]
+    
+    clim = clim.sel(time=dates.values)
+    
+    return clim
+
+def calibrate_SPI(dset, variable='precipitationCal', dimension='time', return_gamma = False):
+    """
+    calibrate the SPI over a climatological dataset (typically obtained using `subset_daily_clim`
+    with appropriate buffer ...)
+    """
+    
+    import numpy as np 
+    import xarray as xr 
+    from scipy import stats as st
+    
+    ds_ma = dset[variable]
+    
+    ds_In = np.log(ds_ma)
+    ds_In = ds_In.where(np.isinf(ds_In) == False) #= np.nan  #Change infinity to NaN
+
+    ds_mu = ds_ma.mean(dimension)
+
+    #Overall Mean of Moving Averages
+    ds_mu = ds_ma.mean(dimension)
+
+    #Summation of Natural log of moving averages
+    ds_sum = ds_In.sum(dimension)
+
+    #Computing essentials for gamma distribution
+    n = ds_In.count(dimension)                  #size of data
+    A = np.log(ds_mu) - (ds_sum/n)             #Computing A
+    alpha = (1/(4*A))*(1+(1+((4*A)/3))**0.5)   #Computing alpha  (a)
+    beta = ds_mu/alpha            
+    
+    if return_gamma: 
+
+        gamma_func = lambda data, a, scale: st.gamma.cdf(data, a=a, scale=scale)
+
+        gamma = xr.apply_ufunc(gamma_func, ds_ma, alpha, beta)
+
+        return gamma, alpha, beta
+
+    else: 
+        
+        return alpha, beta
+    
+def calculate_SPI(dataarray, alpha, beta, name='SPI'): 
+    
+    import xarray as xr 
+    from scipy import stats as st
+    
+    gamma_func = lambda data, a, scale: st.gamma.cdf(data, a=a, scale=scale)
+    
+    gamma = xr.apply_ufunc(gamma_func, dataarray, alpha, beta)
+    
+    norminv = lambda data: st.norm.ppf(data, loc=0, scale=1)
+    
+    norm_spi = xr.apply_ufunc(norminv, gamma)
+    
+    return norm_spi.to_dataset(name=name)
