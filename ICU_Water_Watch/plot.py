@@ -367,11 +367,7 @@ def map_precip_accum(dset, varname='precipitationCal', mask=None, geoms=None, cm
     hexes = ['#01665e', '#01665e', '#5ab4ac', '#c7eae5', '#FFFFFF', '#f6e8c3', '#d8b365', '#8c510a']
     
     hexes.reverse()
-    
-    cbar_ticklabels = ['>1000 mm', '750 – 1000', '500 – 750',  '250 – 500',  '100 – 250',  '50 – 100', '< 50 mm']
-    
-    cbar_ticklabels.reverse()
-    
+            
     ticks_marks = np.diff(np.array(thresholds)) / 2.
 
     ticks = [thresholds[i] + ticks_marks[i] for i in range(len(thresholds) - 1)]
@@ -1519,12 +1515,16 @@ def map_MME_forecast(probs_mean, \
     if gridlines: 
         
         make_gridlines(ax=ax, lon_step=20, lat_step=10)
+
+    # set the title
     
     ax.set_title("")
 
     title = f"C3S MME, probability for rainfall {dops[comp]} {pct}th percentile"
 
     ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
+
+    # set the bottom line, which indicates the valid time for the forecast (be it monthly or seasonal)
 
     if period is not None: 
         
