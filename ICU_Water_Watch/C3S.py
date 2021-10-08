@@ -341,7 +341,7 @@ def convert_rainfall(dset, varin='tprate', varout='precip', leadvar='step', time
 
     return dset
 
-def preprocess_GCM(dset, domain=[120, 245, -55, 30]): 
+def preprocess_GCM(dset, domain=[120, 240, -50, 30]): 
     
     import numpy as np
     import pandas as pd

@@ -1259,7 +1259,7 @@ def plot_eofs(eofs, verif_dset='CMAP'):
 def map_quantile_categories(dset, varname='precip', steps=[1,2,3], n_quantiles=3, cbar_ticklabels=None, cmap='viridis', cbar_label=None, domain=None):
     
     cbar_kwargs = {}
-    cbar_kwargs['ticks'] = np.arange(n_quantiles) + 0.5
+    cbar_kwargs['ticks'] = np.arange(n_quantiles) + 0.5 
     cbar_kwargs['shrink'] = 0.7
     cbar_kwargs['orientation'] = 'horizontal'
     cbar_kwargs['aspect'] = 50
@@ -1476,7 +1476,8 @@ def map_MME_forecast(probs_mean, \
 
     thresholds = [0, 25, 50, 60, 70, 80, 90, 100]
     
-    hexes = ['#41ae76', '#99d8c9', '#e5f5f9', '#f7f7f7', '#e7d4e8', '#af8dc3', '#762a83']
+    # hexes = ['#41ae76', '#99d8c9', '#e5f5f9', '#f7f7f7', '#e7d4e8', '#af8dc3', '#762a83']
+    hexes = ['#a6dba0', '#d9f0d3', '#f7f7f7', '#e7d4e8', '#c2a5cf', '#9970ab', '#762a83']
 
     ticks_marks = np.diff(np.array(thresholds)) / 2.
 
