@@ -68,22 +68,30 @@ def get_files_list(dpath=None, ndays=None, date=None, lag=None):
         
         date =  datetime.utcnow() - timedelta(days=lag)
     
-    lfiles = []
+    if ndays is not None: 
     
-    for d in pd.date_range(end=date, start=date - timedelta(days=ndays - 1)):
+        lfiles = []
         
-        if dpath.joinpath(f"GPM_IMERG_daily.v06.{d:%Y.%m.%d}.nc").exists(): 
+        for d in pd.date_range(end=date, start=date - timedelta(days=ndays - 1)):
             
-            lfiles.append(dpath.joinpath(f"GPM_IMERG_daily.v06.{d:%Y.%m.%d}.nc"))
+            if dpath.joinpath(f"GPM_IMERG_daily.v06.{d:%Y.%m.%d}.nc").exists(): 
+                
+                lfiles.append(dpath.joinpath(f"GPM_IMERG_daily.v06.{d:%Y.%m.%d}.nc"))
+            
+            else:
+                
+                raise ValueError(f"GPM_IMERG_daily.v06.{d:%Y.%m.%d}.nc is missing")
         
-        else:
+        if len(lfiles) != ndays: 
             
-            raise ValueError(f"GPM_IMERG_daily.v06.{d:%Y.%m.%d}.nc is missing")
+            print(f"!!! warning, only {len(lfiles)} days will be used to calculate the rainfall accumulation, instead of the intended {ndays}")
     
-    if len(lfiles) != ndays: 
+    else: 
         
-        print(f"!!! warning, only {len(lfiles)} days will be used to calculate the rainfall accumulation, instead of the intended {ndays}")
+        lfiles = list(dpath.glob("GPM_IMERG_daily.v06.????.??.??.nc"))
         
+        lfiles.sort()
+            
     return lfiles
 
 
