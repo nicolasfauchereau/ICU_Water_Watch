@@ -24,7 +24,7 @@ from matplotlib import pyplot as plt
 
 from . import utils
 
-def get_files_list(dpath=None, ndays=None, date=None, lag=None):
+def get_files_list(dpath=None, ndays=None, date=None, lag=1):
     """
     [summary]
 
@@ -63,12 +63,12 @@ def get_files_list(dpath=None, ndays=None, date=None, lag=None):
         if not dpath.exists():
              
             raise ValueError(f"The path {str(dpath)} does not exist")
-        
-    if date is None: 
-        
-        date =  datetime.utcnow() - timedelta(days=lag)
     
     if ndays is not None: 
+        
+        if date is None: 
+            
+            date =  datetime.utcnow() - timedelta(days=lag)
     
         lfiles = []
         
@@ -77,6 +77,8 @@ def get_files_list(dpath=None, ndays=None, date=None, lag=None):
             if dpath.joinpath(f"GPM_IMERG_daily.v06.{d:%Y.%m.%d}.nc").exists(): 
                 
                 lfiles.append(dpath.joinpath(f"GPM_IMERG_daily.v06.{d:%Y.%m.%d}.nc"))
+                
+                lfiles.sort()
             
             else:
                 
@@ -109,19 +111,19 @@ def make_dataset(lfiles=None, dpath=None, varname='precipitationCal', ndays=None
     
     last_date = datetime(last_date.year, last_date.month, last_date.day)
     
+    ndays_in_dset = len(dset.time)
+    
     # checks that the lag to realtime does not exceed 2 
     
-    if check_lag: 
+    if (check_lag) and (ndays is not None): 
         
         if (datetime.utcnow() - last_date).days > 2: 
             
             print(f"something is wrong, the last date in the dataset is {last_date:%Y-%m-%d}, the expected date should be not earlier than {datetime.utcnow() - timedelta(days=2):%Y-%m-%d}")
-    
-    ndays_in_dset = len(dset.time) 
 
-    if ndays_in_dset != ndays: 
-        
-        print(f"something is wrong with the number of time-steps, expected {ndays}, got {ndays_in_dset}")    
+        if ndays_in_dset != ndays: 
+            
+            print(f"something is wrong with the number of time-steps, expected {ndays}, got {ndays_in_dset}")    
     
     # adds the number of days and the last date as *attributes* of the dataset 
     

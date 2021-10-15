@@ -354,20 +354,29 @@ def map_precip_accum(dset, varname='precipitationCal', mask=None, geoms=None, cm
         
         dataarray = dataarray * dset[mask] 
         
-    if ndays == 90: 
-            
-        thresholds = [-100, 50, 100, 250, 500, 750, 1000, 1500]
-        cbar_ticklabels = ['< 50 mm', '50 – 100', '100 – 250', '250 – 500', '500 – 750', '750 – 1000', '>1000 mm']
+    # defines the thresholds and labels for the colorbar ticks here 
+    # @TODO: put all these into a dictionnary, potentially varying according 
+    # to the season .... 
         
-    elif ndays == 30: 
-    
+    if ndays == 30: 
+        
         thresholds = [-100, 10, 20, 50, 100, 250, 500, 750]
         cbar_ticklabels = ['< 10 mm', '10 – 20', '20 – 50', '50 – 100', '100 – 250', '250 – 500', '>500 mm']
     
-    hexes = ['#01665e', '#01665e', '#5ab4ac', '#c7eae5', '#FFFFFF', '#f6e8c3', '#d8b365', '#8c510a']
-    
-    hexes.reverse()
+    elif ndays == 90: 
             
+        thresholds = [-100, 50, 100, 250, 500, 750, 1000, 1500]
+        cbar_ticklabels = ['< 50 mm', '50 – 100', '100 – 250', '250 – 500', '500 – 750', '750 – 1000', '>1000 mm']
+ 
+    else: 
+ 
+        thresholds = [-100, 50, 100, 250, 500, 750, 1000, 1500]
+        cbar_ticklabels = ['< 50 mm', '50 – 100', '100 – 250', '250 – 500', '500 – 750', '750 – 1000', '>1000 mm']       
+        
+    # colors     
+    hexes = ['#8c510a', '#d8b365', '#f6e8c3', '#FFFFFF', '#c7eae5', '#5ab4ac', '#01665e', '#01665e']
+
+    # ticks locations             
     ticks_marks = np.diff(np.array(thresholds)) / 2.
 
     ticks = [thresholds[i] + ticks_marks[i] for i in range(len(thresholds) - 1)]
@@ -997,17 +1006,17 @@ def map_EAR_Watch(dset, world_coastlines, country_coastline, EEZ, varname='pctsc
     
     xlocs[xlocs > 180] -= 360 # fix the longitudes to go from -180 to 180 (for plotting)
     
-    # EAR Watch thresholds, hard coded 
+    # EAR Watch thresholds, hard coded
     
     thresholds = [0, 5, 10, 25, 90.01, 100]
+
+    # colors for each level 
+
+    rgbs = ['#F04E37', '#F99D1C','#FFDE40','#FFFFFF', '#33BBED']
     
     # EAR Watch ticklabels, hard coded 
     
     cbar_ticklabels = ["Severely dry (< 5%)",'Seriously dry (< 10%)', 'Warning (< 25%)', 'Near or Wetter', 'Seriously wet (> 90%)']
-    
-    # colors for each level 
-    
-    rgbs = ['#8a0606', '#fc0b03','#fcf003','#ffffff', '#0335ff']
     
     # automatically defines tickmarks 
     
@@ -1048,8 +1057,8 @@ def map_EAR_Watch(dset, world_coastlines, country_coastline, EEZ, varname='pctsc
     gl.ylabel_style = {'size': 10, 'color': 'k'}
 
     f.patch.set_facecolor('white')
-    
-    title = f"{country_name}: GPM-IMERG, \"EAR\" watch advisory levels\n{ndays} days to {last_day:%d %B %Y} [UTC]"
+        
+    title = f"{country_name}: \"EAR\" Watch alert levels\n({ndays} day cumulative rainfall)"
     
     ax.set_title(title, fontsize=13, color='k')
 
@@ -1057,11 +1066,7 @@ def map_EAR_Watch(dset, world_coastlines, country_coastline, EEZ, varname='pctsc
 
     ax.set_extent([lon_min, lon_max, lat_min, lat_max])    
 
-    special_chars = [' / ', '/',' ','%',':', ' & ']
-
-    for special_char in special_chars: 
-        
-        country_name_file = country_name.replace(special_char,'_')
+    country_name_file = utils.sanitize_name(country_name)
         
     if fpath is None: # if no path, then the path is the current directory 
         
@@ -1168,20 +1173,16 @@ def map_USDM(dset, world_coastlines, country_coastline, EEZ, varname='pctscore',
     gl.ylabel_style = {'size': 10, 'color': 'k'}
 
     f.patch.set_facecolor('white')
-    
-    title = f"{country_name}: GPM-IMERG, \"USDM\" levels\n{ndays} days to {last_day:%d %B %Y} [UTC]"
+        
+    title = f"{country_name}: \"USDM\" levels\n({ndays} day cumulative rainfall)"
     
     ax.set_title(title, fontsize=13, color='k')
 
     f.patch.set_facecolor('white')
 
     ax.set_extent([lon_min, lon_max, lat_min, lat_max])    
-
-    special_chars = [' / ', '/',' ','%',':', ' & ']
-
-    for special_char in special_chars: 
-        
-        country_name_file = country_name.replace(special_char,'_')
+    
+    country_name_file = utils.sanitize_name(country_name)
         
     if fpath is None: # if no path, then the path is the current directory 
         
@@ -1383,7 +1384,7 @@ def plot_heatmap(mat, year = 2021, start_month=3, n_steps=5, cumsum=False, title
 
 def map_MME_forecast(probs_mean, \
                           varname='precip',
-                          step=1, \
+                          step=1,
                           pct_dim='percentile', \
                           pct=None, \
                           comp='below', \
@@ -1397,16 +1398,20 @@ def map_MME_forecast(probs_mean, \
 
     import numpy as np 
     from dateutil.relativedelta import relativedelta
-    from calendar import month_abbr
+    from calendar import month_name
     import matplotlib
     from matplotlib import pyplot as plt
 
     # munging on the month abbreviations to account for periods straddling 2 years 
     
-    month_abbr = list(month_abbr)
+    month_name = list(month_name)
     
-    month_abbr = month_abbr + month_abbr[1:]
+    month_name = month_name + month_name[1:]
+    
+    # period taken from the dataset  
 
+    period = probs_mean.attrs['period']
+    
     # some checks 
     
     if (not(pct_dim in ['tercile','decile','percentile'])) or (not(pct_dim in probs_mean.dims)): 
@@ -1420,21 +1425,36 @@ def map_MME_forecast(probs_mean, \
     valid_time = probs_mean.time.to_index()[0] + relativedelta(months=step)
     
     month = probs_mean.time.to_index().month[0]
+    
     year = probs_mean.time.to_index().year[0]
 
-    # get the period attribute if present in the dictionnary 
-    
+    # period label 
+
     if 'period' in probs_mean.attrs.keys(): 
         
         period = probs_mean.attrs['period']
         
     else: 
         
-        period = None
+        period = 'monthly'
+    
+    if period == 'monthly': 
 
+        period_label = month_name[month + 1]
+
+    elif period == 'seasonal': 
+        
+        period_label = month_name[month + 1] + '-' + month_name[month + 3]
+    
     # selects the step 
     
     probs_mean = probs_mean.sel(step=step).squeeze()
+    
+    # interpolation 
+    
+    if interp: 
+    
+        probs_mean = utils.interp(probs_mean)
     
     # get the percentile bins  
     
@@ -1457,14 +1477,6 @@ def map_MME_forecast(probs_mean, \
     dops = {}
     dops['below'] = '<'
     dops['above'] = '>'
-    
-    # we get the maximum probability from ptot 
-    
-    max_prob = float(ptot.max(['lat','lon']).squeeze()[varname].data)
-    
-    if interp: 
-        
-        ptot = utils.interp(ptot)
         
     if (mask is not None) and (type(mask) == gpd.geodataframe.GeoDataFrame): 
         
@@ -1476,7 +1488,6 @@ def map_MME_forecast(probs_mean, \
 
     thresholds = [0, 25, 50, 60, 70, 80, 90, 100]
     
-    # hexes = ['#41ae76', '#99d8c9', '#e5f5f9', '#f7f7f7', '#e7d4e8', '#af8dc3', '#762a83']
     hexes = ['#a6dba0', '#d9f0d3', '#f7f7f7', '#e7d4e8', '#c2a5cf', '#9970ab', '#762a83']
 
     ticks_marks = np.diff(np.array(thresholds)) / 2.
@@ -1520,8 +1531,8 @@ def map_MME_forecast(probs_mean, \
     # set the title
     
     ax.set_title("")
-
-    title = f"C3S MME, probability for rainfall {dops[comp]} {pct}th percentile"
+    
+    title = f"{period_label} Probability of rainfall {dops[comp]} {pct}th percentile"
 
     ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
 
@@ -1766,3 +1777,5 @@ def plot_virtual_station(df, station_name=None, lon=None, lat=None):
     [l.set_fontsize(12) for l in ax2.yaxis.get_ticklabels()]
 
     return f
+
+# def map_SPI_Pacific()
