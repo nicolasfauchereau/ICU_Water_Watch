@@ -685,7 +685,7 @@ def get_one_GCM(dpath='/media/nicolasf/END19101/ICU/data/CDS/', GCM='ECMWF', var
     # if detrend is set to True, we detrend (assuming over the 'time') dimension
     if detrend: 
         
-        dset_gcm[vdict[varname]] = detrend_dim(dset_gcm[vdict[varname]], 'time')
+        dset_gcm[vdict[varname]] = utils.detrend_dim(dset_gcm[vdict[varname]], 'time')
 
     # is we passed a GeoDataFrame as a mask, we use it to mask the data 
     if (mask is not None) and (type(mask) == gpd.geodataframe.GeoDataFrame): 
