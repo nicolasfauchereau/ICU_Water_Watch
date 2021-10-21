@@ -1518,7 +1518,7 @@ def map_MME_forecast(probs_mean, \
 
     cbar_ax.set_yticklabels(cbar_ticklabels)
 
-    ax.coastlines(resolution='10m',lw=0.5)
+    ax.coastlines(resolution='10m')
 
     if geoms is not None:
         
@@ -1535,6 +1535,10 @@ def map_MME_forecast(probs_mean, \
     title = f"{period_label} Probability of rainfall {dops[comp]} {pct}th percentile"
 
     ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
+
+    # adds the copyright sentence 
+
+    ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GCM data from https://cds.climate.copernicus.eu/", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     # set the bottom line, which indicates the valid time for the forecast (be it monthly or seasonal)
 
