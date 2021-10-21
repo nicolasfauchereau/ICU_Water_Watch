@@ -1502,6 +1502,8 @@ def map_MME_forecast(probs_mean, \
     
     f, ax = plt.subplots(figsize=(14,8), subplot_kw={"projection": ccrs.PlateCarree(central_longitude=180)})
 
+    # uncomment this if needs to add contours 
+
     # for i, ct in enumerate(contours): 
 
     #     fc = ptot.plot.contour(ax=ax, x='lon',y='lat', levels=[ct], colors=contours_colors[i], linewidths=0.7, transform=ccrs.PlateCarree())
