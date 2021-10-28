@@ -409,7 +409,7 @@ def preprocess_GCM(dset, domain=[120, 240, -50, 30]):
         
     return dset 
 
-def calc_climatological_percentiles(dset, percentiles=None, dims=['member','time']):
+def calc_empirical_quantiles(dset, quantiles=[0.3333, 0.6666], dims=['member','time']):
     """
     calculates the climatological percentiles, over dimensions 
     ['member','time'] from a CDS hindcast dataset 
@@ -437,7 +437,7 @@ def calc_climatological_percentiles(dset, percentiles=None, dims=['member','time
     
     >> clim = clim.chunk({'time':-1, 'member':-1, 'step':1, 'lat':1, 'lon':1})
     
-    >> terciles_climatology = clim.groupby(clim.time.dt.month).map(calc_percentiles, **{'percentiles':[0.3333, 0.6666]})
+    >> terciles_climatology = clim.groupby(clim.time.dt.month).map(calc_percentiles, **{'quantiles':[0.3333, 0.6666]})
 
     >> with ProgressBar():
     >>    terciles_climatology = terciles_climatology.compute()
@@ -446,11 +446,11 @@ def calc_climatological_percentiles(dset, percentiles=None, dims=['member','time
     
     import numpy as np
     
-    if percentiles is None: 
+    if quantiles is None: 
         
-        percentiles = [0.02, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95]
+        quantiles = [0.02, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95]
     
-    return dset.quantile(percentiles, dim=dims) 
+    return dset.quantile(quantiles, dim=dims) 
 
 
 def get_percentile_bounds(dset, name='quantile'): 

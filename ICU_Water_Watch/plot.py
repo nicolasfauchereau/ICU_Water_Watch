@@ -1,3 +1,4 @@
+from os import path
 from geopandas import geodataframe
 import matplotlib
 
@@ -374,7 +375,10 @@ def map_precip_accum(dset, varname='precipitationCal', mask=None, geoms=None, cm
         cbar_ticklabels = ['< 50 mm', '50 – 100', '100 – 250', '250 – 500', '500 – 750', '750 – 1000', '>1000 mm']       
         
     # colors     
-    hexes = ['#8c510a', '#d8b365', '#f6e8c3', '#FFFFFF', '#c7eae5', '#5ab4ac', '#01665e', '#01665e']
+    # hexes = ['#8c510a', '#d8b365', '#f6e8c3', '#FFFFFF', '#c7eae5', '#5ab4ac', '#01665e', '#01665e']
+    hexes = ['#243494', '#243494', '#225ea8', '#1d91bf', '#42b6c4', '#7fcdbb', '#c7e9b4', '#edf9b1']
+    hexes.reverse()
+
 
     # ticks locations             
     ticks_marks = np.diff(np.array(thresholds)) / 2.
@@ -413,11 +417,17 @@ def map_precip_accum(dset, varname='precipitationCal', mask=None, geoms=None, cm
         
         add_geom(ax=ax, geoms=geoms)
 
+    # title 
+
     ax.set_title('')
     
     title = f"Last {ndays} days\ncumulative rainfall (mm)"
     
     ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
+
+    # copyright notice 
+    
+    ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
@@ -434,7 +444,6 @@ def map_precip_accum(dset, varname='precipitationCal', mask=None, geoms=None, cm
     if close: 
         
         plt.close(f)
-
 
 def map_precip_anoms(dset, varname='anoms', mask=None, cmap=None, geoms=None, fpath=None, close=True, gridlines=False): 
     """
@@ -488,6 +497,10 @@ def map_precip_anoms(dset, varname='anoms', mask=None, cmap=None, geoms=None, fp
     title = f"Last {ndays} days cumulative rainfall anomalies (mm)" 
 
     ax.text(0.99, 0.94, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
+    
+    # copyright notice 
+    
+    ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
     
     ax.set_extent(domain, crs = ccrs.PlateCarree())
 
@@ -593,6 +606,10 @@ def map_dry_days_Pacific(dset, varname='dry_days', mask=None, cmap=None, geoms=N
     
     ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
 
+    # copyright notice 
+    
+    ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
     f.patch.set_facecolor('white')
@@ -671,6 +688,10 @@ def map_days_since_rain_Pacific(dset, varname='days_since_rain', mask=None, cmap
     
     ax.text(0.99, 0.94, title, fontsize=13, fontdict={'color':'green'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
 
+    # copyright notice 
+    
+    ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
     f.patch.set_facecolor('white')
@@ -686,7 +707,6 @@ def map_days_since_rain_Pacific(dset, varname='days_since_rain', mask=None, cmap
     if close: 
         
         plt.close(f)
-
         
 def map_dry_days(dset, world_coastlines, country_coastline, EEZ, varname='dry_days', \
     mask_type='mask_EEZ', country_name='Fiji', cbar_label='number of days', cbar_kwargs=None, \
@@ -773,6 +793,10 @@ def map_dry_days(dset, world_coastlines, country_coastline, EEZ, varname='dry_da
         ax.set_title(title, fontsize=13, color='k')
         
     print(title)
+
+    # copyright notice 
+    
+    ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent([lon_min, lon_max, lat_min, lat_max])    
 
@@ -882,6 +906,10 @@ def map_EAR_Watch_Pacific(dset, varname='pctscore', mask=None, geoms=None, fpath
     ax.set_title("") # to get rid of the default title
     
     ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
+    
+    # copyright notice 
+    
+    ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
@@ -965,6 +993,10 @@ def map_USDM_Pacific(dset, mask=None, geoms=None, fpath=None, close=True, gridli
     ax.set_title("") # to get rid of the default title
     
     ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
+
+    # copyright notice 
+    
+    ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
@@ -1063,6 +1095,10 @@ def map_EAR_Watch(dset, world_coastlines, country_coastline, EEZ, varname='pctsc
     ax.set_title(title, fontsize=13, color='k')
 
     f.patch.set_facecolor('white')
+
+    # copyright notice 
+    
+    ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent([lon_min, lon_max, lat_min, lat_max])    
 
@@ -1179,6 +1215,10 @@ def map_USDM(dset, world_coastlines, country_coastline, EEZ, varname='pctscore',
     ax.set_title(title, fontsize=13, color='k')
 
     f.patch.set_facecolor('white')
+
+    # copyright notice 
+    
+    ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent([lon_min, lon_max, lat_min, lat_max])    
     
@@ -1784,4 +1824,35 @@ def plot_virtual_station(df, station_name=None, lon=None, lat=None):
 
     return f
 
-# def map_SPI_Pacific()
+def insert_logo(logo_path='./logo', x=-0.06, y=0.88, width=0.25, ax=None): 
+    """
+    insert a logo into axes 
+
+    insert the NIWA logo into the given axes 
+
+    Parameters
+    ----------
+    logo_path : str, optional
+        The path to the logo image (png), by default './logo'
+    x : float, optional
+        x coordinates (in axes units), by default -0.06
+    y : float, optional
+        y coordinates (in axes units), by default 0.88
+    width : float, optional
+        The width (in axes units), by default 0.25
+    ax : [type], optional
+        The axes where to insert, by default None
+    """
+    
+    import pathlib
+    from matplotlib import pyplot as plt
+    
+    logo_path = pathlib.Path(logo_path)
+
+
+    logo = plt.imread(logo_path.joinpath('NIWA_CMYK_Hor.png'), format='png')
+    aspect = logo.shape[0] / logo.shape[1]
+    
+    axin = ax.inset_axes([x,y, width, width * aspect],transform=ax.transAxes)    # create new inset axes in data coordinates
+    axin.imshow(logo)
+    axin.axis('off')
