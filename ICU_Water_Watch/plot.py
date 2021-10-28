@@ -431,6 +431,10 @@ def map_precip_accum(dset, varname='precipitationCal', mask=None, geoms=None, cm
 
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
+    # insert the logo 
+    
+    insert_logo(ax=ax)
+    
     f.patch.set_facecolor('white')
 
     if fpath is not None: 
@@ -503,6 +507,10 @@ def map_precip_anoms(dset, varname='anoms', mask=None, cmap=None, geoms=None, fp
     ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
     
     ax.set_extent(domain, crs = ccrs.PlateCarree())
+    
+    # insert the NIWA logo 
+    
+    insert_logo(ax=ax)
 
     f.patch.set_facecolor('white')
     
@@ -612,6 +620,10 @@ def map_dry_days_Pacific(dset, varname='dry_days', mask=None, cmap=None, geoms=N
 
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
+    # insert the NIWA logo 
+    
+    insert_logo(ax=ax)
+    
     f.patch.set_facecolor('white')
     
     if fpath is not None: 
@@ -693,6 +705,10 @@ def map_days_since_rain_Pacific(dset, varname='days_since_rain', mask=None, cmap
     ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent(domain, crs = ccrs.PlateCarree())
+    
+    # insert the NIWA logo 
+    
+    insert_logo(ax=ax)
     
     f.patch.set_facecolor('white')
     
@@ -800,12 +816,10 @@ def map_dry_days(dset, world_coastlines, country_coastline, EEZ, varname='dry_da
 
     ax.set_extent([lon_min, lon_max, lat_min, lat_max])    
 
-    special_chars = [' / ', '/',' ','%',':', '&']
-
-    for special_char in special_chars: 
-        
-        country_name_file = country_name.replace(special_char,'_')
-        
+    # insert the NIWA logo 
+    
+    insert_logo(ax=ax) 
+                
     if path is None: # if no path, then the path is the current directory 
         
         path = pathlib.Path.cwd()
@@ -826,7 +840,7 @@ def map_dry_days(dset, world_coastlines, country_coastline, EEZ, varname='dry_da
     
     else: 
         
-        filename = f"{country_name_file}_{mask_type}_{varname}_{ndays}nbdays_to_{last_day:%Y-%m-%d}.png"
+        filename = f"{utils.sanitize_name(country_name)}_{mask_type}_{varname}_{ndays}nbdays_to_{last_day:%Y-%m-%d}.png"
         
         f.savefig(path.joinpath(filename), dpi=200, bbox_inches='tight')
         
@@ -900,8 +914,6 @@ def map_EAR_Watch_Pacific(dset, varname='pctscore', mask=None, geoms=None, fpath
         make_gridlines(ax=ax, lon_step=20, lat_step=10)
 
     title = f"\"EAR\" Watch alert levels\n({ndays} day cumulative rainfall)"
-
-    # ax.set_title(title, fontsize=13, color='k')
     
     ax.set_title("") # to get rid of the default title
     
@@ -912,6 +924,10 @@ def map_EAR_Watch_Pacific(dset, varname='pctscore', mask=None, geoms=None, fpath
     ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent(domain, crs = ccrs.PlateCarree())
+    
+    # insert the logo 
+    
+    insert_logo(ax=ax)
     
     f.patch.set_facecolor('white')
     
@@ -999,6 +1015,10 @@ def map_USDM_Pacific(dset, mask=None, geoms=None, fpath=None, close=True, gridli
     ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent(domain, crs = ccrs.PlateCarree())
+    
+    # insert the NIWA logo 
+    
+    insert_logo(ax=ax)
     
     f.patch.set_facecolor('white')
     
@@ -1101,6 +1121,10 @@ def map_EAR_Watch(dset, world_coastlines, country_coastline, EEZ, varname='pctsc
     ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent([lon_min, lon_max, lat_min, lat_max])    
+
+    # insert the logo 
+    
+    insert_logo(ax=ax)
 
     country_name_file = utils.sanitize_name(country_name)
         
@@ -1221,9 +1245,7 @@ def map_USDM(dset, world_coastlines, country_coastline, EEZ, varname='pctscore',
     ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent([lon_min, lon_max, lat_min, lat_max])    
-    
-    country_name_file = utils.sanitize_name(country_name)
-        
+            
     if fpath is None: # if no path, then the path is the current directory 
         
         fpath = pathlib.Path.cwd()
@@ -1238,7 +1260,7 @@ def map_USDM(dset, world_coastlines, country_coastline, EEZ, varname='pctscore',
     
     # build the file name 
     
-    filename = f"{country_name_file}_{mask_name}_USDM_{ndays}nbdays_to_{last_day:%Y-%m-%d}.png"
+    filename = f"{utils.sanitize_name(country_name)}_{mask_name}_USDM_{ndays}nbdays_to_{last_day:%Y-%m-%d}.png"
         
     # save the figure 
     
@@ -1582,6 +1604,10 @@ def map_MME_forecast(probs_mean, \
 
     ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GCM data from https://cds.climate.copernicus.eu/", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
+    # add the NIWA logo 
+    
+    insert_logo(ax=ax)
+
     # set the bottom line, which indicates the valid time for the forecast (be it monthly or seasonal)
 
     if period is not None: 
@@ -1844,15 +1870,20 @@ def insert_logo(logo_path='./logo', x=-0.06, y=0.88, width=0.25, ax=None):
         The axes where to insert, by default None
     """
     
-    import pathlib
+    import os
+    import sys
     from matplotlib import pyplot as plt
     
-    logo_path = pathlib.Path(logo_path)
-
-
-    logo = plt.imread(logo_path.joinpath('NIWA_CMYK_Hor.png'), format='png')
+    impath = os.path.dirname(sys.modules['ICU_Water_Watch'].__file__)
+    
+    impath = pathlib.Path(impath).joinpath('logo')
+        
+    logo = plt.imread(impath.joinpath("NIWA_CMYK_Hor.png"), format='png')
+    
     aspect = logo.shape[0] / logo.shape[1]
     
     axin = ax.inset_axes([x,y, width, width * aspect],transform=ax.transAxes)    # create new inset axes in data coordinates
+    
     axin.imshow(logo)
+    
     axin.axis('off')
