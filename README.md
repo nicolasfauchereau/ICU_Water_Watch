@@ -7,9 +7,9 @@ Source code, scripts and notebooks for the NIWA Island Climate Update (ICU) "Wat
 You can create a suitable conda environment by running: 
 
 ```
-$ conda env create -f ICU.yml
+$ conda env create -f ICU_mamba_environment.yml
 $ conda activate ICU
-$ pip install palettable
+$ pip install palettable lmoments3
 ```
 
 ## Installation 
@@ -34,18 +34,21 @@ The climatologies have been pre-computed from all the available data over the **
 
 **3) Monthly and seasonal rainfall forecasts from the C3S Multi-Model Ensemble (MME)** 
 
-Probabilistic forecasts are derived from a Multi-Model Ensemble (MME) including forecasts from the following 8 Coupled Ocean-Atmosphere GCMs: 
+Probabilistic forecasts are derived from a Multi-Model Ensemble (MME) including forecasts from the following 9 Coupled Ocean-Atmosphere GCMs: 
 
 - ECMWF (SEAS5)
-- UKMO (GloSea6-GC3.2)
-- Meteo-France (Météo-France System 7)
+- UKMO (GloSea6)
+- Meteo-France (Météo-France System 8)
 - DWD (GCFS2.1)
-- CMCC (CMCC-SPS3.5)
+- CMCC (SPSv3.5)
 - NCEP (CFSv2)
-- JMA (JMA/MRI-CPS2)
-- ECCC (CanSIPSv2)
+- JMA (CPS2)
+- ECCC system 1 (GEM-NEMO)
+- ECCC system 2 (CanCM4i)
 
 The details for the different GCM can be found [here](https://confluence.ecmwf.int/display/CKB/Description+of+the+C3S+seasonal+multi-system)
+
+A summary of the available data (hindcasts and forecasts for the different systems) is available [here](https://confluence.ecmwf.int/display/CKB/Summary+of+available+data)
 
 The forecast data (post 2017) for this MME contains in excess of 370 members.
 
