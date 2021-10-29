@@ -1,10 +1,11 @@
-from os import path
-from geopandas import geodataframe
+import os 
+import sys
 import matplotlib
 
 import pathlib
 
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 import numpy as np 
 import pandas as pd
@@ -197,8 +198,7 @@ def make_gridlines(ax, lon_step=5, lat_step=5, left_labels=True, bottom_labels=T
     >> [make_gridlines(x, lon_step=20, lat_step=10) for x in fg.axes[0]]
     
     """   
-    import numpy as np 
-    
+
     gl = ax.gridlines(draw_labels=True, linestyle=':', xlocs=np.arange(-180,180+lon_step,lon_step), ylocs=np.arange(-90, 90+lat_step, lat_step))
     
     gl.top_labels = False
@@ -1458,13 +1458,11 @@ def map_MME_forecast(probs_mean, \
                           close=True, \
                           gridlines=False): 
 
-    import numpy as np 
-    from dateutil.relativedelta import relativedelta
-    from calendar import month_name
-    import matplotlib
-    from matplotlib import pyplot as plt
+
 
     # munging on the month abbreviations to account for periods straddling 2 years 
+    
+    from calendar import month_name
     
     month_name = list(month_name)
     
@@ -1655,10 +1653,7 @@ def map_MME_probabilities(probs_mean, \
                           domain=None, 
                           mask=None): 
 
-    import numpy as np 
     from calendar import month_abbr
-    from matplotlib import pyplot as plt
-    import palettable
 
     # munging on the month abbreviations to account for periods straddling 2 years 
     
@@ -1788,9 +1783,6 @@ def map_MME_probabilities(probs_mean, \
 
 def plot_virtual_station(df, station_name=None, lon=None, lat=None): 
     
-    from matplotlib import pyplot as plt
-    import numpy as np 
-    
     # some parameters we'll use later 
     
     ndays = len(df) 
@@ -1869,10 +1861,6 @@ def insert_logo(logo_path='./logo', x=-0.06, y=0.88, width=0.25, ax=None):
     ax : [type], optional
         The axes where to insert, by default None
     """
-    
-    import os
-    import sys
-    from matplotlib import pyplot as plt
     
     impath = os.path.dirname(sys.modules['ICU_Water_Watch'].__file__)
     
