@@ -421,19 +421,20 @@ def map_precip_accum(dset, varname='precipitationCal', mask=None, geoms=None, cm
 
     ax.set_title('')
     
-    title = f"Last {ndays} days\ncumulative rainfall (mm)"
+    # title = f"Last {ndays} days\ncumulative rainfall (mm)"
+    title = f"last {ndays} days cumulative rainfall (mm)\nto {last_day:%d %b %Y}"
     
     ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
 
     # copyright notice 
     
-    ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+    ax.text(0.006, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
     # insert the logo 
     
-    insert_logo(ax=ax)
+    # insert_logo(ax=ax)
     
     f.patch.set_facecolor('white')
 
@@ -498,19 +499,19 @@ def map_precip_anoms(dset, varname='anoms', mask=None, cmap=None, geoms=None, fp
         
     ax.set_title("") # to get rid of default title
 
-    title = f"Last {ndays} days cumulative rainfall anomalies (mm)" 
+    title = f"Last {ndays} days cumulative rainfall anomalies (mm)\nto {last_day:%d %b %Y}" 
 
     ax.text(0.99, 0.94, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
     
     # copyright notice 
     
-    ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+    ax.text(0.006, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
     
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
-    # insert the NIWA logo 
+    # insert the NIWAlogo 
     
-    insert_logo(ax=ax)
+    # insert_logo(ax=ax)
 
     f.patch.set_facecolor('white')
     
@@ -610,13 +611,13 @@ def map_dry_days_Pacific(dset, varname='dry_days', mask=None, cmap=None, geoms=N
 
     ax.set_title('', fontsize=13, color='k') # get rid of default title
 
-    title = f"Number of dry days\nover the last {ndays} days"
+    title = f"Number of dry days over the last {ndays} days\nto {last_day:%d %b %Y}"
     
     ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
 
     # copyright notice 
     
-    ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+    ax.text(0.006, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
@@ -696,13 +697,13 @@ def map_days_since_rain_Pacific(dset, varname='days_since_rain', mask=None, cmap
 
     ax.set_title("") # get rid of default title
 
-    title = f"Days since last rain (>= 1 mm/day): \n{ndays} days period to {last_day:%d %B %Y} [UTC]"
+    title = f"Days since last rain (>= 1 mm/day): {ndays} days\nto {last_day:%d %B %Y}"
     
     ax.text(0.99, 0.94, title, fontsize=13, fontdict={'color':'green'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
 
     # copyright notice 
     
-    ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+    ax.text(0.006, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
@@ -812,7 +813,7 @@ def map_dry_days(dset, world_coastlines, country_coastline, EEZ, varname='dry_da
 
     # copyright notice 
     
-    ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+    ax.text(0.006, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent([lon_min, lon_max, lat_min, lat_max])    
 
@@ -913,7 +914,7 @@ def map_EAR_Watch_Pacific(dset, varname='pctscore', mask=None, geoms=None, fpath
         
         make_gridlines(ax=ax, lon_step=20, lat_step=10)
 
-    title = f"\"EAR\" Watch alert levels\n({ndays} day cumulative rainfall)"
+    title = f"\"EAR\" Watch alert levels\n{ndays} days to {last_day:%d %b %Y}"
     
     ax.set_title("") # to get rid of the default title
     
@@ -921,13 +922,13 @@ def map_EAR_Watch_Pacific(dset, varname='pctscore', mask=None, geoms=None, fpath
     
     # copyright notice 
     
-    ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+    ax.text(0.006, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
     # insert the logo 
     
-    insert_logo(ax=ax)
+    # insert_logo(ax=ax)
     
     f.patch.set_facecolor('white')
     
@@ -1002,7 +1003,7 @@ def map_USDM_Pacific(dset, mask=None, geoms=None, fpath=None, close=True, gridli
         
         make_gridlines(ax=ax, lon_step=20, lat_step=10)
 
-    title = f"US Drought Monitor\n({ndays} day cumulative rainfall)"
+    title = f"US Drought Monitor\n{ndays} days to {last_day:%d %b %Y}"
 
     # ax.set_title(title, fontsize=13, color='k')
     
@@ -1012,13 +1013,13 @@ def map_USDM_Pacific(dset, mask=None, geoms=None, fpath=None, close=True, gridli
 
     # copyright notice 
     
-    ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+    ax.text(0.006, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
-    # insert the NIWA logo 
+    # insert the NIWAlogo 
     
-    insert_logo(ax=ax)
+    # insert_logo(ax=ax)
     
     f.patch.set_facecolor('white')
     
@@ -1118,7 +1119,7 @@ def map_EAR_Watch(dset, world_coastlines, country_coastline, EEZ, varname='pctsc
 
     # copyright notice 
     
-    ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+    ax.text(0.006, 0.02, u'\u00A9'+" NIWA, GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent([lon_min, lon_max, lat_min, lat_max])    
 
@@ -1242,7 +1243,7 @@ def map_USDM(dset, world_coastlines, country_coastline, EEZ, varname='pctscore',
 
     # copyright notice 
     
-    ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+    ax.text(0.006, 0.02, u'\u00A9'+" NIWA, GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent([lon_min, lon_max, lat_min, lat_max])    
             
@@ -1546,17 +1547,23 @@ def map_MME_forecast(probs_mean, \
 
     # set the parameters for plotting 
 
-    thresholds = [0, 25, 50, 60, 70, 80, 90, 100]
+    thresholds = [0, 50, 60, 70, 80, 90, 100]
     
-    hexes = ['#a6dba0', '#d9f0d3', '#f7f7f7', '#e7d4e8', '#c2a5cf', '#9970ab', '#762a83']
+    # hexes = ['#a6dba0', '#d9f0d3', '#f7f7f7', '#e7d4e8', '#c2a5cf', '#9970ab', '#762a83']
+    
+    hexes = ['#ffffff', '#f6e8c3', '#dfc27d', '#bf812d','#ecb256', '#c18b36', '#543005']
 
     ticks_marks = np.diff(np.array(thresholds)) / 2.
 
     ticks = [thresholds[i] + ticks_marks[i] for i in range(len(thresholds) - 1)]
 
-    cbar_ticklabels = ["< 25%", "25-50%", "50-60%", "60-70%", "70-80%", "80-90%", "> 90%"]
+    # cbar_ticklabels = ["< 25%", "25-50%", "50-60%", "60-70%", "70-80%", "80-90%", "> 90%"]
     
-    cmap = matplotlib.colors.ListedColormap(hexes, name='probabilities')
+    cbar_ticklabels = ["< 50%", "50-60%", "60-70%", "70-80%", "80-90%", "> 90%"]
+    
+    # cmap = matplotlib.colors.ListedColormap(hexes, name='probabilities')
+    
+    cmap = cmap_discretize(palettable.scientific.sequential.Bilbao_6.mpl_colormap, 6)
     
     # starts the plot
     
@@ -1600,11 +1607,11 @@ def map_MME_forecast(probs_mean, \
 
     # adds the copyright sentence 
 
-    ax.text(0.006, 0.02, u'\u00A9'+" NIWA Ltd., GCM data from https://cds.climate.copernicus.eu/", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+    ax.text(0.006, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
-    # add the NIWA logo 
+    # add the NIWAlogo 
     
-    insert_logo(ax=ax)
+    # insert_logo(ax=ax)
 
     # set the bottom line, which indicates the valid time for the forecast (be it monthly or seasonal)
 
@@ -1846,7 +1853,7 @@ def insert_logo(logo_path='./logo', x=-0.06, y=0.88, width=0.25, ax=None):
     """
     insert a logo into axes 
 
-    insert the NIWA logo into the given axes 
+    insert the NIWAlogo into the given axes 
 
     Parameters
     ----------
@@ -1862,10 +1869,11 @@ def insert_logo(logo_path='./logo', x=-0.06, y=0.88, width=0.25, ax=None):
         The axes where to insert, by default None
     """
     
+    
     impath = os.path.dirname(sys.modules['ICU_Water_Watch'].__file__)
     
     impath = pathlib.Path(impath).joinpath('logo')
-        
+            
     logo = plt.imread(impath.joinpath("NIWA_CMYK_Hor.png"), format='png')
     
     aspect = logo.shape[0] / logo.shape[1]
