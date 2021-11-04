@@ -17,8 +17,6 @@ import matplotlib.cm as cm
 import matplotlib.colors as mcolors
 
 import palettable
-from rasterio.dtypes import validate_dtype
-from xarray.core.duck_array_ops import pd_timedelta_to_float
 
 # import local utils and geo module, for interpolation and masking
 
@@ -179,8 +177,6 @@ def add_geom(ax=None, geoms=None):
 def make_gridlines(ax, lon_step=5, lat_step=5, left_labels=True, bottom_labels=True): 
     """
     make gridlines (for a geographical plot with cartopy)
-
-    [extended_summary]
 
     Parameters
     ----------
@@ -422,7 +418,7 @@ def map_precip_accum(dset, varname='precipitationCal', mask=None, geoms=None, cm
     ax.set_title('')
     
     # title = f"Last {ndays} days\ncumulative rainfall (mm)"
-    title = f"last {ndays} days cumulative rainfall (mm)\nto {last_day:%d %b %Y}"
+    title = f"Cumulative rainfall (mm)\n{ndays} days to {last_day:%d %b %Y}"
     
     ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
 
@@ -1883,3 +1879,74 @@ def insert_logo(logo_path='./logo', x=-0.06, y=0.88, width=0.25, ax=None):
     axin.imshow(logo)
     
     axin.axis('off')
+    
+def get_hexes(cmap): 
+    """
+    get a list of hex values from a matplotlib colormap 
+
+    Parameters
+    ----------
+    cmap : a matplotlib colormap 
+        The input matplotlib colormap 
+
+    Returns
+    -------
+    list
+        A list of hex values as strings (e.g. '#ffffff' for white)
+    """
+    l = []
+    for i in range(cmap.N):
+        rgb = cmap(i)[:3]  # will return rgba, we take only first 3 so we get rgb
+        l.append(matplotlib.colors.rgb2hex(rgb))
+    l = np.array(l)
+
+    hexes = (np.unique(l)[::-1]).tolist()
+
+    return hexes 
+
+def hex_to_rgb(value):
+    """
+    converts a hex value to RGB 
+
+    e.g. hex_to_rgb('#ffffff') -> (255, 255, 255)
+
+    Parameters
+    ----------
+    value : string
+        The hex value as string
+
+    Returns
+    -------
+    tuple
+        tuple with (R, G, B) values (0 to 255)
+    """
+    
+    
+    value = value.lstrip('#')
+    
+    lv = len(value)
+    
+    return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
+
+def rgb_to_hex(rgb):
+    """
+    (R,G,B) to hex value
+
+    convert a tuple of RGB values to hex code
+    
+    example: 
+    
+    >> rgb_to_hex((255,255,255))
+    >> '#ffffff'
+
+    Parameters
+    ----------
+    rgb : tuple
+        tuple with (R, G, B) values (0 to 255)
+
+    Returns
+    -------
+    str
+        hex value as string
+    """
+    return '#%02x%02x%02x' % rgb
