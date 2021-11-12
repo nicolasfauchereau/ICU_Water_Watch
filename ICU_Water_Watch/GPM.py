@@ -103,7 +103,7 @@ def make_dataset(lfiles=None, dpath=None, varname='precipitationCal', ndays=None
         
         lfiles = get_files_list(dpath, ndays=ndays)
 
-    dset = xr.open_mfdataset(lfiles, concat_dim='time', combine='by_coords', parallel=True, engine='netcdf4')[[varname]]
+    dset = xr.open_mfdataset(lfiles, concat_dim='time', combine='nested', parallel=True, engine='netcdf4')[[varname]]
     
     # get the last date in the dataset 
     
