@@ -314,7 +314,6 @@ def shift_geom(shift, gdataframe):
 
     return moved_geom_gdf
 
-
 def make_point_buffer_gdf(lon, lat, radius=2000, radius_unit='km'):
     """
     take a point (lon and lat), apply a buffer (defined by kw `radius`)

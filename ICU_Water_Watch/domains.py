@@ -8,7 +8,7 @@ domains['Fiji'] = [175, 183, -21, -15]
 domains['NZ'] = [161, 181, -50, -30] 
 domains['Pacific'] = [140, 240, -50, 25]
 domains['C3S_download'] = [100, 240, -50, 30]
-domains['Water_Watch'] = [120, 240, -38, 22.5]
+domains['Water_Watch'] = [120, 240, -35, 25]
 
 # small utility function to get the geographical domain of 
 # an xarray dataset or dataarray 

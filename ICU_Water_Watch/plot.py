@@ -357,13 +357,13 @@ def map_precip_accum(dset, varname='precipitationCal', mask=None, geoms=None, cm
         
     if ndays == 30: 
         
-        thresholds = [-100, 10, 20, 50, 100, 250, 500, 750]
-        cbar_ticklabels = ['< 10 mm', '10 – 20', '20 – 50', '50 – 100', '100 – 250', '250 – 500', '>500 mm']
+        thresholds = [-100, 10, 20, 40, 100, 200, 330, 500]
+        cbar_ticklabels = ['< 10 mm', '10 – 20', '20 – 40', '40 – 100', '100 – 200', '250 – 330', '>330 mm']
     
     elif ndays == 90: 
             
-        thresholds = [-100, 50, 100, 250, 500, 750, 1000, 1500]
-        cbar_ticklabels = ['< 50 mm', '50 – 100', '100 – 250', '250 – 500', '500 – 750', '750 – 1000', '>1000 mm']
+        thresholds = [-100, 30, 60, 120, 300, 600, 990, 1500]
+        cbar_ticklabels = ['< 30 mm', '30 – 60', '60 – 120', '120 – 300', '300 – 600', '600 – 990', '>990 mm']
  
     else: 
  
@@ -424,7 +424,7 @@ def map_precip_accum(dset, varname='precipitationCal', mask=None, geoms=None, cm
 
     # copyright notice 
     
-    ax.text(0.006, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+    ax.text(0.0065, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
@@ -501,7 +501,7 @@ def map_precip_anoms(dset, varname='anoms', mask=None, cmap=None, geoms=None, fp
     
     # copyright notice 
     
-    ax.text(0.006, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+    ax.text(0.0065, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
     
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
@@ -613,13 +613,13 @@ def map_dry_days_Pacific(dset, varname='dry_days', mask=None, cmap=None, geoms=N
 
     # copyright notice 
     
-    ax.text(0.006, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+    ax.text(0.0065, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
     # insert the NIWA logo 
     
-    insert_logo(ax=ax)
+    # insert_logo(ax=ax)
     
     f.patch.set_facecolor('white')
     
@@ -692,20 +692,20 @@ def map_days_since_rain_Pacific(dset, varname='days_since_rain', mask=None, cmap
         make_gridlines(ax=ax, lon_step=20, lat_step=10)
 
     ax.set_title("") # get rid of default title
-
-    title = f"Days since last rain (>= 1 mm/day): {ndays} days\nto {last_day:%d %B %Y}"
     
-    ax.text(0.99, 0.94, title, fontsize=13, fontdict={'color':'green'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
+    title = f"Days since last rain, {ndays} days period\nto {last_day:%d %b %Y}"
+    
+    ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
 
     # copyright notice 
     
-    ax.text(0.006, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+    ax.text(0.0065, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
     # insert the NIWA logo 
     
-    insert_logo(ax=ax)
+    # insert_logo(ax=ax)
     
     f.patch.set_facecolor('white')
     
@@ -794,28 +794,28 @@ def map_dry_days(dset, world_coastlines, country_coastline, EEZ, varname='dry_da
     gl.ylabel_style = {'size': 10, 'color': 'k'}
 
     f.patch.set_facecolor('white')
+
+    ax.set_title("")
     
     if varname == 'dry_days': 
-        title = f"{country_name}: GPM-IMERG, number of dry days (< 1 mm/day)\nover the past {ndays} days to {last_day:%d %B %Y} [UTC]"
-        ax.set_title(title, fontsize=13, color='k')
+        title = f"{country_name}: Number of dry days, {ndays} days period\nto {last_day:%d %b %Y}"
+        ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
     elif varname == 'days_since_rain': 
-        title = f"{country_name}: GPM-IMERG, days since last rain (>= 1 mm/day)\nover the past {ndays} days to {last_day:%d %B %Y} [UTC]"
-        ax.set_title(title, fontsize=13, color='k')   
+        title = f"{country_name}: Days since last rain, {ndays} days period\nto {last_day:%d %b %Y}"
+        ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
     elif varname == 'wet_days': 
-        title = f"{country_name}: GPM-IMERG, number of wet days (>= 1 mm/day)\nover the past {ndays} days to {last_day:%d %B %Y} [UTC]"
-        ax.set_title(title, fontsize=13, color='k')
+        title = title = f"{country_name}: Number of wet days, {ndays} days period\nto {last_day:%d %b %Y}"
+        ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
         
-    print(title)
-
     # copyright notice 
     
-    ax.text(0.006, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+    ax.text(0.01, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent([lon_min, lon_max, lat_min, lat_max])    
 
     # insert the NIWA logo 
     
-    insert_logo(ax=ax) 
+    # insert_logo(ax=ax) 
                 
     if path is None: # if no path, then the path is the current directory 
         
@@ -918,7 +918,7 @@ def map_EAR_Watch_Pacific(dset, varname='pctscore', mask=None, geoms=None, fpath
     
     # copyright notice 
     
-    ax.text(0.006, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+    ax.text(0.0065, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
@@ -1009,7 +1009,7 @@ def map_USDM_Pacific(dset, mask=None, geoms=None, fpath=None, close=True, gridli
 
     # copyright notice 
     
-    ax.text(0.006, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+    ax.text(0.0065, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent(domain, crs = ccrs.PlateCarree())
     
@@ -1095,7 +1095,7 @@ def map_EAR_Watch(dset, world_coastlines, country_coastline, EEZ, varname='pctsc
 
     country_coastline.boundary.plot(ax=ax, transform=ccrs.PlateCarree(), color='k', lw=0.8)
 
-    EEZ.boundary.plot(ax=ax, transform=ccrs.PlateCarree(), color='steelblue', lw=1)
+    EEZ.boundary.plot(ax=ax, transform=ccrs.PlateCarree(), color='0.4', linewidth=0.8)
 
     gl = ax.gridlines(draw_labels=True, linestyle=':', xlocs=xlocs, ylocs=ylocs, crs=ccrs.PlateCarree())
 
@@ -1107,7 +1107,7 @@ def map_EAR_Watch(dset, world_coastlines, country_coastline, EEZ, varname='pctsc
 
     f.patch.set_facecolor('white')
         
-    title = f"{country_name}: \"EAR\" Watch alert levels\n({ndays} day cumulative rainfall)"
+    title = f"{country_name}: \"EAR\" Watch alert levels\n{ndays} days to {last_day:%d %b %Y}"
     
     ax.set_title(title, fontsize=13, color='k')
 
@@ -1115,13 +1115,13 @@ def map_EAR_Watch(dset, world_coastlines, country_coastline, EEZ, varname='pctsc
 
     # copyright notice 
     
-    ax.text(0.006, 0.02, u'\u00A9'+" NIWA, GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+    ax.text(0.01, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent([lon_min, lon_max, lat_min, lat_max])    
 
     # insert the logo 
     
-    insert_logo(ax=ax)
+    # insert_logo(ax=ax)
 
     country_name_file = utils.sanitize_name(country_name)
         
@@ -1219,7 +1219,7 @@ def map_USDM(dset, world_coastlines, country_coastline, EEZ, varname='pctscore',
 
     country_coastline.boundary.plot(ax=ax, transform=ccrs.PlateCarree(), color='k', lw=0.8)
 
-    EEZ.boundary.plot(ax=ax, transform=ccrs.PlateCarree(), color='steelblue', lw=1)
+    EEZ.boundary.plot(ax=ax, transform=ccrs.PlateCarree(), color='0.4', linewidth=0.8)
 
     gl = ax.gridlines(draw_labels=True, linestyle=':', xlocs=xlocs, ylocs=ylocs, crs=ccrs.PlateCarree())
 
@@ -1231,7 +1231,7 @@ def map_USDM(dset, world_coastlines, country_coastline, EEZ, varname='pctscore',
 
     f.patch.set_facecolor('white')
         
-    title = f"{country_name}: \"USDM\" levels\n({ndays} day cumulative rainfall)"
+    title = f"{country_name}: US Drought Monitor\n{ndays} days to {last_day:%d %b %Y}"
     
     ax.set_title(title, fontsize=13, color='k')
 
@@ -1239,7 +1239,7 @@ def map_USDM(dset, world_coastlines, country_coastline, EEZ, varname='pctscore',
 
     # copyright notice 
     
-    ax.text(0.006, 0.02, u'\u00A9'+" NIWA, GPM-IMERG data from https://gpm.nasa.gov/data/imerg", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+    ax.text(0.01, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent([lon_min, lon_max, lat_min, lat_max])    
             
@@ -1501,7 +1501,7 @@ def map_MME_forecast(probs_mean, \
 
     elif period == 'seasonal': 
         
-        period_label = month_name[month + 1] + '-' + month_name[month + 3]
+        period_label = month_name[month + 1] + ' through ' + month_name[month + 3]
     
     # selects the step 
     
@@ -1546,8 +1546,7 @@ def map_MME_forecast(probs_mean, \
     thresholds = [0, 50, 60, 70, 80, 90, 100]
     
     # hexes = ['#a6dba0', '#d9f0d3', '#f7f7f7', '#e7d4e8', '#c2a5cf', '#9970ab', '#762a83']
-    
-    hexes = ['#ffffff', '#f6e8c3', '#dfc27d', '#bf812d','#ecb256', '#c18b36', '#543005']
+    # hexes = ['#ffffff', '#f6e8c3', '#dfc27d', '#bf812d','#ecb256', '#c18b36', '#543005']
 
     ticks_marks = np.diff(np.array(thresholds)) / 2.
 
@@ -1597,13 +1596,13 @@ def map_MME_forecast(probs_mean, \
     
     ax.set_title("")
     
-    title = f"{period_label} Probability of rainfall {dops[comp]} {pct}th percentile"
+    title = f"Probability of rainfall {dops[comp]} {pct}th percentile\n{period_label}"
 
     ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
 
     # adds the copyright sentence 
 
-    ax.text(0.006, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+    ax.text(0.0065, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     # add the NIWAlogo 
     
@@ -1611,13 +1610,13 @@ def map_MME_forecast(probs_mean, \
 
     # set the bottom line, which indicates the valid time for the forecast (be it monthly or seasonal)
 
-    if period is not None: 
+    # if period is not None: 
         
-        ax.text(0.99, 0.02, f"{period} forecast, valid to end {valid_time:%Y-%m}", fontsize=10, fontdict={'color':'0.4'}, horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
+    #     ax.text(0.99, 0.02, f"{period} forecast, valid to end {valid_time:%Y-%m}", fontsize=10, fontdict={'color':'0.4'}, horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
 
-    else: 
+    # else: 
 
-        ax.text(0.99, 0.02, f"valid {valid_time:%Y-%m}", fontsize=10, fontdict={'color':'0.4'}, horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
+    #     ax.text(0.99, 0.02, f"valid {valid_time:%Y-%m}", fontsize=10, fontdict={'color':'0.4'}, horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
 
     if domain is not None: 
     

@@ -29,7 +29,7 @@ def get_era5(dpath='/media/nicolasf/END19101/data/REANALYSIS/downloads', varname
     
     lfiles = [x for x in lfiles if (int(x.name.split('_')[-2]) >= start) and (int(x.name.split('_')[-2]) <= end)]
 
-    dset = xr.open_mfdataset(lfiles, parallel=True, concat_dim='time', preprocess=preprocess_era)
+    dset = xr.open_mfdataset(lfiles, parallel=True, concat_dim='time', combine='nested', preprocess=preprocess_era)
     
     if varname == 'precip': 
         
