@@ -1115,7 +1115,7 @@ def map_EAR_Watch(dset, world_coastlines, country_coastline, EEZ, varname='pctsc
 
     # copyright notice 
     
-    ax.text(0.01, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+    ax.text(0.02, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent([lon_min, lon_max, lat_min, lat_max])    
 
@@ -1239,7 +1239,7 @@ def map_USDM(dset, world_coastlines, country_coastline, EEZ, varname='pctscore',
 
     # copyright notice 
     
-    ax.text(0.01, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+    ax.text(0.02, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
 
     ax.set_extent([lon_min, lon_max, lat_min, lat_max])    
             
@@ -1267,7 +1267,210 @@ def map_USDM(dset, world_coastlines, country_coastline, EEZ, varname='pctscore',
         
         plt.close(f)
 
+def map_SPI_Pacific(dset, varname='SPI', mask=None, geoms=None, domain=[125, 240, -35, 25], fpath=None, close=True, gridlines=False): 
+
+    # get the last date and the number of days from the dataset 
+    
+    last_day, ndays = get_attrs(dset) 
+
+    dataarray = dset[varname].squeeze()
+    
+    # if mask_EEZs is True, we multiply the percentage of score by the EEZs mask 
+
+    if (mask is not None) and (mask in dset.data_vars): 
         
+        dataarray = dataarray * dset[mask]
+
+    # here hard-coded thresholds, colors and labels 
+
+    thresholds = [-2.5, -2, -1.5, -1, 1, 1.5, 2, 2.5]
+
+    rgbs = ['#F04E37', '#F99D1C', '#FFDE40', '#ffffff', '#96ceff', '#4553bf', '#09146b']
+
+    ticks_marks = np.diff(np.array(thresholds)) / 2.
+
+    ticks = [thresholds[i] + ticks_marks[i] for i in range(len(thresholds) - 1)]
+
+    cbar_ticklabels = ['extremely dry','severely dry','moderately dry',' ', 'moderately wet','severely wet','extremely wet']
+
+    cmap = matplotlib.colors.ListedColormap(rgbs, name='SPI')
+
+    cbar_kwargs={'shrink':0.5, 'pad':0.01, 'extend':'neither', 'drawedges':True, 'ticks':ticks, 'aspect':15}
+
+    # plot starts here 
+    
+    f, ax = plt.subplots(figsize=(13, 8), subplot_kw={'projection':ccrs.PlateCarree(central_longitude=180)})
+
+    im = dataarray.plot.contourf(ax=ax, levels=thresholds, cmap=cmap, transform=ccrs.PlateCarree(), add_colorbar=False)
+
+    # adds the colorbar axes as insets 
+
+    cbar_ax = ax.axes.inset_axes([0.80, 0.5225, 0.025, 0.38])
+    
+    # plots the colorbar in these axes 
+    
+    cb = plt.colorbar(im, cax=cbar_ax, **cbar_kwargs)
+
+    # removes the minor ticks 
+
+    cb.ax.minorticks_off() 
+
+    # plots the ticklabels 
+    
+    cbar_ax.set_yticklabels(cbar_ticklabels)
+    
+    # removes the ticks 
+    
+    cb.ax.tick_params(size=0)
+
+    ax.coastlines(resolution='10m')
+
+    if geoms is not None: 
+        
+        add_geom(ax=ax, geoms=geoms)
+
+    if gridlines: 
+        
+        make_gridlines(ax=ax, lon_step=20, lat_step=10)
+
+    title = f"Standardized Precipitation Index (SPI)\n{ndays} days to {last_day:%d %b %Y}"
+    
+    ax.set_title("") # to get rid of the default title
+    
+    ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
+    
+    # copyright notice 
+    
+    ax.text(0.0065, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+    
+    ax.set_extent(domain, crs = ccrs.PlateCarree())
+    
+    # insert the logo 
+    
+    # insert_logo(ax=ax)
+    
+    f.patch.set_facecolor('white')
+    
+    if fpath is not None: 
+        
+        if type(fpath) != pathlib.PosixPath: 
+            
+            fpath = pathlib.Path(fpath)
+
+        f.savefig(fpath.joinpath(f"SPI_Pacific_{ndays}days_to_{last_day:%Y-%m-%d}.png"), dpi=200, bbox_inches='tight')
+    
+    if close: 
+        
+        plt.close(f)
+
+def map_SPI(dset_sub_country, world_coastlines, country_coastline, EEZ, varname='SPI', mask_name='mask_EEZ', country_name='Fiji', fpath=None, close=True): 
+
+    thresholds = [-2.5, -2, -1.5, -1, 1, 1.5, 2, 2.5]
+
+    rgbs = ['#F04E37', '#F99D1C', '#FFDE40', '#ffffff', '#96ceff', '#4553bf', '#09146b']
+
+    ticks_marks = np.diff(np.array(thresholds)) / 2.
+
+    ticks = [thresholds[i] + ticks_marks[i] for i in range(len(thresholds) - 1)]
+
+    cbar_ticklabels = ['extremely dry','severely dry','moderately dry',' ', 'moderately wet','severely wet','extremely wet']
+
+    cmap = matplotlib.colors.ListedColormap(rgbs, name='SPI')
+
+    cbar_kwargs={'shrink':0.5, 'pad':0.01, 'extend':'neither', 'drawedges':True, 'ticks':ticks, 'aspect':15}
+
+    # extracts the number of days and last day 
+
+    last_day, ndays = get_attrs(dset_sub_country)
+
+    # determine boundaries 
+
+    lon_min = np.floor(dset_sub_country.lon.data.min())
+    lon_max = np.ceil(dset_sub_country.lon.data.max())
+    lat_min = np.floor(dset_sub_country.lat.data.min())
+    lat_max = np.ceil(dset_sub_country.lat.data.max())
+
+    # make xlocs and ylocs 
+    
+    xlocs = np.linspace(lon_min, lon_max + 1, 5, endpoint=True)
+    ylocs = np.linspace(lat_min, lat_max + 1, 5, endpoint=True)
+    
+    xlocs[xlocs > 180] -= 360 # fix the longitudes to go from -180 to 180 (for plotting)
+
+    # extract the dataarray and apply the mask 
+    if mask_name is not None: 
+
+        dataarray = (dset_sub_country[varname] * dset_sub_country[mask_name]).squeeze()
+
+    else: 
+
+        dataarray = dset_sub_country[varname].squeeze()
+
+
+    f, ax = plt.subplots(figsize=(13, 8), subplot_kw={'projection':ccrs.PlateCarree(central_longitude=180)})
+
+    im_arr  = dataarray.plot.contourf(ax=ax, levels=thresholds, cmap=cmap, transform=ccrs.PlateCarree(), add_colorbar=False, extend='both')
+
+    # cbar_ax = ax.axes.inset_axes([1.05, 0.225, 0.035, 0.6])
+
+    # plots the colorbar in these axes 
+
+    cb = plt.colorbar(im_arr, **cbar_kwargs)
+
+    cb.ax.tick_params(size=0)
+
+    # plots the ticklabels 
+
+    cb.ax.set_yticklabels(cbar_ticklabels)
+
+    world_coastlines.boundary.plot(ax=ax, transform=ccrs.PlateCarree(), lw=1, color='0.8')
+
+    country_coastline.boundary.plot(ax=ax, transform=ccrs.PlateCarree(), lw=1, color='k')
+
+    ax.set_extent([lon_min, lon_max, lat_min, lat_max])
+
+    add_geom(ax, geoms=EEZ)
+
+    gl = ax.gridlines(draw_labels=True, linestyle=':', xlocs=xlocs, ylocs=ylocs, crs=ccrs.PlateCarree())
+
+    gl.top_labels = False
+    gl.right_labels = False
+
+    gl.xlabel_style = {'size': 10, 'color': 'k'}
+    gl.ylabel_style = {'size': 10, 'color': 'k'}
+
+    title = f"{country_name}: Standardized Precipitation Index (SPI)\n{ndays} days to {last_day:%d %b %Y}"
+
+    ax.set_title(title, fontsize=13, color='k')
+
+    ax.text(0.02, 0.02, u'\u00A9'+" NIWA", transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='w'), fontdict=dict(color='0.4'))
+
+    ax.set_extent([lon_min, lon_max, lat_min, lat_max])
+    
+    if fpath is None: # if no path, then the path is the current directory 
+        
+        fpath = pathlib.Path.cwd()
+        
+    else: 
+            
+        fpath = pathlib.Path(fpath)
+            
+        if not fpath.exists():
+            
+            fpath.mkdir(parents=True)
+    
+    # build the file name 
+    
+    filename = f"{utils.sanitize_name(country_name)}_{mask_name}_SPI_{ndays}nbdays_to_{last_day:%Y-%m-%d}.png"
+        
+    # save the figure 
+    
+    f.savefig(fpath.joinpath(filename), dpi=200, bbox_inches='tight')
+        
+    if close: 
+        
+        plt.close(f)
+
 def plot_eofs(eofs, verif_dset='CMAP'): 
     """
     plots the EOFS held in a xarray.Dataarray (as from appliying eofs from A.J. Dawson      )
