@@ -1462,7 +1462,7 @@ def map_SPI(dset_sub_country, world_coastlines, country_coastline, EEZ, varname=
         
     # save the figure 
     
-    f.savefig(fpath.joinpath(filename), dpi=200, bbox_inches='tight')
+    f.savefig(fpath.joinpath(filename), dpi=200, bbox_inches='tight', facecolor='w')
         
     if close: 
         
@@ -1616,11 +1616,11 @@ def plot_heatmap(mat, year = 2021, start_month=3, n_steps=5, cumsum=False, title
         
         mat = mat.cumsum(axis=0)
     
-        ytick_labels = [f'< {x}%' for x in range(10, 100 + 10, 10)] 
+        ytick_labels = [f'< {x}' for x in range(10, 100 + 10, 10)] 
         
     else: 
         
-        ytick_labels = [f'{x} to {x+10}%' for x in range(0, 100, 10)]
+        ytick_labels = [f'{x} to {x+10}' for x in range(0, 100, 10)]
         
         cmap = cmap.replace('_r','')
     
