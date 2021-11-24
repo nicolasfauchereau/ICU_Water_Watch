@@ -533,49 +533,32 @@ def map_dry_days_Pacific(dset, varname='dry_days', mask=None, cmap=None, geoms=N
         
         dataarray = dataarray * dset[mask]
         
-    # defines the levels if the number of days is 90 
+    # defines the levels if the number of days
     
-    if ndays == 90: 
-        
-        levels = [0, 25, 40, 50, 60, 70, 80, 90]
-        
-        hexes = ['#01665e', '#5ab4ac', '#c7eae5', '#FFFFFF', '#f6e8c3', '#d8b365', '#8c510a']
-        
-        cbar_ticklabels = ['< 25 days', '25 -40', '40 - 50', '50 - 60', '60 - 70', '70 - 80', '> 80 days']
-        
-        ticks_marks = np.diff(np.array(levels)) / 2.
-
-        ticks = [levels[i] + ticks_marks[i] for i in range(len(levels) - 1)]
-
-        # arguments for the colorbar 
-
-        cbar_kwargs={'shrink':0.5, 'pad':0.01, 'extend':'neither', 'drawedges':True, 'ticks':ticks, 'aspect':15}
-
-        cmap = matplotlib.colors.ListedColormap(hexes, name='accumulations')
-        
-    else: 
+    levels_dict = {}
+    levels_dict[30] = np.arange(0, 30 + 5, 5)
+    levels_dict[60] = np.arange(0, 60 + 5, 5) 
+    levels_dict[90] = np.arange(0, 90 + 10, 10)
+    levels_dict[180] = np.arange(0, 180 + 20, 20)
+    levels_dict[360] = np.arange(0, 360 + 30, 30)
     
-        if ndays in [30, 60]: 
-        
-            levels = np.arange(0, ndays + 5, 5)
-        
-        else:  
-        
-            levels = np.arange(0, ndays + 10, 10)
-        
-        # colorbar keyword arguments 
+    levels = levels_dict[ndays]
     
-        cbar_kwargs = {'shrink':0.7, 'pad':0.01, 'extend':'max', 'drawedges':True, 'label':'days', 'ticks':levels}
+    cmap = matplotlib.cm.BrBG_r
     
-        # colormap 
-
-        if cmap is None and palettable: 
-            
-            cmap = palettable.colorbrewer.diverging.BrBG_11_r.mpl_colormap
-        
-        else:
-            
-            cmap = cm.Oranges
+    cmap = cmap_discretize(cmap, len(np.diff(levels)))
+    
+    b = [f"< {levels[1]}"]
+    a = [f"> {levels[-2]}"]
+    m = [f"{levels[i]} - {levels[i + 1]}" for i in range(1, len(levels) - 2)]
+    
+    cbar_ticklabels = b + m + a
+    
+    ticks_marks = np.diff(np.array(levels)) / 2.
+    
+    ticks = [levels[i] + ticks_marks[i] for i in range(len(levels) - 1)]
+    
+    cbar_kwargs={'shrink':0.5, 'pad':0.01, 'extend':'neither', 'drawedges':True, 'ticks':ticks, 'aspect':15}
     
     # plot starts here --------------------------------------------------------------------------------- 
     
@@ -594,10 +577,8 @@ def map_dry_days_Pacific(dset, varname='dry_days', mask=None, cmap=None, geoms=N
     if geoms is not None: 
         
         add_geom(ax=ax, geoms=geoms)
-        
-    if ndays == 90: 
-        
-        cbar_ax.set_yticklabels(cbar_ticklabels)
+    
+    cbar_ax.set_yticklabels(cbar_ticklabels)
     
     ax.coastlines(resolution='50m')
     
@@ -651,9 +632,13 @@ def map_days_since_rain_Pacific(dset, varname='days_since_rain', mask=None, cmap
         
         levels = np.arange(0, ndays + 5, 5)
         
+    elif ndays in [90, 180]: 
+        
+        levels = np.arange(0, ndays + 10, 10)
+        
     else: 
         
-        levels = levels = np.arange(0, ndays + 10, 10)
+        levels = np.arange(0, ndays + 30, 30)
     
     # colorbar keyword arguments 
     
@@ -729,7 +714,30 @@ def map_dry_days(dset, world_coastlines, country_coastline, EEZ, varname='dry_da
     
     last_day, ndays = get_attrs(dset)
     
-    levels = np.arange(0, ndays + (ndays // 10), (ndays // 10))
+    levels_dict = {}
+    levels_dict[30] = np.arange(0, 30 + 5, 5)
+    levels_dict[60] = np.arange(0, 60 + 5, 5) 
+    levels_dict[90] = np.arange(0, 90 + 10, 10)
+    levels_dict[180] = np.arange(0, 180 + 20, 20)
+    levels_dict[360] = np.arange(0, 360 + 30, 30)
+    
+    levels = levels_dict[ndays]
+    
+    cmap = matplotlib.cm.BrBG_r
+    
+    cmap = cmap_discretize(cmap, len(np.diff(levels)))
+    
+    b = [f"< {levels[1]}"]
+    a = [f"> {levels[-2]}"]
+    m = [f"{levels[i]} - {levels[i + 1]}" for i in range(1, len(levels) - 2)]
+    
+    cbar_ticklabels = b + m + a
+    
+    ticks_marks = np.diff(np.array(levels)) / 2.
+    
+    ticks = [levels[i] + ticks_marks[i] for i in range(len(levels) - 1)]
+    
+    cbar_kwargs={'shrink':0.5, 'pad':0.01, 'extend':'neither', 'drawedges':True, 'ticks':ticks, 'aspect':15}
     
     # determine boundaries 
     
@@ -748,18 +756,7 @@ def map_dry_days(dset, world_coastlines, country_coastline, EEZ, varname='dry_da
     if figsize is None: 
         
         figsize = (13, 8)
-    
-    if cmap is None: 
-        
-        cmap = palettable.colorbrewer.sequential.Oranges_9.mpl_colormap
-    
-    if cbar_kwargs is not None: 
-         
-        cbar_kwargs['label'] = cbar_label
-        
-    else: 
-            
-        cbar_kwargs = {'shrink':0.7, 'pad':0.01, 'extend':'max', 'drawedges':True, 'label':cbar_label}
+
 
     # plot ---------------------------------------------------------------------------------------------------------------
 
@@ -1671,7 +1668,7 @@ def map_MME_forecast(probs_mean, \
     # period taken from the dataset  
 
     period = probs_mean.attrs['period']
-    
+
     # some checks 
     
     if (not(pct_dim in ['tercile','decile','percentile'])) or (not(pct_dim in probs_mean.dims)): 
@@ -1681,35 +1678,25 @@ def map_MME_forecast(probs_mean, \
     # get month and year of the forecast (initial month)
     
     # valid time
-    
-    valid_time = probs_mean.time.to_index()[0] + relativedelta(months=step)
-    
+        
     month = probs_mean.time.to_index().month[0]
     
     year = probs_mean.time.to_index().year[0]
+    
+    # take the step 
+    
+    probs_mean = probs_mean.sel(step=step).squeeze()
 
     # period label 
-
-    if 'period' in probs_mean.attrs.keys(): 
-        
-        period = probs_mean.attrs['period']
-        
-    else: 
-        
-        period = 'monthly'
     
     if period == 'monthly': 
 
-        period_label = month_name[month + 1]
+        period_label = month_name[month + step]
 
     elif period == 'seasonal': 
         
-        period_label = month_name[month + 1] + ' through ' + month_name[month + 3]
-    
-    # selects the step 
-    
-    probs_mean = probs_mean.sel(step=step).squeeze()
-    
+        period_label = month_name[month + step - 2] + " - " + month_name[month + step]
+        
     # interpolation 
     
     if interp: 
@@ -1835,11 +1822,11 @@ def map_MME_forecast(probs_mean, \
 
         if period is not None: 
 
-            f.savefig(fpath.joinpath(f"C3S_{period}_MME_{comp}_{pct}_{year}_{month}.png"), dpi=200, bbox_inches='tight')
+            f.savefig(fpath.joinpath(f"C3S_{period}_MME_{comp}_{pct}_{year}_{month}_init_{period_label.replace(' - ','_')}.png"), dpi=200, bbox_inches='tight')
             
         else: 
             
-            f.savefig(fpath.joinpath(f"C3S_MME_{comp}_{pct}_{year}_{month}.png"), dpi=200, bbox_inches='tight')
+            f.savefig(fpath.joinpath(f"C3S_MME_{comp}_{pct}_{year}_{month}_init_{period_label.replace(' - ','_')}.png"), dpi=200, bbox_inches='tight')
     
     if close: 
         

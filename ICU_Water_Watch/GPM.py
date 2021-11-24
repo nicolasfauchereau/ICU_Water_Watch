@@ -132,6 +132,39 @@ def make_dataset(lfiles=None, dpath=None, varname='precipitationCal', ndays=None
     
     return dset
 
+def set_attrs(dset, ndays=None, last_day=None): 
+    """
+    set number of days and last day as global attributes 
+    in a xarray dataset 
+
+    Parameters
+    ----------
+    dset : xarray.Dataset
+        The xarray Dataset 
+    ndays : int, optional
+        The number of days, by default None
+    last_day : str or datetime, optional
+        The last day of the `ndays` period, by default None
+
+    Returns
+    -------
+    xarray.Dataset
+        The xarray Dataset with attributes set
+    """
+    
+    if ndays is not None: 
+        
+        dset.attrs['ndays'] = ndays 
+        
+    if last_day is not None: 
+        
+        if isinstance(last_day, str): 
+            dset.attrs['last_day'] = last_day
+        elif isinstance(last_day, datetime): 
+            dset.attrs['last_day'] = f"{last_day:%Y-%m-%d}"
+            
+        return dset 
+    
 def get_attrs(dset): 
     """
     return (in order) the last day and the number of days
