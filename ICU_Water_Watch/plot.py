@@ -1572,7 +1572,7 @@ def map_quantile_categories(dset, varname='precip', steps=[1,2,3], n_quantiles=3
         
     return fg.fig, fg.axes
 
-def plot_heatmap(mat, year = 2021, start_month=3, n_steps=5, cumsum=False, title=None, cmap='Oranges'): 
+def plot_heatmap(mat, year = 2021, start_month=3, period='monthly', n_steps=5, cumsum=False, title=None, cmap='Oranges'): 
     """
     Plot a heatmap of decile probabilities or cumulative decile probabilities
 
@@ -1610,7 +1610,13 @@ def plot_heatmap(mat, year = 2021, start_month=3, n_steps=5, cumsum=False, title
     
     month_abbr = month_abbr + month_abbr[1:]
     
-    xtick_labels = month_abbr[start_month: start_month + n_steps]
+    if period == 'monthly':
+    
+        xtick_labels = month_abbr[start_month: start_month + n_steps]
+    
+    elif period == 'seasonal': 
+        
+        xtick_labels = [f"{month_abbr[start_month + i]} - {month_abbr[start_month + i + 2]}" for i in range(n_steps)]
     
     if cumsum: 
         
