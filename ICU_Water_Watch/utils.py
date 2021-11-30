@@ -385,3 +385,48 @@ def round_to_100_percent(number_set, digit_after_decimal=2):
         remainder -= 1
         index = (index + 1) % len(number_set)
     return [int(x) / float(10 ** digit_after_decimal) for x in unround_numbers]
+
+def convert_rainfall_OBS(dset, varin='precipitationCal', varout='precip', timevar='time'): 
+    """
+    converts the rainfall - anomalies or raw data - originally in mm/day
+    in the GPM-IMERG dataset to mm per month ... 
+    """
+    
+    import pandas as pd 
+    import numpy as np 
+    from datetime import datetime
+    from calendar import monthrange
+    from dateutil.relativedelta import relativedelta
+    
+    # cheks that the variable is expressed in mm/day 
+    
+    if not('units' in dset[varin].attrs and dset[varin].attrs['units'] in ['mm','mm/day']): 
+        print(f"Warning, the variable {varin} has no units attributes or is not expressed in mm or mm/day")
+        return None
+    else: 
+    
+        # coonvert cdftime to datetimeindex 
+        
+        index = dset.indexes[timevar]
+        
+        if type(index) != pd.core.indexes.datetimes.DatetimeIndex: 
+            
+            index = index.to_datetimeindex()
+    
+        dset[timevar] = index
+    
+        # gets the number of days in each month 
+        ndays = [monthrange(x.year, x.month)[1] for x in index]
+        
+        # adds this variable into the dataset 
+        dset['ndays'] = ((timevar), np.array(ndays))
+        
+        # multiply to get the anomalies in mm / month 
+        dset['var'] = dset[varin] * dset['ndays'] 
+
+        # rename 
+        dset = dset.drop(varin)
+        
+        dset = dset.rename({'var':varout})
+        
+        return dset 

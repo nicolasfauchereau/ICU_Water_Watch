@@ -1,3 +1,10 @@
+# imports 
+
+from . import geo 
+import numpy as np
+import matplotlib.pyplot as plt
+from cartopy import crs as ccrs
+
 # dictionnay holding the different geographical domains used 
 # in the ICU Water Watch and the SCO 
 
@@ -9,6 +16,42 @@ domains['NZ'] = [161, 181, -50, -30]
 domains['Pacific'] = [140, 240, -50, 25]
 domains['C3S_download'] = [100, 240, -50, 30]
 domains['Water_Watch'] = [120, 240, -35, 25]
+
+
+def plot_domain(domains):
+    """
+    small function to plot a dictionnary of domains ([lonmin, lonmax, latmin, latmax])
+
+    Parameters
+    ----------
+    domains : dictionnary
+        key = name
+        value = list ([lonmin, lonmax, latmin, latmax])
+
+    Returns
+    -------
+    matplotlib Figure
+    """
+    
+    color = iter(plt.cm.rainbow(np.linspace(0, 1, len(domains.domains))))
+
+    f, ax = plt.subplots(subplot_kw=dict(projection=ccrs.PlateCarree(central_longitude=180)), figsize=(13,8))
+
+    for k in domains.domains.keys(): 
+    
+        c = next(color)
+    
+        lonmin, lonmax, latmin, latmax = domains.domains[k]
+    
+        shape = geo.gpd_from_domain(lonmin=lonmin, lonmax=lonmax, latmin=latmin, latmax=latmax)
+    
+        shape.boundary.plot(ax=ax, transform=ccrs.PlateCarree(), color=c) 
+    
+        ax.text(shape.centroid.x, shape.centroid.y, k, color=c, transform=ccrs.PlateCarree())
+
+    ax.coastlines(resolution='10m') 
+
+    return f
 
 # small utility function to get the geographical domain of 
 # an xarray dataset or dataarray 
