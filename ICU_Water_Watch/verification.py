@@ -3,12 +3,24 @@ The `verification` module contains helper functions for the verification of dete
 C3S forecasts against observations or reanalyses 
 """
 
+from functools import partial
+
 import pathlib
 import numpy as np
 import pandas as pd
 import xarray as xr
 
-from datetime import datetime, date 
+import cartopy.crs as ccrs 
+
+from climpred import HindcastEnsemble
+
+from dask.diagnostics import ProgressBar
+
+from matplotlib import pyplot as plt
+
+from sklearn.metrics import accuracy_score, confusion_matrix, precision_score
+
+from datetime import date 
 
 from . import utils
 from . import GPM 
@@ -133,7 +145,6 @@ def get_cmap(dpath='/media/nicolasf/END19101/data/CMAP', fname='precip.mon.mean.
     tuple
         (xarray.Dataset of raw values, xarray.Dataset of anomalies)
     """
-    from datetime import datetime
     
     if not(type(dpath) == pathlib.PosixPath): 
         dpath = pathlib.Path(dpath)
@@ -173,9 +184,7 @@ def get_cmap(dpath='/media/nicolasf/END19101/data/CMAP', fname='precip.mon.mean.
     return dset, dset_anomalies
 
 def get_gpcp(dpath='/media/nicolasf/END19101/data/GPCP', fname='precip.mon.mean.nc', start=1993, end=2016, month_begin=True, accum=True, domain=None, chunks=None): 
-        
-    from datetime import datetime
-    
+            
     if not(type(dpath) == pathlib.PosixPath): 
         dpath = pathlib.Path(dpath)
         
@@ -404,6 +413,7 @@ def process_for_climpred(dset, time_name='time', lead_name='step'):
     -------
     xarray.Dataset
     """
+    
     dset = dset.rename({time_name:'init',lead_name:'lead'})
     dset['lead'].attrs = {'units':'months'}
     return dset 
@@ -537,13 +547,6 @@ def enso_to_xarray(enso):
     return enso
 
 def make_ENSO_ACC_RMSE(MME, dset_obs, enso_index, GCM='MME', name='El Nino', plot_map=True, fname=None, cmap=None): 
-
-    import numpy as np 
-    import xarray as xr 
-    import cartopy.crs as ccrs 
-    from climpred import HindcastEnsemble
-    from dask.diagnostics import ProgressBar
-    from matplotlib import pyplot as plt
     
     if type(enso_index) != xr.core.dataset.Dataset: 
         
@@ -595,3 +598,59 @@ def make_ENSO_ACC_RMSE(MME, dset_obs, enso_index, GCM='MME', name='El Nino', plo
             RMSE = RMSE.compute()
             
     return R_map, ACC, RMSE
+
+def tp(x, y, class_value):
+    """
+    x: is the GCM
+    y: is the observed
+    """
+    intersection = ((x == class_value) * (y == class_value)).sum()
+    # same as the and statement
+    # multiplication ensures that this is only where both values equal the class set
+    # this is the same as true positives
+    return intersection 
+
+def fp(x, y, class_value):
+    """
+    x: is the GCM
+    y: is the observed
+    """
+    fps = ((x == class_value) * (~(y == class_value))).sum()
+    # multiplication ensures that this is only where both values equal the class set
+    # this is the same as true positives
+    return fps
+
+def fn(x, y, class_value):
+    """
+    x: is the GCM
+    y: is the observed
+    """
+    fns = ((y == class_value) * (~(x == class_value))).sum()
+    # multiplication ensures that this is only where both values equal the class set
+    # this is the same as true positives
+    return fns
+
+def tn(x, y, class_value): 
+    tns = ((~(y == class_value)) * (~(x == class_value))).sum()
+    # multiplication ensures that this is only where both values equal the class set
+    # this is the same as true positives
+    return tns
+
+def iou(x, y, class_value):
+    intersection = ((x == class_value) * (y == class_value)).sum()
+    # multiplication ensures that this is only where both values equal the class set
+    union_set = (x == class_value) + (y == class_value)
+    # union will combine the two (e.g. when the predicted value is 0 and observed is 1)
+    union_set = np.clip(union_set, a_min =0, a_max =1).sum()
+    # clipping the set, as we only want a boolean union
+    return intersection / union_set
+
+def confusion_matrix_parallel(x, y):
+    x = x-1
+    y = y-1
+    # converting the ones to zeros
+    # Note see documentation if you'd like to normalize the data
+    return confusion_matrix(x, y)
+
+
+

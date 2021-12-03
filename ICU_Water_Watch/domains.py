@@ -15,10 +15,10 @@ domains['Fiji'] = [175, 183, -21, -15]
 domains['NZ'] = [161, 181, -50, -30] 
 domains['Pacific'] = [140, 240, -50, 25]
 domains['C3S_download'] = [100, 240, -50, 30]
-domains['Water_Watch'] = [120, 240, -35, 25]
+domains['Water_Watch'] = [125, 240, -35, 25]
 
 
-def plot_domain(domains):
+def plot_domains():
     """
     small function to plot a dictionnary of domains ([lonmin, lonmax, latmin, latmax])
 
@@ -33,15 +33,15 @@ def plot_domain(domains):
     matplotlib Figure
     """
     
-    color = iter(plt.cm.rainbow(np.linspace(0, 1, len(domains.domains))))
+    color = iter(plt.cm.rainbow(np.linspace(0, 1, len(domains))))
 
     f, ax = plt.subplots(subplot_kw=dict(projection=ccrs.PlateCarree(central_longitude=180)), figsize=(13,8))
 
-    for k in domains.domains.keys(): 
+    for k in domains.keys():
     
         c = next(color)
     
-        lonmin, lonmax, latmin, latmax = domains.domains[k]
+        lonmin, lonmax, latmin, latmax = domains[k]
     
         shape = geo.gpd_from_domain(lonmin=lonmin, lonmax=lonmax, latmin=latmin, latmax=latmax)
     
