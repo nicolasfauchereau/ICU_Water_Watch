@@ -819,6 +819,7 @@ def calibrate_SPI(dset, variable='precipitationCal', dimension='time', return_ga
     ds_ma = dset[variable]
     
     ds_In = np.log(ds_ma)
+    
     ds_In = ds_In.where(np.isinf(ds_In) == False) #= np.nan  #Change infinity to NaN
 
     ds_mu = ds_ma.mean(dimension)
@@ -839,7 +840,7 @@ def calibrate_SPI(dset, variable='precipitationCal', dimension='time', return_ga
 
         gamma_func = lambda data, a, scale: st.gamma.cdf(data, a=a, scale=scale)
 
-        gamma = xr.apply_ufunc(gamma_func, ds_ma, alpha, beta)
+        gamma = xr.apply_ufunc(gamma_func, ds_ma, alpha, beta, dask='allowed')
 
         return gamma, alpha, beta
 
@@ -854,10 +855,10 @@ def calculate_SPI(dataarray, alpha, beta, name='SPI'):
     
     gamma_func = lambda data, a, scale: st.gamma.cdf(data, a=a, scale=scale)
     
-    gamma = xr.apply_ufunc(gamma_func, dataarray, alpha, beta)
+    gamma = xr.apply_ufunc(gamma_func, dataarray, alpha, beta, dask='allowed')
     
     norminv = lambda data: st.norm.ppf(data, loc=0, scale=1)
     
-    norm_spi = xr.apply_ufunc(norminv, gamma)
+    norm_spi = xr.apply_ufunc(norminv, gamma, dask='allowed')
     
     return norm_spi.to_dataset(name=name)

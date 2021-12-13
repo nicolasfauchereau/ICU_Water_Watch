@@ -551,8 +551,8 @@ def calculate_quantiles_probabilities(dset, ncategories=3):
     import xarray as xr 
     import numpy as np 
     
-    if not(ncategories in [3,4, 10, 21]):
-        raise ValueError(f"given number of categories {ncategories} is not in [3,4, 10,21]")
+    if not(ncategories in [3, 4, 10, 21]):
+        raise ValueError(f"given number of categories {ncategories} is not in [3, 4, 10, 21]")
         return None
     else:
         category_proportion = []

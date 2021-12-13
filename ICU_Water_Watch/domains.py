@@ -18,7 +18,7 @@ domains['C3S_download'] = [100, 240, -50, 30]
 domains['Water_Watch'] = [125, 240, -35, 25]
 
 
-def plot_domains():
+def plot_domains(domain_name=None):
     """
     small function to plot a dictionnary of domains ([lonmin, lonmax, latmin, latmax])
 
@@ -33,23 +33,39 @@ def plot_domains():
     matplotlib Figure
     """
     
-    color = iter(plt.cm.rainbow(np.linspace(0, 1, len(domains))))
-
-    f, ax = plt.subplots(subplot_kw=dict(projection=ccrs.PlateCarree(central_longitude=180)), figsize=(13,8))
-
-    for k in domains.keys():
-    
-        c = next(color)
-    
-        lonmin, lonmax, latmin, latmax = domains[k]
-    
+    if domain_name is not None:
+        
+        f, ax = plt.subplots(subplot_kw=dict(projection=ccrs.PlateCarree(central_longitude=180)), figsize=(13,8))
+        
+        lonmin, lonmax, latmin, latmax = domains[domain_name]
+        
         shape = geo.gpd_from_domain(lonmin=lonmin, lonmax=lonmax, latmin=latmin, latmax=latmax)
+        
+        shape.boundary.plot(ax=ax, transform=ccrs.PlateCarree(), color='r')
+        
+        ax.text(shape.centroid.x, shape.centroid.y, domain_name, color='r', transform=ccrs.PlateCarree())
     
-        shape.boundary.plot(ax=ax, transform=ccrs.PlateCarree(), color=c) 
+        ax.coastlines(resolution='10m')
+        
+    else: 
     
-        ax.text(shape.centroid.x, shape.centroid.y, k, color=c, transform=ccrs.PlateCarree())
+        color = iter(plt.cm.rainbow(np.linspace(0, 1, len(domains))))
 
-    ax.coastlines(resolution='10m') 
+        f, ax = plt.subplots(subplot_kw=dict(projection=ccrs.PlateCarree(central_longitude=180)), figsize=(13,8))
+
+        for k in domains.keys():
+        
+            c = next(color)
+        
+            lonmin, lonmax, latmin, latmax = domains[k]
+        
+            shape = geo.gpd_from_domain(lonmin=lonmin, lonmax=lonmax, latmin=latmin, latmax=latmax)
+        
+            shape.boundary.plot(ax=ax, transform=ccrs.PlateCarree(), color=c) 
+        
+            ax.text(shape.centroid.x, shape.centroid.y, k, color=c, transform=ccrs.PlateCarree())
+
+        ax.coastlines(resolution='10m') 
 
     return f
 

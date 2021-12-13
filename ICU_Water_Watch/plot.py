@@ -351,30 +351,39 @@ def map_precip_accum(dset, varname='precipitationCal', mask=None, geoms=None, cm
         
         dataarray = dataarray * dset[mask] 
         
-    # defines the thresholds and labels for the colorbar ticks here 
-    # @TODO: put all these into a dictionnary, potentially varying according 
-    # to the season .... 
-        
-    if ndays == 30: 
-        
-        thresholds = [-100, 10, 20, 40, 100, 200, 330, 500]
-        cbar_ticklabels = ['< 10 mm', '10 – 20', '20 – 40', '40 – 100', '100 – 200', '250 – 330', '>330 mm']
+    # defines the thresholds and labels for the colorbar ticks here
     
-    elif ndays == 90: 
-            
-        thresholds = [-100, 30, 60, 120, 300, 600, 990, 1500]
-        cbar_ticklabels = ['< 30 mm', '30 – 60', '60 – 120', '120 – 300', '300 – 600', '600 – 990', '>990 mm']
- 
-    else: 
- 
-        thresholds = [-100, 50, 100, 250, 500, 750, 1000, 1500]
-        cbar_ticklabels = ['< 50 mm', '50 – 100', '100 – 250', '250 – 500', '500 – 750', '750 – 1000', '>1000 mm']       
+    dict_levels = {}
+    
+    dict_levels[30] = {}
+    dict_levels[30]['thresholds'] = [-100, 10, 20, 40, 100, 200, 330, 500]
+    dict_levels[30]['cbar_ticklabels'] = ['< 10 mm', '10 – 20', '20 – 40', '40 – 100', '100 – 200', '250 – 330', '>330 mm']
+
+    dict_levels[60] = {}
+    dict_levels[60]['thresholds'] = [-100, 20, 40, 80, 200, 400, 660, 1000]
+    dict_levels[60]['cbar_ticklabels'] = ['< 20 mm', '20 – 40', '40 – 80', '80 – 200', '200 – 400', '400 – 660', '>660 mm'] 
+    
+    dict_levels[90] = {}
+    dict_levels[90]['thresholds'] = [-100, 30, 60, 120, 300, 600, 990, 1500]
+    dict_levels[90]['cbar_ticklabels'] = ['< 30 mm', '30 – 60', '60 – 120', '120 – 300', '300 – 600', '600 – 990', '>990 mm']
+    
+    dict_levels[180] = {}
+    dict_levels[180]['thresholds'] = [-100, 40, 80, 160, 400, 800, 1320, 1700]
+    dict_levels[180]['cbar_ticklabels'] = ['< 40 mm', '40 – 80', '80 – 160', '160 – 400', '400 – 800', '800 – 1320', '>1320 mm'] 
+    
+    dict_levels[360] = {}
+    dict_levels[360]['thresholds'] = [-100, 120, 240, 480, 1200, 2400, 3960, 4500]
+    dict_levels[360]['cbar_ticklabels'] = ['< 120 mm', '120 – 240', '240 – 480', '480 – 1200', '1200 – 2400', '2400 – 3960', '>3960 mm']  
         
     # colors     
     # hexes = ['#8c510a', '#d8b365', '#f6e8c3', '#FFFFFF', '#c7eae5', '#5ab4ac', '#01665e', '#01665e']
     hexes = ['#243494', '#243494', '#225ea8', '#1d91bf', '#42b6c4', '#7fcdbb', '#c7e9b4', '#edf9b1']
     hexes.reverse()
 
+    # get the thresholds and cbar_ticklabels 
+    
+    thresholds = dict_levels[ndays]['thresholds']
+    cbar_ticklabels = dict_levels[ndays]['cbar_ticklabels']
 
     # ticks locations             
     ticks_marks = np.diff(np.array(thresholds)) / 2.
@@ -1354,7 +1363,7 @@ def map_SPI_Pacific(dset, varname='SPI', mask=None, geoms=None, domain=[125, 240
             
             fpath = pathlib.Path(fpath)
 
-        f.savefig(fpath.joinpath(f"SPI_Pacific_{ndays}days_to_{last_day:%Y-%m-%d}.png"), dpi=200, bbox_inches='tight')
+        f.savefig(fpath.joinpath(f"GPM_IMERG_SPI_Pacific_{ndays}days_to_{last_day:%Y-%m-%d}.png"), dpi=200, bbox_inches='tight')
     
     if close: 
         
