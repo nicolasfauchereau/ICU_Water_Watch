@@ -10,7 +10,7 @@ warnings.simplefilter("ignore", UserWarning)
 import matplotlib
 # matplotlib.use('Agg') # uncomment to use the non-interactive Agg backend
 
-import sys
+import os
 import pathlib
 
 from datetime import datetime, timedelta
@@ -23,6 +23,163 @@ from matplotlib import pyplot as plt
 # import the local utils package 
 
 from . import utils
+
+def get_files_to_download(dpath=None): 
+    
+    # checks paths 
+    if dpath is None: 
+        
+        dpath = pathlib.Path.cwd().parents[2].joinpath('data/GPM_IMERG/daily') 
+    
+    else:
+        
+        if type(dpath) != pathlib.PosixPath: 
+            
+            dpath = pathlib.Path(dpath)
+            
+        if not dpath.exists():
+             
+            raise ValueError(f"The path {str(dpath)} does not exist")
+        
+    # get the list of files present in the directory
+    
+    lfiles_local = list(dpath.glob("GPM_IMERG_daily.v06.????.??.??.nc"))
+    
+    lfiles_local.sort()
+    
+    # get the list of files that should be present
+    
+    today = datetime.today()
+    
+    if today.hour < 12: 
+            
+        lag = 1
+        
+    else:
+    
+        lag = 2
+    
+    last_day = today - timedelta(days=lag)
+    
+    # list of files that should be present according to the current date 
+    
+    lfiles_complete = [dpath.joinpath(f"GPM_IMERG_daily.v06.{date:%Y.%m.%d}.nc") for date in pd.date_range(start='2001-01-01', end=f"{last_day:%Y-%m-%d}")]
+    
+    # list of files missing 
+    
+    lfiles_missing = list(set(lfiles_complete) - set(lfiles_local))
+    
+    lfiles_missing.sort()
+    
+    if len(lfiles_missing) >= 1: 
+        
+        return lfiles_missing
+    
+    else: 
+        
+        return None
+    
+def download(dpath=None, lfiles=None, proxy=None, lon_min=125., lon_max=240., lat_min=-50., lat_max=25., interp=True): 
+    
+    from subprocess import call
+    from shutil import which 
+    
+    import xarray as xr 
+    
+    curl = which("curl") 
+
+    # checks paths 
+    if dpath is None: 
+        
+        dpath = pathlib.Path.cwd().parents[2].joinpath('data/GPM_IMERG/daily') 
+    
+    else:
+        
+        if type(dpath) != pathlib.PosixPath: 
+            
+            dpath = pathlib.Path(dpath)
+            
+        if not dpath.exists():
+             
+            raise ValueError(f"The path {str(dpath)} does not exist")
+    
+    if lfiles is not None: 
+        
+        print(f"will be downloading {len(lfiles)}")
+        
+        dates_to_download = [get_date_from_file(fname) for fname in lfiles]
+        
+        for date in dates_to_download:
+
+            root_url = f"https://gpm1.gesdisc.eosdis.nasa.gov/data/GPM_L3/GPM_3IMERGDL.06/{date:%Y/%m}"
+
+            fname = f"3B-DAY-L.MS.MRG.3IMERG.{date:%Y%m%d}-S000000-E235959.V06.nc4"
+
+            fname_out = f'GPM_IMERG_daily.v06.{date:%Y.%m.%d}.nc'
+
+            ### ==============================================================================================================
+            # build the command
+            if proxy:
+                
+                cmd = f"{curl} --silent --proxy {proxy} -n -c ~/.urs_cookies -b ~/.urs_cookies -L --url {root_url}/{fname} -o {dpath}/{fname}"
+            else:
+                
+                cmd = f"{curl} --silent -n -c ~/.urs_cookies -b ~/.urs_cookies -L --url {root_url}/{fname} -o {dpath}/{fname}"
+
+            print(f"trying to download {fname_out} in {str(dpath)}")
+
+            # execute the command
+            r = call(cmd, shell=True)
+
+            if r != 0:
+
+                print("download failed for date {:%Y-%m-%d}".format(date))
+                
+                pass
+
+            else:
+
+                stat_info = os.stat(str(dpath.joinpath(fname)))
+
+                if stat_info.st_size > 800000:
+
+                    dset_in = xr.open_dataset(dpath.joinpath(fname), engine='netcdf4')
+
+                    dset_in = dset_in[['HQprecipitation','precipitationCal']]
+
+                    if interp: 
+
+                        trmm_grid = make_trmm_grid()
+
+                        dset_in = dset_in.interp_like(trmm_grid)
+
+                    dset_in = dset_in.transpose('time','lat','lon')
+
+                    # roll in the longitudes to go from -180 → 180 to 0 → 360
+
+                    dset_in = utils.roll_longitudes(dset_in)
+
+                    dset_in = dset_in.sel(lon=slice(lon_min, lon_max), lat=slice(lat_min, lat_max))
+
+                    dset_in.to_netcdf(dpath.joinpath(fname_out),  unlimited_dims='time')
+                    
+                    dpath.joinpath(fname).unlink()
+                                                        
+                    dset_in.close()
+
+                    trmm_grid.close()
+
+                else:
+
+                    print(f'\n! file size for input file {fname} is too small, netcdf file {fname_out} is not yet available to download from {root_url}\n')
+                    
+                    # cleaning the nc4 files 
+                    
+                    for nc4_file in list(dpath.glob("*.nc4")): 
+
+                        nc4_file.unlink()
+                    
+                    pass
 
 def get_files_list(dpath=None, ndays=None, date=None, lag=1):
     """

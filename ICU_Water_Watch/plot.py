@@ -1667,6 +1667,7 @@ def map_MME_forecast(probs_mean, \
                           geoms=None, \
                           domain=None, \
                           fpath=None, \
+                          fname=None, \
                           close=True, \
                           gridlines=False): 
 
@@ -1829,6 +1830,16 @@ def map_MME_forecast(probs_mean, \
     
     f.patch.set_facecolor('white')
     
+    if fname is None: 
+        
+        if period is not None: 
+        
+            fname = f"C3S_{period}_MME_{comp}_{pct}_{year}_{month}_init_{period_label.replace(' - ','_')}.png"
+        
+        else: 
+             
+            fname = f"C3S_MME_{comp}_{pct}_{year}_{month}_init_{period_label.replace(' - ','_')}.png"
+            
     if fpath is not None: 
         
         if type(fpath) != pathlib.PosixPath: 
@@ -1837,11 +1848,11 @@ def map_MME_forecast(probs_mean, \
 
         if period is not None: 
 
-            f.savefig(fpath.joinpath(f"C3S_{period}_MME_{comp}_{pct}_{year}_{month}_init_{period_label.replace(' - ','_')}.png"), dpi=200, bbox_inches='tight')
+            f.savefig(fpath.joinpath(fname), dpi=200, bbox_inches='tight')
             
         else: 
             
-            f.savefig(fpath.joinpath(f"C3S_MME_{comp}_{pct}_{year}_{month}_init_{period_label.replace(' - ','_')}.png"), dpi=200, bbox_inches='tight')
+            f.savefig(fpath.joinpath(fname), dpi=200, bbox_inches='tight')
     
     if close: 
         
