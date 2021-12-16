@@ -18,5 +18,17 @@ lag=1
 
 
 for ndays in 30 60 90 180 360; do
-	./GPM_processing.py --dpath=${dpath} --ndays=${ndays} --lag=${lag} --dpath_shapes=${dpath_shapes} --opath=${opath} --fpath=${figures_path};
+	./GPM.py --dpath=${dpath} --ndays=${ndays} --lag=${lag} --dpath_shapes=${dpath_shapes} --opath=${opath} --fpath=${figures_path};
 done; 
+
+# Now run the SPI processing and mapping using papermill 
+
+echo "now running the SPI"
+
+notebook='/home/nicolasf/operational/ICU/development/hotspots/code/ICU_Water_Watch/notebooks/GPM/calculates_GPM-IMERG_accumulations_SPI.ipynb'
+
+papermill='/home/nicolasf/mambaforge/envs/climetlab/bin/papermill'
+
+for ndays in 30 60 90 180 360; do
+	${papermill} ${notebook} ${notebook} -p ndays ${ndays}; 
+done
