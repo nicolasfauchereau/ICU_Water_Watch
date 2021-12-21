@@ -59,3 +59,17 @@ optional arguments:
 
 ```
 
+<hr>
+
+## example for running it all locally
+
+```
+$ ./GPM_update.py -d /home/nicolasf/operational/ICU/ops/data/GPM_IMERG/daily/extended_SP 
+
+$ for ndays in 30 60 90 180 360; do ./GPM_process.py --ndays ${ndays} --lag 1 --dpath /home/nicolasf/operational/ICU/ops/data/GPM_IMERG/daily/extended_SP  --dpath_shapes /home/nicolasf/operational/ICU/development/hotspots/data/shapefiles --opath /home/nicolasf/operational/ICU/development/hotspots/outputs/GPM_IMERG; done
+
+$ for ndays in 30 60 90 180 360; do ./GPM_map.py --ndays ${ndays} --dpath /home/nicolasf/operational/ICU/development/hotspots/outputs/GPM_IMERG --dpath_shapes /home/nicolasf/operational/ICU/development/hotspots/data/shapefiles --fpath /home/nicolasf/operational/ICU/development/hotspots/figures/GPM_IMERG; done
+```
+
+
+
