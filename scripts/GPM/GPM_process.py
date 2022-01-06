@@ -2,7 +2,7 @@
 # coding: utf-8
 
 """
-Script for the retrieval and processing of the GPM-IMERG rainfall estimates (for the Island Climate Update "Water Watch")
+Script for the processing of the GPM-IMERG rainfall estimates (for the Island Climate Update "Water Watch")
 
 
 - GPM_update.py (get the list of files to download and update the local dataset)
@@ -55,6 +55,11 @@ def main(dpath='/home/nicolasf/operational/ICU/ops/data/GPM_IMERG/daily/extended
 
     lfiles = GPM.get_files_list(dpath = dpath, ndays=ndays, lag=lag)
     
+    filenames = [f.name for f in lfiles]
+    
+    print(f"list of files is of length {len(lfiles)}\n")
+    print("\n".join(filenames))
+    
     # make the dataset, and retrieve the attributes
 
     dset = GPM.make_dataset(lfiles, ndays=ndays)
@@ -97,7 +102,6 @@ def main(dpath='/home/nicolasf/operational/ICU/ops/data/GPM_IMERG/daily/extended
         
     GPM.save(dset_ndays, opath=opath, kind='ndays')
     
-    # NOW start the plotting
 if __name__ == '__main__':
     
     import argparse

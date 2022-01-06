@@ -26,6 +26,8 @@ optional arguments:
 
 def main(dpath='/home/nicolasf/operational/ICU/ops/data/GPM_IMERG/daily/extended_SP'): 
 
+    print("now starting assessing the files locally missing\n")
+
     import pathlib
     
     import sys
