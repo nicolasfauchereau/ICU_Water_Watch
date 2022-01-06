@@ -916,7 +916,7 @@ def map_EAR_Watch_Pacific(dset, varname='pctscore', mask=None, geoms=None, fpath
         
         make_gridlines(ax=ax, lon_step=20, lat_step=10)
 
-    title = f"\"EAR\" Watch alert levels\n{ndays} days to {last_day:%d %b %Y}"
+    title = f"Water Stress ({ndays} days to {last_day:%d %b %Y})\n(aligned to \"EAR\" alert levels)"
     
     ax.set_title("") # to get rid of the default title
     

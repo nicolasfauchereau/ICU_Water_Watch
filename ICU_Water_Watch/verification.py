@@ -652,5 +652,41 @@ def confusion_matrix_parallel(x, y):
     # Note see documentation if you'd like to normalize the data
     return confusion_matrix(x, y)
 
+def false_negatives(dset, class_value=1, forecast_var='gcm', verification_var='verif', input_core_dim='time'): 
+    fnegatives = xr.apply_ufunc(partial(fn, class_value = class_value), dset[forecast_var], dset[verification_var],
+                          input_core_dims =[[input_core_dim],[input_core_dim]],
+                          output_core_dims =[[]],
+                          vectorize = True,
+                          dask ='parallelized',
+                          output_dtypes =[float])
+    return fnegatives
+
+def false_positives(dset, class_value=1, forecast_var='gcm', verification_var='verif', input_core_dim='time'): 
+    fpositives = xr.apply_ufunc(partial(fp, class_value = class_value), dset[forecast_var], dset[verification_var],
+                          input_core_dims =[[input_core_dim],[input_core_dim]],
+                          output_core_dims =[[]],
+                          vectorize = True,
+                          dask ='parallelized',
+                          output_dtypes =[float])
+    return fpositives
+
+def true_positives(dset, class_value=1, forecast_var='gcm', verification_var='verif', input_core_dim='time'): 
+    tpositives = xr.apply_ufunc(partial(tp, class_value = class_value), dset[forecast_var], dset[verification_var],
+                          input_core_dims =[[input_core_dim],[input_core_dim]],
+                          output_core_dims =[[]],
+                          vectorize = True,
+                          dask ='parallelized',
+                          output_dtypes =[float])
+    return tpositives
+
+def true_negatives(dset, class_value=1, forecast_var='gcm', verification_var='verif', input_core_dim='time'): 
+    tnegatives = xr.apply_ufunc(partial(tn, class_value = class_value), dset[forecast_var], dset[verification_var],
+                          input_core_dims =[[input_core_dim],[input_core_dim]],
+                          output_core_dims =[[]],
+                          vectorize = True,
+                          dask ='parallelized',
+                          output_dtypes =[float])
+    return tnegatives
+
 
 

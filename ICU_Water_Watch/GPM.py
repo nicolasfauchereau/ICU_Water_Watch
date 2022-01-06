@@ -105,7 +105,7 @@ def download(dpath=None, lfiles=None, proxy=None, lon_min=125., lon_max=240., la
     
     if lfiles is not None: 
         
-        print(f"will be downloading {len(lfiles)}")
+        print(f"will be downloading {len(lfiles)} files")
         
         dates_to_download = [get_date_from_file(fname) for fname in lfiles]
         
@@ -225,7 +225,7 @@ def get_files_list(dpath=None, ndays=None, date=None, lag=1):
         
         if date is None: 
             
-            date =  datetime.utcnow() - timedelta(days=lag)
+            date =  datetime.now() - timedelta(days=lag)
     
         lfiles = []
         
@@ -274,9 +274,9 @@ def make_dataset(lfiles=None, dpath=None, varname='precipitationCal', ndays=None
     
     if (check_lag) and (ndays is not None): 
         
-        if (datetime.utcnow() - last_date).days > 2: 
+        if (datetime.now() - last_date).days > 2: 
             
-            print(f"something is wrong, the last date in the dataset is {last_date:%Y-%m-%d}, the expected date should be not earlier than {datetime.utcnow() - timedelta(days=2):%Y-%m-%d}")
+            print(f"something is wrong, the last date in the dataset is {last_date:%Y-%m-%d}, the expected date should be not earlier than {datetime.now() - timedelta(days=2):%Y-%m-%d}")
 
         if ndays_in_dset != ndays: 
             
@@ -455,7 +455,7 @@ def get_climatology(dpath=None, ndays=None, date=None, window_clim=2, lag=None, 
         
     if date is None: 
         
-        date =  datetime.utcnow() - timedelta(days=lag)
+        date =  datetime.now() - timedelta(days=lag)
     
     clim_file = dpath.joinpath(f'GPM_IMERG_daily.v06.{clim[0]}.{clim[1]}_precipitationCal_{ndays}d_runsum.nc')
     
