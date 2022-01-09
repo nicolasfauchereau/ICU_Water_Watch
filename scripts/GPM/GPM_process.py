@@ -114,7 +114,7 @@ if __name__ == '__main__':
     
     parser.add_argument('-n','--ndays', dest='ndays', type=int, default=30, help='the number of days over which to calculate the accumulation and take the climatology')
 
-    parser.add_argument('-l','--lag', dest='lag', type=int, default=2, help='the lag (in days) to realtime, if run in the morning (NZ time) 1 should be OK')
+    parser.add_argument('-l','--lag', dest='lag', type=int, default=2, help='the lag (in days) to realtime, default to 2 given the latency and the time difference between NZ time and UTC')
 
     parser.add_argument('-ds','--dpath_shapes', dest='dpath_shapes', type=str, default=None, help='the path to the `EEZs` and `Coastlines` folder containing the respective shapefiles, REQUIRED')
 
