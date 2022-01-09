@@ -4,6 +4,7 @@
 """
 Script for the processing of the GPM-IMERG rainfall estimates (for the Island Climate Update "Water Watch")
 
+see also: 
 
 - GPM_update.py (get the list of files to download and update the local dataset)
 - GPM_map.py (maps the various indices and quantities derived from the GPM-IMERG data (for the Island Climate Update "Water Watch"))
@@ -27,7 +28,7 @@ optional arguments:
 
 -l LAG, --lag LAG       
                         
-                        the lag (in days) to realtime, if run in the morning (NZ time) 1 should be OK
+                        the lag (in days) to realtime, default to 2 days to realtime given the latency and time difference between NZ time and UTC
 
 -ds DPATH_SHAPES, --dpath_shapes DPATH_SHAPES
                         
@@ -39,7 +40,7 @@ optional arguments:
 --------------------------------------------------------------------------------------------------------------------------
 """
 
-def main(dpath='/home/nicolasf/operational/ICU/ops/data/GPM_IMERG/daily/extended_SP', ndays=30, lag=1, dpath_shapes='/home/nicolasf/operational/ICU/development/hotspots/data/shapefiles', opath='/home/nicolasf/operational/ICU/development/hotspots/outputs/GPM_IMERG'): 
+def main(dpath='/home/nicolasf/operational/ICU/ops/data/GPM_IMERG/daily/extended_SP', ndays=30, lag=2, dpath_shapes='/home/nicolasf/operational/ICU/development/hotspots/data/shapefiles', opath='/home/nicolasf/operational/ICU/development/hotspots/outputs/GPM_IMERG'): 
 
     import pathlib
     
@@ -58,6 +59,7 @@ def main(dpath='/home/nicolasf/operational/ICU/ops/data/GPM_IMERG/daily/extended
     filenames = [f.name for f in lfiles]
     
     print(f"list of files is of length {len(lfiles)}\n")
+    
     print("\n".join(filenames))
     
     # make the dataset, and retrieve the attributes
@@ -112,7 +114,7 @@ if __name__ == '__main__':
     
     parser.add_argument('-n','--ndays', dest='ndays', type=int, default=30, help='the number of days over which to calculate the accumulation and take the climatology')
 
-    parser.add_argument('-l','--lag', dest='lag', type=int, default=1, help='the lag (in days) to realtime, if run in the morning (NZ time) 1 should be OK')
+    parser.add_argument('-l','--lag', dest='lag', type=int, default=2, help='the lag (in days) to realtime, if run in the morning (NZ time) 1 should be OK')
 
     parser.add_argument('-ds','--dpath_shapes', dest='dpath_shapes', type=str, default=None, help='the path to the `EEZs` and `Coastlines` folder containing the respective shapefiles, REQUIRED')
 

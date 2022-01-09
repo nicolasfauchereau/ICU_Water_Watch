@@ -32,10 +32,7 @@ optional arguments:
 --------------------------------------------------------------------------------------------------------------------------
 """
 
-from datetime import date
-
-
-def main(dpath='home/nicolasf/operational/ICU/development/hotspots/outputs/GPM_IMERG', ndays=30, lag=1, dpath_shapes='/home/nicolasf/operational/ICU/development/hotspots/data/shapefiles', fpath='.'): 
+def main(dpath='home/nicolasf/operational/ICU/development/hotspots/outputs/GPM_IMERG', ndays=30, lag=2, dpath_shapes='/home/nicolasf/operational/ICU/development/hotspots/data/shapefiles', fpath='.'): 
     
     import matplotlib
 
@@ -168,7 +165,7 @@ if __name__ == '__main__':
     
     parser.add_argument('-n','--ndays', dest='ndays', type=int, default=30, help='the number of days for the above')
     
-    parser.add_argument('-l','--lag', dest='lag', type=int, default=1, help='the lag to realtime (UTC) in days')
+    parser.add_argument('-l','--lag', dest='lag', type=int, default=2, help='the lag to realtime (UTC) in days, default 2 days lag to realtime given the latency and the time difference between NZ time and UTC')
 
     parser.add_argument('-ds','--dpath_shapes', dest='dpath_shapes', type=str, default=None, help='the path to the `EEZs` and `Coastlines` folder containing the respective shapefiles, REQUIRED')
     
