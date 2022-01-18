@@ -9,7 +9,7 @@ You can create a suitable conda environment by running:
 ```
 $ conda env create -f ICU_mamba_environment.yml
 $ conda activate ICU
-$ pip install palettable lmoments3
+$ pip install palettable lmoments3 papermill
 ```
 
 ## Installation 
@@ -19,6 +19,8 @@ You should be able to install this pure Python package in the ICU environment us
 ```
 $ python setup.py install
 ```
+
+after having cloned the repository and natigated to the "ICU_Water_Watch" directory that contains the `setup.py` file
 
 ## Background 
 
