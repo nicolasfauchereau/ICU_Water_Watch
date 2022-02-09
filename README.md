@@ -4,13 +4,22 @@ Source code, scripts and notebooks for the NIWA Island Climate Update (ICU) "Wat
 
 ## Requirements 
 
-You can create a suitable conda environment by running: 
+The first step is to create a suitable [mamba](https://mamba.readthedocs.io/en/latest/) (alternative to conda) environment, this can done using the [ICU_ops environment file](https://github.com/nicolasfauchereau/ICU_Water_Watch/blob/main/ICU_ops.yaml)
+
+To create this environment using [mamba](https://mamba.readthedocs.io/en/latest/) (alternative to conda): 
 
 ```
-$ conda env create -f ICU_mamba_environment.yml
-$ conda activate ICU
-$ pip install palettable lmoments3 papermill
+$ mamba env create -n ICU_ops # creates an empty environment 
+$ mamba env update -n ICU_ops -f ICU_ops.yaml 
 ```
+
+The package [lmoments3](https://github.com/OpenHydrology/lmoments3) is (at the time of this writing) not conda / mamba installable, so you need to use pip 
+
+```
+$ pip install lmoments3
+```
+
+Note that this is entirely optional, it is only used if you choose to derive *parametrized* (Gamme distribution) quantiles instead of empirical quantiles for the precipitation amounts. In operations we are currently using the empirically-derived quantiles, as it e.g. ends matching perfectly the tercile probabilistic forecasts provided by ECMWF for the C3S MME.  
 
 ## Installation 
 
@@ -24,7 +33,7 @@ after having cloned the repository and natigated to the "ICU_Water_Watch" direct
 
 ## Background 
 
-The aim of these modules, scripts and notebooks is to combine realtime rainfall monitoring in the Southwest Pacific, using the [NASA GPM-IMERG](https://gpm.nasa.gov/data/imerg) satellite product, and probabilistic monthly and seasonal forecast data (from 8 different General Circulation Models, or *GCMs*) to highlight regions that are and / or will be in potential "water-stress" conditions: i.e. - in a nutshell - where significant rainfall deficits have been recorded over the past few months, and the monthly or seasonal forecasts indicate high probability for dry conditions to persist or worsen. 
+The aim of these modules, scripts and notebooks is to combine realtime rainfall monitoring in the Southwest Pacific, using the [NASA GPM-IMERG](https://gpm.nasa.gov/data/imerg) satellite product, and probabilistic monthly and seasonal forecast data (from 9 different General Circulation Models, or *GCMs*) to highlight regions that are and / or will be in potential "water-stress" conditions: i.e. - in a nutshell - where significant rainfall deficits have been recorded over the past few months, and the monthly or seasonal forecasts indicate high probability for dry conditions to persist or worsen. 
 
 #### Data 
 
@@ -77,7 +86,7 @@ The development of this software was made possible by funding from NIWA's "core"
 
 ### Acknowledgments 
 
-Thanks as well for support, feedbacks and advice from Doug Ramsay, Dr. Andrew Lorrey and Ben Noll from NIWA. 
+Thanks go as well for support, feedbacks and advice to Doug Ramsay, Dr. Andrew Lorrey and Ben Noll from NIWA. 
 
 ### References 
 
@@ -86,3 +95,5 @@ Thanks as well for support, feedbacks and advice from Doug Ramsay, Dr. Andrew Lo
  - Fauchereau N., Lorrey A.M, Noll B.E. (in preparation): On the predictability of New Zealand’s seasonal climate from General Circulation Models forecasts and observational indices. To be submitted to *Weather and Climate*.  
 
 ### Additional material and references
+
+To be added
