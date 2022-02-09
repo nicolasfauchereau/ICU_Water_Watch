@@ -409,7 +409,7 @@ def convert_rainfall_OBS(dset, varin='precipitationCal', varout='precip', timeva
         
         return dset 
     
-def get_climatology(dpath=None, ndays=None, date=None, window_clim=2, lag=None, clim=[2001, 2020]): 
+def get_climatology(dpath=None, ndays=None, date=None, window_clim=2, lag=None, clim=[2001, 2020], zarr=True): 
     """
     [summary]
 
@@ -424,9 +424,11 @@ def get_climatology(dpath=None, ndays=None, date=None, window_clim=2, lag=None, 
     date : [type], optional
         [description], by default None
     window_clim : int, optional
-        [description], by default 2
+        The window, in days, for the selection of the days in the climatology, by default 2 (2 days each side of target day)
     lag : int, optional
-        [description], by default 1
+        The lag to realtime, in days, by default 1
+    zarr : bool, optional 
+        Whether to open a zarr file or a netcdf file, default to True (opens the zarr version)
 
     Returns
     -------
@@ -456,10 +458,20 @@ def get_climatology(dpath=None, ndays=None, date=None, window_clim=2, lag=None, 
     if date is None: 
         
         date =  datetime.now() - timedelta(days=lag)
-    
-    clim_file = dpath.joinpath(f'GPM_IMERG_daily.v06.{clim[0]}.{clim[1]}_precipitationCal_{ndays}d_runsum.nc')
-    
-    dset_clim = xr.open_dataset(clim_file, engine='netcdf4')
+        
+    if zarr: 
+        
+        clim_file = dpath.joinpath(f'GPM_IMERG_daily.v06.{clim[0]}.{clim[1]}_precipitationCal_{ndays}d_runsum.zarr')
+        
+        dset_clim = xr.open_zarr(clim_file)
+        
+        dset_clim = dset_clim.chunk({'time':-1, 'lat':10, 'lon':10})
+        
+    else: 
+        
+        clim_file = dpath.joinpath(f'GPM_IMERG_daily.v06.{clim[0]}.{clim[1]}_precipitationCal_{ndays}d_runsum.nc')
+        
+        dset_clim = xr.open_dataset(clim_file, engine='netcdf4')
     
     dates_clim = [date + timedelta(days=shift) for shift in list(range(-window_clim, window_clim+1))]
     
@@ -478,7 +490,6 @@ def get_climatology(dpath=None, ndays=None, date=None, window_clim=2, lag=None, 
     dset_clim.close()
     
     return dset_clim_ref
-
 
 def calc_anoms_and_pctscores(dset, dset_clim):
     """
