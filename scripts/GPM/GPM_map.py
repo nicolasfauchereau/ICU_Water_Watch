@@ -1,4 +1,4 @@
-#!/home/nicolasf/mambaforge/envs/ICU/bin/python
+#!/home/nicolasf/mambaforge/envs/ICU_ops/bin/python
 # coding: utf-8
 
 """

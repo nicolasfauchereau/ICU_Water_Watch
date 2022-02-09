@@ -1,4 +1,4 @@
-#!/home/nicolasf/mambaforge/envs/ICU/bin/python
+#!/home/nicolasf/mambaforge/envs/ICU_ops/bin/python
 # coding: utf-8
 
 """
@@ -40,7 +40,7 @@ optional arguments:
 --------------------------------------------------------------------------------------------------------------------------
 """
 
-def main(dpath='/home/nicolasf/operational/ICU/ops/data/GPM_IMERG/daily/extended_SP', ndays=30, lag=2, dpath_shapes='/home/nicolasf/operational/ICU/development/hotspots/data/shapefiles', opath='/home/nicolasf/operational/ICU/development/hotspots/outputs/GPM_IMERG'): 
+def main(dpath='/media/nicolasf/END19101/data/GPM_IMERG/daily/extended_SP', ndays=30, lag=2, dpath_shapes='/home/nicolasf/operational/ICU/development/hotspots/data/shapefiles', opath='/home/nicolasf/operational/ICU/development/hotspots/outputs/GPM_IMERG'): 
 
     import pathlib
     

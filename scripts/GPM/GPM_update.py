@@ -1,4 +1,4 @@
-#!/home/nicolasf/mambaforge/envs/ICU/bin/python
+#!/home/nicolasf/mambaforge/envs/ICU_ops/bin/python
 # coding: utf-8
 
 """
@@ -24,7 +24,7 @@ optional arguments:
 --------------------------------------------------------------------------------------------------------------------------
 """
 
-def main(dpath='/home/nicolasf/operational/ICU/ops/data/GPM_IMERG/daily/extended_SP'): 
+def main(dpath='/media/nicolasf/END19101/data/GPM_IMERG/daily/extended_SP'): 
 
     print("now starting assessing the files locally missing\n")
 
@@ -40,7 +40,7 @@ def main(dpath='/home/nicolasf/operational/ICU/ops/data/GPM_IMERG/daily/extended
     
     # get the list of files 
     
-    lfiles_to_download = GPM.get_files_to_download(dpath)
+    lfiles_to_download = GPM.get_files_to_download(dpath=dpath)
     
     # now download the files if not empty
     
