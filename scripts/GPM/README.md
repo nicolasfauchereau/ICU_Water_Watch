@@ -1,5 +1,17 @@
 # How to run the GPM-IMERG download, processing and mapping script 
 
+*FIRST*, make sure you have the right environment, using the [ICU_ops environment file](https://github.com/nicolasfauchereau/ICU_Water_Watch/blob/main/ICU_ops.yaml)
+
+To create this environment using [mamba](https://mamba.readthedocs.io/en/latest/) (alternative to conda): 
+
+```
+$ mamba env create -n ICU_ops # creates an empty environment 
+$ mamba env update -n ICU_ops -f ICU_ops.yaml 
+```
+
+You should be good to go 
+
+
 You can call the help on these script by (e.g.)
 
 ```
@@ -73,6 +85,3 @@ $ for ndays in 30 60 90 180 360; do ./GPM_process.py --ndays ${ndays} --lag 2 --
 
 $ for ndays in 30 60 90 180 360; do ./GPM_map.py --ndays ${ndays} --lag 2 --dpath /home/nicolasf/operational/ICU/development/hotspots/outputs/GPM_IMERG --dpath_shapes /home/nicolasf/operational/ICU/development/hotspots/data/shapefiles --fpath /home/nicolasf/operational/ICU/development/hotspots/figures/GPM_IMERG; done
 ```
-
-
-
