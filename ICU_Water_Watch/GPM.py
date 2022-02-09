@@ -181,7 +181,7 @@ def download(dpath=None, lfiles=None, proxy=None, lon_min=125., lon_max=240., la
                     
                     pass
 
-def get_files_list(dpath=None, ndays=None, date=None, lag=1):
+def get_files_list(dpath='/media/nicolasf/END19101/data/GPM-IMERG', ndays=None, date=None, lag=1):
     """
     [summary]
 
@@ -464,9 +464,7 @@ def get_climatology(dpath=None, ndays=None, date=None, window_clim=2, lag=None, 
         clim_file = dpath.joinpath(f'GPM_IMERG_daily.v06.{clim[0]}.{clim[1]}_precipitationCal_{ndays}d_runsum.zarr')
         
         dset_clim = xr.open_zarr(clim_file)
-        
-        dset_clim = dset_clim.chunk({'time':-1, 'lat':10, 'lon':10})
-        
+                
     else: 
         
         clim_file = dpath.joinpath(f'GPM_IMERG_daily.v06.{clim[0]}.{clim[1]}_precipitationCal_{ndays}d_runsum.nc')
@@ -486,6 +484,8 @@ def get_climatology(dpath=None, ndays=None, date=None, window_clim=2, lag=None, 
         dset_clim_ref.append(dset_clim.sel(time=t))
 
     dset_clim_ref = xr.concat(dset_clim_ref, dim='time')
+    
+    dset_clim_ref = dset_clim_ref.chunk({'time':-1, 'lat':10, 'lon':10})
     
     dset_clim.close()
     
