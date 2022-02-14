@@ -34,6 +34,7 @@ dependencies:
   - ca-certificates=2021.10.8=ha878542_0
   - cairo=1.16.0=ha00ac49_1009
   - cartopy=0.20.2=py39hc85cdae_3
+  - cdsapi=0.5.1=pyhd8ed1ab_0
   - certifi=2021.10.8=py39hf3d152e_1
   - cf_xarray=0.7.0=pyhd8ed1ab_0
   - cffi=1.15.0=py39h4bc2ebd_0
@@ -45,6 +46,7 @@ dependencies:
   - cligj=0.7.2=pyhd8ed1ab_1
   - climpred=2.2.0=pyhd8ed1ab_0
   - cloudpickle=2.0.0=pyhd8ed1ab_0
+  - colorama=0.4.4=pyh9f0ad1d_0
   - cryptography=36.0.0=py39h9ce1e76_0
   - curl=7.81.0=h494985f_0
   - cycler=0.11.0=pyhd8ed1ab_0
@@ -52,11 +54,13 @@ dependencies:
   - dask=2022.1.1=pyhd8ed1ab_0
   - dask-core=2022.1.1=pyhd8ed1ab_0
   - dataclasses=0.8=pyhc8e2a94_3
+  - dateparser=1.1.0=pyhd8ed1ab_0
   - debugpy=1.5.1=py39he80948d_0
   - decorator=5.1.1=pyhd8ed1ab_0
   - defusedxml=0.7.1=pyhd8ed1ab_0
   - distributed=2022.1.1=py39hf3d152e_0
   - docrep=0.3.2=pyh44b312d_0
+  - eccodes=2.24.2=h11d1a29_0
   - entrypoints=0.4=pyhd8ed1ab_0
   - eofs=1.4.0=py_0
   - esmf=8.2.0=mpi_mpich_h4975321_100
@@ -75,6 +79,7 @@ dependencies:
   - fonts-conda-ecosystem=1=0
   - fonts-conda-forge=1=0
   - fonttools=4.29.1=py39h3811e60_0
+  - freeglut=3.2.2=h9c3ff4c_0
   - freetype=2.10.4=h0708190_1
   - freexl=1.0.6=h7f98852_0
   - fribidi=1.0.10=h36c2ea0_0
@@ -98,6 +103,7 @@ dependencies:
   - ipykernel=6.9.0=py39hef51801_0
   - ipython=8.0.1=py39hf3d152e_0
   - ipython_genutils=0.2.0=py_1
+  - jasper=2.0.33=ha77e612_0
   - jbig=2.1=h7f98852_2003
   - jedi=0.18.1=py39hf3d152e_0
   - jinja2=3.0.3=pyhd8ed1ab_0
@@ -119,6 +125,7 @@ dependencies:
   - lcms2=2.12=hddcbb42_0
   - ld_impl_linux-64=2.36.1=hea4e1c9_2
   - lerc=3.0=h9c3ff4c_0
+  - libaec=1.0.6=h9c3ff4c_0
   - libblas=3.9.0=13_linux64_openblas
   - libbrotlicommon=1.0.9=h7f98852_6
   - libbrotlidec=1.0.9=h7f98852_6
@@ -135,6 +142,7 @@ dependencies:
   - libgfortran-ng=11.2.0=h69a702a_12
   - libgfortran5=11.2.0=h5c6108e_12
   - libglib=2.70.2=h174f98d_2
+  - libglu=9.0.0=he1b5a44_1001
   - libgomp=11.2.0=h1d223b6_12
   - libiconv=1.16=h516909a_0
   - libimagequant=2.17.0=h7f98852_1
@@ -225,6 +233,7 @@ dependencies:
   - pure_eval=0.2.2=pyhd8ed1ab_0
   - pycparser=2.21=pyhd8ed1ab_0
   - pygments=2.11.2=pyhd8ed1ab_0
+  - pygrib=2.1.4=py39h8f7b310_4
   - pyopenssl=22.0.0=pyhd8ed1ab_0
   - pyparsing=3.0.7=pyhd8ed1ab_0
   - pyproj=3.3.0=py39hab5ddba_1
@@ -233,12 +242,15 @@ dependencies:
   - pysocks=1.7.1=py39hf3d152e_4
   - python=3.9.10=hc74c709_2_cpython
   - python-dateutil=2.8.2=pyhd8ed1ab_0
+  - python-tzdata=2021.5=pyhd8ed1ab_0
   - python_abi=3.9=2_cp39
   - pytz=2021.3=pyhd8ed1ab_0
+  - pytz-deprecation-shim=0.1.0.post0=py39hf3d152e_1
   - pyyaml=6.0=py39h3811e60_3
   - pyzmq=22.3.0=py39h37b5a0c_1
   - rasterio=1.2.10=py39h0401cea_4
   - readline=8.1=h46c0cb4_0
+  - regex=2022.1.18=py39h3811e60_0
   - regionmask=0.8.0=pyhd8ed1ab_1
   - requests=2.27.1=pyhd8ed1ab_0
   - rioxarray=0.9.1=pyhd8ed1ab_0
@@ -265,11 +277,13 @@ dependencies:
   - tomli=2.0.1=pyhd8ed1ab_0
   - toolz=0.11.2=pyhd8ed1ab_0
   - tornado=6.1=py39h3811e60_2
+  - tqdm=4.62.3=pyhd8ed1ab_0
   - traitlets=5.1.1=pyhd8ed1ab_0
   - typed-ast=1.5.2=py39h3811e60_0
   - typing_extensions=4.0.1=pyha770c72_0
   - tzcode=2021e=h7f98852_0
   - tzdata=2021e=he74cb21_0
+  - tzlocal=4.1=py39hf3d152e_1
   - unicodedata2=14.0.0=py39h3811e60_0
   - urllib3=1.26.8=pyhd8ed1ab_1
   - wcwidth=0.2.5=pyh9f0ad1d_2
@@ -281,6 +295,8 @@ dependencies:
   - xerces-c=3.2.3=h8ce2273_4
   - xesmf=0.6.2=pyhd8ed1ab_0
   - xhistogram=0.3.1=pyhd8ed1ab_0
+  - xorg-fixesproto=5.0=h7f98852_1002
+  - xorg-inputproto=2.3.2=h7f98852_1002
   - xorg-kbproto=1.0.7=h7f98852_1002
   - xorg-libice=1.0.10=h7f98852_0
   - xorg-libsm=1.2.3=hd9c2040_1000
@@ -288,6 +304,8 @@ dependencies:
   - xorg-libxau=1.0.9=h7f98852_0
   - xorg-libxdmcp=1.1.3=h7f98852_0
   - xorg-libxext=1.3.4=h7f98852_1
+  - xorg-libxfixes=5.0.3=h7f98852_1004
+  - xorg-libxi=1.7.10=h7f98852_0
   - xorg-libxrender=0.9.10=h7f98852_1003
   - xorg-renderproto=0.11.1=h7f98852_1002
   - xorg-xextproto=7.3.0=h7f98852_1002
@@ -303,4 +321,6 @@ dependencies:
   - zipp=3.7.0=pyhd8ed1ab_1
   - zlib=1.2.11=h36c2ea0_1013
   - zstd=1.5.2=ha95c52a_0
+  - pip:
+    - lmoments3==1.0.1
 prefix: /home/nicolasf/mambaforge/envs/ICU_ops
