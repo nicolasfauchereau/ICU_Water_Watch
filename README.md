@@ -6,10 +6,9 @@ Source code, scripts and notebooks for the NIWA Island Climate Update (ICU) "Wat
 
 The first step is to create a suitable [mamba](https://mamba.readthedocs.io/en/latest/) (alternative to conda) environment, this can done using the [ICU_ops environment file](https://github.com/nicolasfauchereau/ICU_Water_Watch/blob/main/ICU_ops.yaml)
 
-To create this environment using [mamba](https://mamba.readthedocs.io/en/latest/) (alternative to conda): 
+To create this environment using [mamba](https://mamba.readthedocs.io): 
 
 ```
-$ mamba env create -n ICU_ops # creates an empty environment 
 $ mamba env update -n ICU_ops -f ICU_ops.yaml 
 ```
 
@@ -19,7 +18,7 @@ The package [lmoments3](https://github.com/OpenHydrology/lmoments3) is (at the t
 $ pip install lmoments3
 ```
 
-Note that this is entirely optional, it is only used if you choose to derive *parametrized* (Gamme distribution) quantiles instead of empirical quantiles for the precipitation amounts. In operations we are currently using the empirically-derived quantiles, as it e.g. ends matching perfectly the tercile probabilistic forecasts provided by ECMWF for the C3S MME.  
+Note that this is entirely optional, it is only used if you choose to derive *parametrized* (Gamma distribution) climatological quantiles instead of empirical quantiles from the precipitation amounts. Operationally we are currently using the empirically-derived quantiles, as it e.g. ends up matching perfectly the tercile probabilistic forecasts provided by ECMWF for the C3S MME.  
 
 ## Installation 
 
@@ -33,13 +32,13 @@ after having cloned the repository and natigated to the "ICU_Water_Watch" direct
 
 ## Background 
 
-The aim of these modules, scripts and notebooks is to combine realtime rainfall monitoring in the Southwest Pacific, using the [NASA GPM-IMERG](https://gpm.nasa.gov/data/imerg) satellite product, and probabilistic monthly and seasonal forecast data (from 9 different General Circulation Models, or *GCMs*) to highlight regions that are and / or will be in potential "water-stress" conditions: i.e. - in a nutshell - where significant rainfall deficits have been recorded over the past few months, and the monthly or seasonal forecasts indicate high probability for dry conditions to persist or worsen. 
+The aim of these modules, scripts and notebooks is to combine realtime rainfall monitoring in the Southwest Pacific, using the [NASA GPM-IMERG](https://gpm.nasa.gov/data/imerg) satellite product, and probabilistic monthly and seasonal forecast (data from 9 different General Circulation Models, or *GCMs*) to highlight regions that are and / or will be in potential "water-stress" conditions: i.e. - in a nutshell - where significant rainfall deficits have been recorded over the past few months, and the monthly or seasonal forecasts indicate high probability for dry conditions to persist or worsen. 
 
 #### Data 
 
 **1) The GPM-IMERG satellite rainfall estimates**
 
-The past 30, 60, 90, 180 and 360 days rainfall accumulations, anomalies, percentile of scores and Standardized Precipitation Index (SPI) are derived from the daily, [GPM-IMERG](https://gpm.nasa.gov/data/imerg) mission. The daily, near realtime (2 days lag) data is downloaded from https://gpm1.gesdisc.eosdis.nasa.gov/data/GPM_L3/GPM_3IMERGDL.06 
+The past 30, 60, 90, 180 and 360 days rainfall accumulations, anomalies, percentile of scores and Standardized Precipitation Index (SPI) are derived from the daily, [GPM-IMERG](https://gpm.nasa.gov/data/imerg) mission. The near realtime (2 days lag) data is downloaded from https://gpm1.gesdisc.eosdis.nasa.gov/data/GPM_L3/GPM_3IMERGDL.06 
 
 The climatologies have been pre-computed from all the available data over the **2001 - 2020 period**. 
 
@@ -57,7 +56,7 @@ Probabilistic forecasts are derived from a Multi-Model Ensemble (MME) including 
 - ECCC system 1 (GEM-NEMO)
 - ECCC system 2 (CanCM4i)
 
-The details for the different GCM can be found [here](https://confluence.ecmwf.int/display/CKB/Description+of+the+C3S+seasonal+multi-system)
+The details for the different GCMs can be found [here](https://confluence.ecmwf.int/display/CKB/Description+of+the+C3S+seasonal+multi-system)
 
 A summary of the available data (hindcasts and forecasts for the different systems) is available [here](https://confluence.ecmwf.int/display/CKB/Summary+of+available+data)
 
@@ -96,4 +95,4 @@ Thanks go as well for support, feedbacks and advice to Doug Ramsay, Dr. Andrew L
 
 ### Additional material and references
 
-To be added
+Coming soon !
