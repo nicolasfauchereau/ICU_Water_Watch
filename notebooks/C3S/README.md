@@ -40,7 +40,7 @@ The second step is to download the latest *forecasts* from the 9 GCMs part of th
 
 This is done by running the notebook **2_download_latest_C3S_forecasts.ipynb**.
 
-Similarly to the **1_download_C3S_rolling_hindcasts.ipynb** notebook, it relies on the file `CDS_config.yaml`, and the parameters are the same, note that by default `gcm_path` points to '/media/nicolasf/END19101/ICU/data/CDS/operational/forecasts'
+Similarly to the **1_download_C3S_rolling_hindcasts.ipynb** notebook, it relies on the file `CDS_config.yaml`, and the parameters are the same, note that by default `gcm_path` points to `/media/nicolasf/END19101/ICU/data/CDS/operational/forecasts`
 
 #### STEP 3
 
@@ -49,7 +49,7 @@ The third step is to calculate the different lead-time dependent quantiles (terc
 - `GCM`: The name of the GCM (needs to be in ['ECMWF','UKMO','METEO_FRANCE','CMCC','DWD', 'NCEP', 'JMA', 'ECCC_CanCM4i', 'ECCC_GEM_NEMO'])
 - `period`: The accumulation period ('seasonal or 'monthly')
 - `lag`: The lag (in months) with respect to the current month (again, so that one can calculates the retrospective climatologies)
-- 'gcm_path`: The path to the hindcast datasets, default is '/media/nicolasf/END19101/ICU/data/CDS/operational/hindcasts' 
+- `gcm_path`: The path to the hindcast datasets, default is `/media/nicolasf/END19101/ICU/data/CDS/operational/hindcasts`
   
 so typically, in an operational setting, this notebook is run like so:
 
@@ -63,7 +63,7 @@ done;
 
 The climatologies will be saved in: 
 
-'{gcm_path}/CLIMATOLOGY/{GCM}/TPRATE/' 
+`{gcm_path}/CLIMATOLOGY/{GCM}/TPRATE/`
 
 #### STEP 4
 
@@ -76,8 +76,8 @@ The arguments (for papermill) are:
 - `GCM`: The name of the GCM (needs to be in ['ECMWF','UKMO','METEO_FRANCE','CMCC','DWD', 'NCEP', 'JMA', 'ECCC_CanCM4i', 'ECCC_GEM_NEMO'])
 - `period`: The accumulation period ('seasonal or 'monthly')
 - `lag`: The lag (in months) with respect to the current month (again, so that one can calculates the retrospective forecast probabilities)
-- 'gcm_path`: The path containing the hindcast *and* the forecast datasets, default is '/media/nicolasf/END19101/ICU/data/CDS/operational' 
-- `outputs_path`: The path where to save the netcdf files containing the probabilities, default is set currently to '/home/nicolasf/operational/ICU/development/hotspots/code/ICU_Water_Watch/outputs/C3S' 
+- 'gcm_path`: The path containing the hindcast *and* the forecast datasets, default is `/media/nicolasf/END19101/ICU/data/CDS/operational`
+- `outputs_path`: The path where to save the netcdf files containing the probabilities, default is set currently to `/home/nicolasf/operational/ICU/development/hotspots/code/ICU_Water_Watch/outputs/C3S`
 
 so typically, in an operational setting, this notebook is run like so:
 
