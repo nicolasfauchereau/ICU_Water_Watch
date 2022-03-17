@@ -93,13 +93,13 @@ This is where we plot the maps of monthly or seasonal tercile, decile probabilit
 
 There are 3 notebooks that one needs to run: 
 
-- 5_map_C3S_MME_probabilistic_tercile_forecast.ipynb
-- 6_map_C3S_MME_probabilistic_decile_forecast.ipynb
-- 7_map_C3S_MME_probabilistic_1st_quartile_forecast.ipynb 
+- *5_map_C3S_MME_probabilistic_tercile_forecast.ipynb*
+- *6_map_C3S_MME_probabilistic_decile_forecast.ipynb*
+- *7_map_C3S_MME_probabilistic_1st_quartile_forecast.ipynb*
 
 Typically, this is how these are run operationally 
 
-For monthly tercile probabilistic forecasts:
+For the monthly tercile probabilistic forecasts:
 
 ```
 for lead in 1 2 3 4 5; do 
@@ -107,7 +107,7 @@ for lead in 1 2 3 4 5; do
 done; 
 ```
 
-For seasonal tercile probabilistic forecasts:
+For the seasonal tercile probabilistic forecasts:
 
 ```
 for lead in 1 2 3; do 
@@ -115,7 +115,7 @@ for lead in 1 2 3; do
 done; 
 ```
 
-For monthly decile probabilistic forecasts (i.e. the first decile category where the cumulative probability reaches 50%)
+For the monthly decile probabilistic forecasts (i.e. the first decile category where the cumulative probability reaches 50%)
 
 ```
 for lead in 1 2 3 4 5; do 
@@ -123,7 +123,7 @@ for lead in 1 2 3 4 5; do
 done; 
 ```
 
-For seasonal decile probabilistic forecasts:
+For the seasonal decile probabilistic forecasts:
 
 ```
 for lead in 1 2 3; do 
@@ -139,7 +139,7 @@ for lead in 1 2 3 4 5; do
 done; 
 ```
 
-For seasonal decile probabilistic forecasts:
+For the seasonal probability for precipitation accumulations being below the 25th percentile:
 
 ```
 for lead in 1 2 3; do 
