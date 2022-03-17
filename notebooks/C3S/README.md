@@ -1,7 +1,5 @@
 # running the notebooks for the download and processing of the C3S MME hindcasts / forecasts operationally 
 
-## 1) forecast maps and ICU "Water Stress Outlook" 
-
 #### STEP 1
 
 The first step (although step 1 and 2 can be run in any order really) is to download the *hindcast data (1993 - 2016)* for each of the current GCMs (in their latest system) from the Climate Data Store ([CDS](https://cds.climate.copernicus.eu/#!/home)), for all hindcasts initialised on the month corresponding to the current month. 
@@ -133,23 +131,21 @@ for lead in 1 2 3; do
 done; 
 ```
 
-For the probability for precipitation accumulations being below the 25th percentile (st quartile): 
+For the monthly probability for precipitation accumulations being below the 25th percentile (st quartile): 
 
+```
+for lead in 1 2 3 4 5; do 
+    papermill -p period "monthly" -p lead ${lead} 7_map_C3S_MME_probabilistic_1st_quartile_forecast.ipynb 7_map_C3S_MME_probabilistic_1st_quartile_forecast.ipynb; 
+done; 
+```
 
+For seasonal decile probabilistic forecasts:
 
-
-
-
-
-#### STEP 5
-
-The fifth step is the mapping of the tercile, decile probabilistic forecasts and the probability for rainfall being below the 25th percentile. 
-
-This is done by running the notebook **5_drive_forecast_maps.ipynb**. This notebook uses papermill to send parameters and run 3 other notebooks: 
-
-- **5_map_C3S_MME_probabilistic_tercile_forecast.ipynb** (makes the tercile probabilities maps)
-- **5_map_C3S_MME_probabilistic_decile_forecast.ipynb** (makes the cumulative decile probabilities maps)
-- **5_map_C3S_MME_probabilistic_percentile_forecast.ipynb** (map the probability for rainfall being below the 25th percentile)
+```
+for lead in 1 2 3; do 
+    papermill -p period "seasonal" -p lead ${lead} 7_map_C3S_MME_probabilistic_1st_quartile_forecast.ipynb 7_map_C3S_MME_probabilistic_1st_quartile_forecast.ipynb; 
+done; 
+```
 
 #### STEP 6
 
