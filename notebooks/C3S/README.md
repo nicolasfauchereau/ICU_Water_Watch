@@ -99,6 +99,8 @@ There are 3 notebooks that one needs to run:
 
 Typically, this is how these are run operationally 
 
+#### Step 5: Monthly and seasonal tercile probabilistic forecasts
+
 For the monthly tercile probabilistic forecasts:
 
 ```
@@ -114,6 +116,8 @@ for lead in 1 2 3; do
     papermill -p period "seasonal" -p lead ${lead} 5_map_C3S_MME_probabilistic_tercile_forecast.ipynb 5_map_C3S_MME_probabilistic_tercile_forecast.ipynb;
 done; 
 ```
+
+#### Step 6: Monthly and seasonal decile probabilistic forecasts 
 
 For the monthly decile probabilistic forecasts (i.e. the first decile category where the cumulative probability reaches 50%)
 
@@ -131,6 +135,8 @@ for lead in 1 2 3; do
 done; 
 ```
 
+#### Step7: Monthly and seasonal probability for precipitation accumulations being below the 25th percentile (st quartile) 
+
 For the monthly probability for precipitation accumulations being below the 25th percentile (st quartile): 
 
 ```
@@ -147,7 +153,7 @@ for lead in 1 2 3; do
 done; 
 ```
 
-## STEP 6
+## STEP 8
 
 The final step is to derive and map the ICU "Water Stress Outlook" which combines GPM-IMERG realtime data (the percentiles of scores for the past 90 days accumulation) and the probabilistic forecasts from the C3S MME.
 
