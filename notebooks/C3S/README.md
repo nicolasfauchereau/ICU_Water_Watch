@@ -1,6 +1,6 @@
 # running the notebooks for the download and processing of the C3S MME hindcasts / forecasts operationally 
 
-#### STEP 1
+## STEP 1
 
 The first step (although step 1 and 2 can be run in any order really) is to download the *hindcast data (1993 - 2016)* for each of the current GCMs (in their latest system) from the Climate Data Store ([CDS](https://cds.climate.copernicus.eu/#!/home)), for all hindcasts initialised on the month corresponding to the current month. 
 
@@ -32,7 +32,7 @@ So operationally, this notebook is simply run by calling:
 $ papermill 1_download_C3S_rolling_hindcasts.ipynb 1_download_C3S_rolling_hindcasts.ipynb 
 ```
 
-#### STEP 2
+## STEP 2
 
 The second step is to download the latest *forecasts* from the 9 GCMs part of the C3S MME suite (see above) from the CDS. 
 
@@ -40,7 +40,7 @@ This is done by running the notebook **2_download_latest_C3S_forecasts.ipynb**.
 
 Similarly to the **1_download_C3S_rolling_hindcasts.ipynb** notebook, it relies on the file `CDS_config.yaml`, and the parameters are the same, note that by default `gcm_path` points to `/media/nicolasf/END19101/ICU/data/CDS/operational/forecasts`
 
-#### STEP 3
+## STEP 3
 
 The third step is to calculate the different lead-time dependent quantiles (terciles, quartiles, deciles, etc) climatologies for monthly and seasonal accumulation, from the updated hindcast data downloaded in step 1. This is done by running **3_GCMs_hindcast_climatology_ops.ipynb**, again using [papermill](https://papermill.readthedocs.io/en/latest/). The important parameters are: 
 
@@ -63,7 +63,7 @@ The climatologies will be saved in:
 
 `{gcm_path}/CLIMATOLOGY/{GCM}/TPRATE/`
 
-#### STEP 4
+## STEP 4
 
 The fourth step is to calculate the latest forecasts probabilities, from the forecast data downloaded at step 2, and the climatologies calculated at step 3.
 
@@ -87,7 +87,7 @@ for GCM in 'ECMWF' 'UKMO' 'METEO_FRANCE' 'CMCC' 'DWD' 'NCEP' 'JMA' 'ECCC_CanCM4i
 done; 
 ```
 
-#### STEPS 5,6,7
+## STEPS 5,6,7
 
 This is where we plot the maps of monthly or seasonal tercile, decile probabilities as well as the probability for precipitation being below the 25th percentile (1st quartile). 
 
@@ -147,8 +147,8 @@ for lead in 1 2 3; do
 done; 
 ```
 
-#### STEP 6
+## STEP 6
 
 The final step is to derive and map the ICU "Water Stress Outlook" which combines GPM-IMERG realtime data (the percentiles of scores for the past 90 days accumulation) and the probabilistic forecasts from the C3S MME.
 
-This is done by running the notebook **6_map_ICU_Water_Stress_outlook.ipynb**. Note that currently it needs to be run twice: Once with setting the parameter `period` (at the beginning of the notebook) to "monthly", and once to "seasonal"
+This is done by running the notebook **6_map_ICU_Water_Stress_outlook.ipynb**. Note that currently it needs to be run twice: Once with setting the parameter `period` (at the beginning of the notebook) to "monthly", and once to "seasonal".
