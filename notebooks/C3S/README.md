@@ -24,8 +24,8 @@ ECCC_CanCM4i: 3
 ```
 The notebook is designed to be run via [papermill](https://papermill.readthedocs.io/en/latest/), the main parameters that one might want to change are: 
 
-- the `lag` parameter, which allows you to specify the lag in month with respect to the current month, so that one can download hindcast data for initial months other than the current month, the default is 0.
-- the `gcm_path` parameters, which points to the path where the hindcast datasets will be saved, the default is f'/media/nicolasf/END19101/ICU/data/CDS/operational/hindcasts'
+- the `lag` parameter, which allows you to specify the lag (in months) with respect to the current month, so that one can download hindcast data for initial months other than the current month, the default is 0.
+- the `gcm_path` parameters, which points to the path where the hindcast datasets will be saved, the default is `/media/nicolasf/END19101/ICU/data/CDS/operational/hindcasts`
 - the `config_yaml` parameter, which points to the path to the YAML file mapping GCM name to system 
   
 So operationally, this notebook is simply run by calling: 
@@ -88,6 +88,52 @@ for GCM in 'ECMWF' 'UKMO' 'METEO_FRANCE' 'CMCC' 'DWD' 'NCEP' 'JMA' 'ECCC_CanCM4i
     done; 
 done; 
 ```
+
+#### STEPS 5,6,7
+
+This is where we plot the maps of monthly or seasonal tercile, decile probabilities as well as the probability for precipitation being below the 25th percentile (1st quartile). 
+
+There are 3 notebooks that one needs to run: 
+
+- 5_map_C3S_MME_probabilistic_tercile_forecast.ipynb
+- 6_map_C3S_MME_probabilistic_decile_forecast.ipynb
+- 7_map_C3S_MME_probabilistic_1st_quartile_forecast.ipynb 
+
+Typically, this is how these are run operationally 
+
+For monthly tercile probabilistic forecasts:
+
+```
+for lead in 1 2 3 4 5; do 
+    papermill -p period "monthly" -p lead ${lead} 5_map_C3S_MME_probabilistic_tercile_forecast.ipynb 5_map_C3S_MME_probabilistic_tercile_forecast.ipynb;
+done; 
+```
+
+For seasonal tercile probabilistic forecasts:
+
+```
+for lead in 1 2 3; do 
+    papermill -p period "seasonal" -p lead ${lead} 5_map_C3S_MME_probabilistic_tercile_forecast.ipynb 5_map_C3S_MME_probabilistic_tercile_forecast.ipynb;
+done; 
+```
+
+For monthly decile probabilistic forecasts (i.e. the first decile category where the cumulative probability reaches 50%)
+
+```
+for lead in 1 2 3 4 5; do 
+    papermill -p period "monthly" -p lead ${lead} 6_map_C3S_MME_probabilistic_decile_forecast.ipynb 6_map_C3S_MME_probabilistic_decile_forecast.ipynb; 
+done; 
+```
+
+For seasonal decile probabilistic forecasts:
+
+```
+for lead in 1 2 3; do 
+    papermill -p period "seasonal" -p lead ${lead} 6_map_C3S_MME_probabilistic_decile_forecast.ipynb 6_map_C3S_MME_probabilistic_decile_forecast.ipynb; 
+done; 
+```
+
+For the probability for precipitation accumulations being below the 25th percentile (st quartile): 
 
 
 
