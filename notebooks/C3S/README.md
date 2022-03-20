@@ -157,4 +157,26 @@ done;
 
 The final step is to derive and map the ICU "Water Stress Outlook" which combines GPM-IMERG realtime data (the percentiles of scores for the past 90 days accumulation) and the probabilistic forecasts from the C3S MME.
 
-This is done by running the notebook **6_map_ICU_Water_Stress_outlook.ipynb**. Note that currently it needs to be run twice: Once with setting the parameter `period` (at the beginning of the notebook) to "monthly", and once to "seasonal".
+This is done by running the notebook **8_map_ICU_Water_Stress_outlook.ipynb** via papermill, the important parameters are
+
+- `period`: The period for the forecasts ('monthly' or 'seasonal')
+- `lead`: The leadtime (in months or seasons), should always be 1 at this stage 
+- `ndays`: The number of days for the GPM-IMERG accumulations, typically 90 days (default) or 30 days 
+- `pmin`: The first percentile value for the Water Stress categories, typically 25 (1st quartile, default), corresponding to the 'EAR Watch' *Warning* category
+- `pmax`: The second percentile values for the Water Stress categories, typically 40 (40th percentile, default)
+- `dpath_shapes`: Where to find the shapefiles for the Pacific Islands EEZs
+- `dpath_GPM`: Where to find the probabilistic forecasts from the C3S GCMs 
+- `fpath`: The main path where the figure will be saved 
+- `fpath_web`: The path to save the figure for the web version of the ICU, the file name in this case is always the same (with suffix 'latest')
+  
+To run the notebook operationally 
+
+```
+papermill -p period 'seasonal' -p ndays 90 8_map_ICU_Water_Stress_outlook.ipynb 8_map_ICU_Water_Stress_outlook.ipynb 
+```
+
+and 
+
+```
+papermill -p period 'monthly' -p ndays 30 8_map_ICU_Water_Stress_outlook.ipynb 8_map_ICU_Water_Stress_outlook.ipynb
+```
