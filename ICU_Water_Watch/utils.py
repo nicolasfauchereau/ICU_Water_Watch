@@ -203,7 +203,7 @@ def interp_to_1x(dset, lon_name='lon', lat_name='lat'):
         dset = roll_longitudes(dset, lon_name=lon_name)
 
     if dset[lat_name][0] > dset[lat_name][-1]: 
-        dset = dset.sort_by(lat_name)
+        dset = dset.sortby(lat_name)
         
     d = {}
     d['lat'] = np.arange(float(dset[lat_name].data[0]), float(dset[lat_name].data[-1]) + 1, 1.)

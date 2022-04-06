@@ -1,8 +1,8 @@
 from . import utils, geo
 
-# list of available GCMs here, not that operationally, we are only using the C3S GCMs: 'ECMWF', 'UKMO', 'METEO_FRANCE', 'DWD', 'CMCC', 'NCEP', 'JMA', 'ECCC'
+# list of available GCMs here, not that operationally, we are only using the C3S GCMs: 'ECMWF', 'UKMO', 'METEO_FRANCE', 'DWD', 'CMCC', 'NCEP', 'JMA', 'ECCC_CanCM4i' and 'ECCC_GEM_NEMO'
 
-GCMs = ['ECMWF', 'UKMO', 'METEO_FRANCE', 'DWD', 'CMCC', 'NCEP', 'JMA', 'ECCC', 'KMA', 'NASA', 'MSC']
+GCMs = ['ECMWF', 'UKMO', 'METEO_FRANCE', 'DWD', 'CMCC', 'NCEP', 'JMA', 'ECCC_CanCM4i', 'ECCC_GEM_NEMO']
 
 def download(GCM='ECMWF', system=None, varname='t2m', year=None, month=None, leadtimes=[1,2,3,4,5], opath=None, domain=None, file_format='grib', level='surface', max_retry=3): 
     """

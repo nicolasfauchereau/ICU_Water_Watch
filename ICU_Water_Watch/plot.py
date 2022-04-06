@@ -174,7 +174,7 @@ def add_geom(ax=None, geoms=None):
         raise ValueError(f"the geometry passed is not a geopandas GeoDataFrames or a LIST of GeoDataFrames")
 
 
-def make_gridlines(ax, lon_step=5, lat_step=5, left_labels=True, bottom_labels=True): 
+def make_gridlines(ax, lons=None, lats=None, lon_step=5, lat_step=5, left_labels=True, bottom_labels=True): 
     """
     make gridlines (for a geographical plot with cartopy)
 
@@ -195,7 +195,15 @@ def make_gridlines(ax, lon_step=5, lat_step=5, left_labels=True, bottom_labels=T
     
     """   
 
-    gl = ax.gridlines(draw_labels=True, linestyle=':', xlocs=np.arange(-180,180+lon_step,lon_step), ylocs=np.arange(-90, 90+lat_step, lat_step))
+    if lons is None: 
+
+        lons = np.arange(-180,180+lon_step,lon_step)
+
+    if lats is None: 
+
+        lats = np.arange(-90, 90+lat_step, lat_step)
+
+    gl = ax.gridlines(draw_labels=True, linestyle=':', xlocs=lons, ylocs=lats)
     
     gl.top_labels = False
     
@@ -223,6 +231,7 @@ def cmap_discretize(cmap, N):
     """
 
     if type(cmap) == str:
+        
         cmap = plt.get_cmap(cmap)
     
     colors_i = np.concatenate((np.linspace(0, 1., N), (0.,0.,0.,0.)))
@@ -1687,7 +1696,7 @@ def map_MME_forecast(probs_mean, \
 
     # some checks 
     
-    if (not(pct_dim in ['tercile','decile','percentile'])) or (not(pct_dim in probs_mean.dims)): 
+    if (not(pct_dim in ['tercile','quartile', 'decile','percentile'])) or (not(pct_dim in probs_mean.dims)): 
         
         raise ValueError(f"{pct_dim} not valid, should be in ['tercile','decile','percentile'] and be a dimension in probs_mean") 
         

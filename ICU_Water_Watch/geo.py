@@ -476,24 +476,30 @@ def mask_dataset(dset, shape, varname='precip', lat_name='lat', lon_name='lon', 
     dset = dset.sel(lat=slice(*domain[2:]), lon=slice(*domain[:2]))
         
     # apply coastline buffer (expressed in km)
+
+    if coastline_buffer is not None: 
         
-    shape_buffer = shape.to_crs('EPSG:3857')
+        shape_buffer = shape.to_crs('EPSG:3857')
 
-    shape_buffer = shape_buffer.buffer(coastline_buffer*1e3)
+        shape_buffer = shape_buffer.buffer(coastline_buffer*1e3)
 
-    shape_buffer = shape_buffer.to_crs('EPSG:4326')
+        shape_buffer = shape_buffer.to_crs('EPSG:4326')
 
-    shape_buffer = shape_buffer.to_frame(name='geometry')
+        shape_buffer = shape_buffer.to_frame(name='geometry')
 
-    shape_buffer = shape_buffer.to_crs(crs="+proj=longlat +ellps=WGS84 +pm=-180 +datum=WGS84 +no_defs")
+        shape_buffer = shape_buffer.to_crs(crs="+proj=longlat +ellps=WGS84 +pm=-180 +datum=WGS84 +no_defs")
 
-    # make sure we shift the geometries
+        # make sure we shift the geometries
+        
+        shape_buffer = shift_geom(-180., shape_buffer)
     
-    shape_buffer = shift_geom(-180., shape_buffer)
-    
+    else: 
+
+        shape_buffer = shape
+
     # interpolate the dataset 
     
-    dset = utils.interp(dset, interp_factor=5)
+    dset = utils.interp(dset, interp_factor=interp_factor)
     
     # now get the interpolated lats and lons 
     

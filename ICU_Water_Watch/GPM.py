@@ -844,6 +844,15 @@ def save(dset, opath=None, kind='accum', complevel=4):
     complevel : int, optional
         The compression level, by default 4
     """
+    
+    # make sure the correct attributes are set for the latitudes and longitudes 
+
+    dict_lat = dict(units = "degrees_north", long_name = "Latitude")
+    dict_lon = dict(units = "degrees_east", long_name = "Longitude")
+    
+    dset['lat'].attrs.update(dict_lat)
+    dset['lon'].attrs.update(dict_lon)
+
     if opath is None: 
         
         opath = pathlib.Path.cwd() 

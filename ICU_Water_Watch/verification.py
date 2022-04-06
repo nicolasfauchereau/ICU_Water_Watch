@@ -252,7 +252,7 @@ def get_OISST(dpath='/media/nicolasf/END19101/ICU/data/SST/NOAA_OISSTv2/monthly/
 
     return dset, dset_anoms
 
-def get_ERSST(access='opendap', start=1993, end=2016, month_begin=True, domain=None, chunks=None, detrend=False): 
+def get_ERSST(access='opendap', start=1993, end=2016, domain=None, detrend=False): 
     """
 
     get the ERSST dataset and calculates anomalies 
@@ -286,6 +286,8 @@ def get_ERSST(access='opendap', start=1993, end=2016, month_begin=True, domain=N
         print(f"reading monthly ERSST dataset from {url}")
         
         ersst = xr.open_dataset(url, drop_variables=["time_bnds"]) 
+
+        ersst = ersst.sortby('lat')
         
         if domain is not None: 
         
@@ -306,6 +308,7 @@ def get_ERSST(access='opendap', start=1993, end=2016, month_begin=True, domain=N
             ersst_anoms['sst']  = utils.detrend_dim(ersst_anoms['sst'], 'time')
         
         ersst = ersst.compute()
+
         ersst_anoms = ersst_anoms.compute()
         
         if 'month' in ersst_anoms.coords: 
@@ -323,6 +326,8 @@ def get_ERSST(access='opendap', start=1993, end=2016, month_begin=True, domain=N
 
             ersst = xr.open_zarr(fs.get_mapper("gs://pangeo-noaa-ncei/noaa.ersst.v5.zarr"), consolidated=True).load()
         
+            ersst = ersst.sortby('lat')
+
             if domain is not None: 
 
                 ersst = ersst.sel(time=slice(str(start), str(end)), lon=slice(*domain[:2]), lat=slice(*domain[2:]))
@@ -517,6 +522,7 @@ def get_CPC_NINO(sst='oisst', region='3.4', clim=[1993,2016]):
     import pandas as pd 
     from datetime import datetime
     
+
     nino = pd.read_csv(url, sep='\s+', engine='python')
     
     nino = nino[['YR','MON',f'NINO{region}']]
@@ -631,9 +637,13 @@ def fn(x, y, class_value):
     return fns
 
 def tn(x, y, class_value): 
+    """
+    x: is the GCM
+    y: is the observed
+    """   
     tns = ((~(y == class_value)) * (~(x == class_value))).sum()
     # multiplication ensures that this is only where both values equal the class set
-    # this is the same as true positives
+    # this is the same as true negatives
     return tns
 
 def iou(x, y, class_value):
