@@ -105,9 +105,15 @@ For the monthly tercile probabilistic forecasts:
 
 ```
 for lead in 1 2 3 4 5; do 
-    for period in 'monthly' 'seasonal'; do
-        papermill -p period ${period} -p lead ${lead} 5_map_C3S_MME_probabilistic_tercile_forecast.ipynb 5_map_C3S_MME_probabilistic_tercile_forecast.ipynb;
-    done; 
+    papermill -p period 'monthly' -p lead ${lead} 5_map_C3S_MME_probabilistic_tercile_forecast.ipynb 5_map_C3S_MME_probabilistic_tercile_forecast.ipynb;
+done;
+```
+
+For the seasonal tercile probabilistic forecasts:
+
+```
+for lead in 1 2 3; do 
+    papermill -p period 'seasonal' -p lead ${lead} 5_map_C3S_MME_probabilistic_tercile_forecast.ipynb 5_map_C3S_MME_probabilistic_tercile_forecast.ipynb;
 done;
 ```
 
@@ -117,11 +123,18 @@ For the monthly decile probabilistic forecasts (i.e. the first decile category w
 
 ```
 for lead in 1 2 3 4 5; do 
-    for period in 'monthly' 'seasonal'; do
-        papermill -p period "monthly" -p lead ${lead} 6_map_C3S_MME_probabilistic_decile_forecast.ipynb 6_map_C3S_MME_probabilistic_decile_forecast.ipynb; 
-    done;
+    papermill -p period "monthly" -p lead ${lead} 6_map_C3S_MME_probabilistic_decile_forecast.ipynb 6_map_C3S_MME_probabilistic_decile_forecast.ipynb; 
 done;  
 ```
+
+for the seasonal decile probabilistic forecasts 
+
+```
+for lead in 1 2 3; do 
+    papermill -p period "seasonal" -p lead ${lead} 6_map_C3S_MME_probabilistic_decile_forecast.ipynb 6_map_C3S_MME_probabilistic_decile_forecast.ipynb; 
+done;  
+```
+
 
 #### Step7: Monthly and seasonal probability for precipitation accumulations being below the 25th percentile (st quartile) 
 
@@ -129,10 +142,16 @@ For the monthly probability for precipitation accumulations being below the 25th
 
 ```
 for lead in 1 2 3 4 5; do 
-    for period in 'monthly' 'seasonal'; do
-        papermill -p period "monthly" -p lead ${lead} 7_map_C3S_MME_probabilistic_1st_quartile_forecast.ipynb 7_map_C3S_MME_probabilistic_1st_quartile_forecast.ipynb; 
-    done;
-done;  
+    papermill -p period "monthly" -p lead ${lead} 7_map_C3S_MME_probabilistic_1st_quartile_forecast.ipynb 7_map_C3S_MME_probabilistic_1st_quartile_forecast.ipynb; 
+done;
+```
+
+for the seasonal probability for precipitation accumulations being below the 25th percentile (1st quartile): 
+
+```
+for lead in 1 2 3; do 
+    papermill -p period "seasonal" -p lead ${lead} 7_map_C3S_MME_probabilistic_1st_quartile_forecast.ipynb 7_map_C3S_MME_probabilistic_1st_quartile_forecast.ipynb; 
+done;
 ```
 
 ## STEP 8
