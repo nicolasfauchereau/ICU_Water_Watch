@@ -2046,12 +2046,18 @@ def plot_virtual_station(df, station_name=None, lon=None, lat=None):
 
     if station_name is not None: 
         
-        ax1.set_title(f"Last {ndays} days to {last_day}, GPM-IMERG virtual station for {station_name} [{lon:5.3f}E, {lat:5.3f}S]")
+        if lat < 0: 
+            ax1.set_title(f"Last {ndays} days to {last_day}, GPM-IMERG virtual station for {station_name} [{lon:5.3f}E, {lat:5.3f}S]")
+        else: 
+            ax1.set_title(f"Last {ndays} days to {last_day}, GPM-IMERG virtual station for {station_name} [{lon:5.3f}E, {lat:5.3f}N]")
         
     else: 
         
-        ax1.set_title(f"Last {ndays} days to {last_day}, GPM-IMERG virtual station for coordinates [{lon:5.3f}E, {lat:5.3f}S]")
-    
+        if lat < 0:
+            ax1.set_title(f"Last {ndays} days to {last_day}, GPM-IMERG virtual station for coordinates [{lon:5.3f}E, {lat:5.3f}S]")
+        else: 
+            ax1.set_title(f"Last {ndays} days to {last_day}, GPM-IMERG virtual station for coordinates [{lon:5.3f}E, {lat:5.3f}N]")
+        
     
     # second axes: cumulative rainfall as barplots, with percentage of normal over the past N days
 

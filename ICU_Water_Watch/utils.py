@@ -338,8 +338,6 @@ def interpolate_NaN_da(dataarray, lon_name='lon', lat_name='lat'):
     
     return regridded
 
-    
-
 def read_config(basepath, fname): 
     """
     read a YAML configuration file 
