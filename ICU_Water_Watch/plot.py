@@ -366,7 +366,7 @@ def map_precip_accum(dset, varname='precipitationCal', mask=None, geoms=None, cm
     
     dict_levels[30] = {}
     dict_levels[30]['thresholds'] = [-100, 10, 20, 40, 100, 200, 330, 500]
-    dict_levels[30]['cbar_ticklabels'] = ['< 10 mm', '10 – 20', '20 – 40', '40 – 100', '100 – 200', '250 – 330', '>330 mm']
+    dict_levels[30]['cbar_ticklabels'] = ['< 10 mm', '10 – 20', '20 – 40', '40 – 100', '100 – 200', '200 – 330', '>330 mm']
 
     dict_levels[60] = {}
     dict_levels[60]['thresholds'] = [-100, 20, 40, 80, 200, 400, 660, 1000]
