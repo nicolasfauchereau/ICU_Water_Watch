@@ -85,7 +85,7 @@ The development of this software was made possible by funding from NIWA's "core"
 
 ### Acknowledgments 
 
-Thanks go as well for support, feedbacks and advice to Doug Ramsay, Dr. Andrew Lorrey and Ben Noll from NIWA. 
+Thanks go as well for support, feedbacks and advice to Doug Ramsay, Dr. Andrew Lorrey and Ben Noll from NIWA, as well as John Marra, James Potemra and Richard Heim at NOAA. 
 
 ### References 
 
