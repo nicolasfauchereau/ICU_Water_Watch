@@ -89,7 +89,7 @@ Thanks go as well for support, feedbacks and advice to Doug Ramsay, Dr. Andrew L
 
 ### References 
 
- - Fauchereau N., Ramsay D., Lorrey A.M., Noll B.E (in preparation): Open data and open source software for the development of a multi-model ensemble monthly and seasonal forecast system for the Pacific region. To be submitted to *Climate Services*, and preprint on *ESSOar*.  
+ - Fauchereau N., Ramsay D., Lorrey A.M., Noll B.E (in preparation): Open data and open source software for the development of a multi-model ensemble monthly and seasonal forecast system for the Pacific region. To be submitted to *Climate Services*, and [preprint on ESSOAR](https://www.essoar.org/doi/10.1002/essoar.10511702.1)
 
  - Fauchereau N., Lorrey A.M, Noll B.E. (in preparation): On the predictability of New Zealand’s seasonal climate from General Circulation Models forecasts and observational indices. To be submitted to *Weather and Climate*.  
 
