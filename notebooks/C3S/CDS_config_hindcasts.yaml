@@ -1,0 +1,10 @@
+# configuration file, mapping GCM to system
+ECMWF: 5
+UKMO: 600
+METEO_FRANCE: 8
+DWD: 21
+CMCC: 35
+NCEP: 2
+JMA: 3
+ECCC_CanCM4i: 2
+ECCC_GEM5_NEMO: 3
