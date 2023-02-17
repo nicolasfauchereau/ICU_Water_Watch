@@ -1373,6 +1373,7 @@ def map_SPI_Pacific(dset, varname='SPI', mask=None, geoms=None, domain=[125, 240
             fpath = pathlib.Path(fpath)
 
         f.savefig(fpath.joinpath(f"GPM_IMERG_SPI_Pacific_{ndays}days_to_{last_day:%Y-%m-%d}.png"), dpi=200, bbox_inches='tight')
+        # f.savefig(fpath.joinpath(f"GPM_IMERG_SPI_Pacific_{ndays}days_to_{last_day:%Y-%m-%d}.pdf"), bbox_inches='tight')
     
     if close: 
         
@@ -2008,7 +2009,7 @@ def map_MME_probabilities(probs_mean, \
     
     return f
 
-def plot_virtual_station(df, station_name=None, lon=None, lat=None): 
+def plot_virtual_station(df, station_name=None, country=None, lon=None, lat=None): 
     
     # some parameters we'll use later 
     
@@ -2044,12 +2045,12 @@ def plot_virtual_station(df, station_name=None, lon=None, lat=None):
     
     ax1.grid(ls=':')
 
-    if station_name is not None: 
+    if (station_name is not None) and (country is not None): 
         
         if lat < 0: 
-            ax1.set_title(f"Last {ndays} days to {last_day}, GPM-IMERG virtual station for {station_name} [{lon:5.3f}E, {lat:5.3f}S]")
+            ax1.set_title(f"Last {ndays} days to {last_day}, GPM-IMERG virtual station\n{station_name} ({country}) [{lon:5.3f}E, {lat:5.3f}S]")
         else: 
-            ax1.set_title(f"Last {ndays} days to {last_day}, GPM-IMERG virtual station for {station_name} [{lon:5.3f}E, {lat:5.3f}N]")
+            ax1.set_title(f"Last {ndays} days to {last_day}, GPM-IMERG virtual station\n{station_name} ({country}) [{lon:5.3f}E, {lat:5.3f}N]")
         
     else: 
         
@@ -2180,3 +2181,67 @@ def rgb_to_hex(rgb):
         hex value as string
     """
     return '#%02x%02x%02x' % rgb
+
+def make_dummy_colorbar(ax, lims, colors_list=None, labels_list=None, xpos=0.8, ystart=0.60, height=0.05, bbox=False): 
+    
+    """
+    Parameters
+    ----------
+    
+    ax : Matplotlib Axes, required
+        The axes into which to plot the colorbar 
+    
+    lims : list, required
+        The list of filled contours matplotlib objects, returned by `dataarray.plot.contourf`, 
+        order so that the first item in the list will correspond to lower item in the colorbar
+        (i.e. drier category in the context of the ICU)
+        
+    colors_list : list, required
+        The list of colors corresponding to each of the objects (categories) in `lims`
+        
+    labels_list : list, required 
+        The list of labels 
+        
+    xpos : float, required 
+        The X-axis position where to start the dummy colorbar
+    
+    ystart : float, required
+        The Y-axis position where to start the dummy colorbar
+        
+    height : float, required 
+        The height of the 'boxes' making each part of the colorbar 
+        
+    bbox : bool
+        Whether or not to add a bounding box around labels
+    """
+    
+    if not colors_list: 
+        
+        colors_list = ['#F04E37', '#F99D1C','#FFDE40','#FFFFFF', '#33BBED']
+        
+    if not labels_list: 
+        
+        labels_list = ["Severely dry (< 5%)",'Seriously dry (< 10%)', 'Warning (< 25%)', 'Near or Wetter', 'Seriously wet (> 90%)']
+        
+    incy = 0
+    
+    for i, im in enumerate(lims): 
+        
+        y = ystart + incy
+        
+        cbar_ax = ax.axes.inset_axes([xpos, y, height / 2., height])
+        
+        cb = plt.colorbar(im, cax=cbar_ax)
+        
+        cb.set_ticks([])
+        
+        if bbox: 
+        
+            ax.text(xpos+0.03, y+0.01, labels_list[i],  transform=ax.transAxes, va='bottom', bbox=dict(facecolor='w', edgecolor='w'))  
+        
+        else: 
+            
+            ax.text(xpos+0.03, y+0.01, labels_list[i],  transform=ax.transAxes, va='bottom')
+        
+        incy += (height + 0.01)
+        
