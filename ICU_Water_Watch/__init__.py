@@ -5,4 +5,5 @@ from . import geo
 from . import plot
 from . import verification
 from . import domains
+from . import MSWEP
 __author__ = 'Nicolas Fauchereau'
