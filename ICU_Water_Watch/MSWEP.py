@@ -1,3 +1,8 @@
+import pathlib
+from datetime import datetime
+
+from . import utils
+
 def update(ftp_url="data.gloh2o.org", remote_path="niwa_mswep/MSWEP_V280/NRT/Daily", credentials='./MSWEP_credentials.txt', opath="/media/nicolasf/END19101/ICU/data/glo2ho/MSWEP280/NRT/Daily/"):
 
     import pathlib 
@@ -48,10 +53,6 @@ def update(ftp_url="data.gloh2o.org", remote_path="niwa_mswep/MSWEP_V280/NRT/Dai
         pass 
 
     ftp.close()
-
-
-
-    pass 
 
 def make_dataset(): 
 
@@ -132,7 +133,7 @@ def calculate_realtime_accumulation(dset):
             
     return dset
 
-def get_rain_days_stats(dset, varname='precipitationCal', timevar='time', threshold=1, expand_dim=True): 
+def get_rain_days_stats(dset, varname='precipitation', timevar='time', threshold=1, expand_dim=True): 
     """
     return the number of days since last rainfall, and the number of day and wet days 
     according to a threshold defining what is a wet day (by default 1 mm/day)
@@ -221,32 +222,6 @@ def get_rain_days_stats(dset, varname='precipitationCal', timevar='time', thresh
     
     return dset 
 
-def get_date_from_file(filename, sep='.',year_index=-4, month_index=-3, day_index=-2):
-    
-    import pathlib
-    from datetime import date
-    from dateutil.relativedelta import relativedelta
-    
-    if not type(filename) == pathlib.PosixPath: 
-
-        filename = pathlib.Path(filename)
-     
-    # get the filename 
-    fname = filename.name 
-    
-    fname = fname.split('.')
-    
-    year = fname[year_index]
-    month = fname[month_index]
-    day = fname[day_index]
-    
-    d = list(map(int, [year, month, day])) 
-    
-    d = date(*d)
-    
-    return d
-
-
 def save(dset, opath=None, kind='accum', complevel=4): 
     """
     saves a dataset containing either:
@@ -292,7 +267,7 @@ def save(dset, opath=None, kind='accum', complevel=4):
     
     # build the filename 
     
-    filename = f"GPM_IMERG_{kind}_{ndays}ndays_to_{last_date:%Y-%m-%d}.nc"
+    filename = f"MSWEP_{kind}_{ndays}ndays_to_{last_date:%Y-%m-%d}.nc"
     
     # saves to disk, using compression level 'complevel' (by default 4)
     
@@ -300,7 +275,7 @@ def save(dset, opath=None, kind='accum', complevel=4):
     
     print(f"\nsaving {filename} in {str(opath)}")
 
-def get_virtual_station(dset, lat=None, lon=None, varname='precipitationCal'): 
+def get_virtual_station(dset, lat=None, lon=None, varname='precipitation'): 
     """
     get a time-series from the GPM-IMERG accumulation dataset 
 
@@ -346,7 +321,7 @@ def get_virtual_station(dset, lat=None, lon=None, varname='precipitationCal'):
     
     return sub, (extracted_lon, extracted_lat), dist
 
-def calibrate_SPI(dset, variable='precipitationCal', dimension='time', return_gamma = False):
+def calibrate_SPI(dset, variable='precipitation', dimension='time', return_gamma = False):
     """
     calibrate the SPI over a climatological dataset (typically obtained using `subset_daily_clim`
     with appropriate buffer ...)
