@@ -83,6 +83,46 @@ def preprocess_era(dset):
     
     return dset
 
+def convert_rainfall(dset, varin='precip', varout='precip', timevar='time'): 
+    """
+    converts the rainfall - anomalies or raw data - originally in mm/day
+    to mm per month ... 
+    """
+    
+    import pandas as pd 
+    import numpy as np 
+    from datetime import datetime
+    from calendar import monthrange
+    from dateutil.relativedelta import relativedelta
+    
+    # we *assume* the units are in mm/day
+            
+    index = dset.indexes[timevar]
+    
+    if type(index) != pd.core.indexes.datetimes.DatetimeIndex: 
+        
+        index = index.to_datetimeindex()
+
+    dset[timevar] = index
+
+    # gets the number of days in each month 
+    ndays = [monthrange(x.year, x.month)[1] for x in index]
+    
+    # adds this variable into the dataset 
+    dset['ndays'] = ((timevar), np.array(ndays))
+    
+    # multiply to get the anomalies in mm / month 
+    dset['var'] = dset[varin] * dset['ndays'] 
+
+    # rename 
+    dset = dset.drop(varin)
+    
+    dset = dset.rename({'var':varout})
+
+    dset[varout].attrs = {'units':'mm/month'}
+    
+    return dset 
+
 def get_mswep(dpath='/media/nicolasf/END19101/data/MSWEP/data/global_monthly_1deg/', start=1993, end=2016, month_begin=True, chunks=None):
     
     if not(type(dpath) == pathlib.PosixPath): 

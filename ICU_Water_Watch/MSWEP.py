@@ -37,17 +37,23 @@ def update(ftp_url="data.gloh2o.org", remote_path="niwa_mswep/MSWEP_V280/NRT/Dai
 
     lfiles_remote = ftp.nlst()
 
+    lfiles_remote.sort()
+
     lfiles_missing = list(set(lfiles_remote) - set(lfiles_local)) 
 
     lfiles_missing.sort()
 
     if len(lfiles_missing) >= 1: 
 
+        print(f"preparing to download {len(lfiles_missing)} files missing from the local archive")
+
         for filename in lfiles_missing: 
 
             with open(opath.joinpath(filename), 'wb') as f:
 
                 ftp.retrbinary('RETR ' + filename, f.write)
+
+            print(f"retrieved {filename}")
     else: 
     
         pass 
@@ -121,11 +127,15 @@ def calculate_realtime_accumulation(dset):
     """
     """
 
+    from dask.diagnostics import ProgressBar
+
     # calculates the accumulation, make sure we keep the attributes 
 
     dset = dset.sum('time', keep_attrs=True)
     
-    dset = dset.compute()
+    with ProgressBar(): 
+
+        dset = dset.compute()
     
     # expand the dimension time to have singleton dimension with last date of the ndays accumulation
     
@@ -377,4 +387,3 @@ def calculate_SPI(dataarray, alpha, beta, name='SPI'):
     norm_spi = xr.apply_ufunc(norminv, gamma, dask='allowed')
     
     return norm_spi.to_dataset(name=name)
-

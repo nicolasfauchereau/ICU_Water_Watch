@@ -347,7 +347,6 @@ def get_attrs(dset):
 
     return last_day, ndays
 
-
 def calculate_realtime_accumulation(dset): 
     """
     """
