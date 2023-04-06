@@ -5,7 +5,7 @@ import numpy as np
 import xarray as xr
 
 parser = argparse.ArgumentParser(
-    prog="extract_daily_MSWEP_DOY_with_buffer_zarr.py",
+    prog="extract_daily_MSWEP_runsum_DOY_with_buffer_zarr.py",
     description="""construct zarr datasets for each DOY from a netcdf file containing running accumulations""",
 )
 
@@ -28,8 +28,8 @@ parser.add_argument(
     "-o",
     "--opath",
     type=str,
-    default=90,
-    help="""The directory root where to save the zarr datasets, a '${ndays_agg}days' directory will be created therein""",
+    default='/media/nicolasf/END19101/ICU/data/MSWEP/Daily/subsets_nogauge/SP',
+    help="""The directory root where to save the zarr datasets, a 'climatologies/${ndays_agg}days' directory will be created therein""",
 )
 
 parser.add_argument(
@@ -37,10 +37,8 @@ parser.add_argument(
     "--window",
     type=int,
     default=15,
-    help="""The size of the window in days, should be an odd number, the buffer is defined as {window}//2""",
+    help="""The size of the window in days, should be an odd number, the buffer is defined as {window}//2, default is 15 (7 days each side of the target DOY)""",
 )
-
-
 
 args = parser.parse_args()
 
@@ -51,7 +49,7 @@ window = args.window
 
 # ----------------------------------------------------------------------------------------------------
 
-opath = opath.joinpath(f"{ndays_agg}days")
+opath = opath.joinpath(f"climatologies/{ndays_agg}days")
 
 opath.mkdir(parents=True, exist_ok=True)
 
@@ -63,13 +61,13 @@ dset = dset.drop('time_bnds')
 
 dset = dset.rolling({'time':window}, center=True, min_periods=window).construct(window_dim='buffer')
 
-for DOY in np.arange(365) + 1: 
+for DOY in np.arange(249, 365) + 1: 
 
     print(f"processing DOY {DOY:03d} ...")
     
     doy_dset = dset.sel(time=(dset.time.dt.dayofyear == DOY))
     
-    doy_dset.to_zarr(opath.joinpath(f'MSWEP_nogauge_{ndays_agg}_days_runsum_{window // 2}_days_buffer_DOY_{DOY:03d}.zarr')
+    doy_dset.to_zarr(opath.joinpath(f'MSWEP_nogauge_{ndays_agg}_days_runsum_{window // 2}_days_buffer_DOY_{DOY:03d}.zarr'))
     
     doy_dset.close()
 
