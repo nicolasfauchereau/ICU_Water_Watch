@@ -33,6 +33,22 @@ parser.add_argument(
 
 parser.add_argument(
     "-s",
+    "--doy_start",
+    type=int,
+    default=1,
+    help="""The day of year to start the loop, default 1""",
+)
+
+parser.add_argument(
+    "-e",
+    "--doy_stop",
+    type=int,
+    default=365,
+    help="""The day of year to stop the loop, default 365""",
+)
+
+parser.add_argument(
+    "-s",
     "--clim_start",
     type=int,
     default=1993,
@@ -74,6 +90,8 @@ parser.add_argument(
 args = parser.parse_args()
 
 ndays_agg = args.ndays_agg
+doy_start = args.doy_start
+doy_stop = args.doy_stop
 clim_start = int(args.clim_start)
 clim_stop = int(args.clim_stop)
 varname = args.varname
@@ -104,17 +122,12 @@ ldirs = list(ipath_zarr.glob("*.zarr"))
 
 ldirs.sort()
 
-# %% for now do not include the last one, as it may be empty
-ldirs = ldirs[0:-1]
-
 # %% main loop
-for i in range(len(ldirs)):
+for DOY in np.arange(doy_start, doy_stop + 1):
 
-    DOY = i + 1
+    dset = xr.open_zarr(ldirs[DOY-1])
 
-    dset = xr.open_zarr(ldirs[i])
-
-    print(f"opening {str(ldirs[i])}")
+    print(f"opening {str(ldirs[DOY-1])}")
 
     # selects the climatological period
 

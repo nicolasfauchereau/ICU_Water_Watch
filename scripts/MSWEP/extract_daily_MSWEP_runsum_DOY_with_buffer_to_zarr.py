@@ -18,6 +18,22 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "-s",
+    "--doy_start",
+    type=int,
+    default=1,
+    help="""The day of year to start the loop, default 1""",
+)
+
+parser.add_argument(
+    "-e",
+    "--doy_stop",
+    type=int,
+    default=365,
+    help="""The day of year to stop the loop, default 365""",
+)
+
+parser.add_argument(
     "-f",
     "--fname",
     type=str,
@@ -43,6 +59,8 @@ parser.add_argument(
 args = parser.parse_args()
 
 ndays_agg = args.ndays_agg
+doy_start = args.doy_start
+doy_stop = args.doy_stop
 fname = pathlib.Path(args.fname)
 opath = pathlib.Path(args.opath)
 window = args.window
@@ -61,7 +79,7 @@ dset = dset.drop('time_bnds')
 
 dset = dset.rolling({'time':window}, center=True, min_periods=window).construct(window_dim='buffer')
 
-for DOY in np.arange(249, 365) + 1: 
+for DOY in np.arange(doy_start, doy_stop + 1): 
 
     print(f"processing DOY {DOY:03d} ...")
     
