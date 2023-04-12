@@ -19,7 +19,7 @@ parser = argparse.ArgumentParser(
     prog="calculate_climatologies_MSWEP_nogauge_window_construct_zarr.py",
     description="""
                                 calculate the MSWEP climatologies (average, quantiles, SPI alpha and beta params) from the buffered DOY ZARR files for\n
-                                the 'no-gauge' version of Daily MSWEP, see XXX.py for the processing of the running accumulation and the creation\n
+                                the 'no-gauge' version of Daily MSWEP, see `extract_daily_MSWEP_runsum_DOY_with_buffer_to_zarr.py` for the processing of the running accumulation and the creation\n
                                 of the ZARR files containing the data varying by year and buffer (7 days each side) for each day of year""",
 )
 
@@ -48,7 +48,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "-s",
+    "-cs",
     "--clim_start",
     type=int,
     default=1993,
@@ -56,7 +56,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "-e",
+    "-ce",
     "--clim_stop",
     type=int,
     default=2016,
