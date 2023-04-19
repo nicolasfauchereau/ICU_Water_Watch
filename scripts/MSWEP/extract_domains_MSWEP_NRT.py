@@ -25,6 +25,14 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "-v",
+    "--verbose",
+    type=int,
+    default=1,
+    help="""whether to print something when a file exists already on disk""",
+)
+
+parser.add_argument(
     "-c",
     "--credentials",
     type=str,
@@ -61,6 +69,7 @@ args = parser.parse_args()
 
 # %% get the parameters 
 update = bool(args.update)
+verbose = bool(args.verbose)
 credentials = args.credentials
 ipath = args.ipath 
 opath = args.opath 
@@ -131,8 +140,10 @@ def extract_domain_from_files_list(lfiles, lfiles_dates, domains, country, opath
             dset.close()
         
         else: 
+
+            if verbose:
             
-            print(f"{str(opath.joinpath(f'MSWEP_Daily_{date_file:%Y-%m-%d}.nc'))} exists ... skipping")
+                print(f"{str(opath.joinpath(f'MSWEP_Daily_{date_file:%Y-%m-%d}.nc'))} exists ... skipping")
     
     return opath
 
