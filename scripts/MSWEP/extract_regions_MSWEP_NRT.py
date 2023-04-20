@@ -6,7 +6,7 @@ import pathlib
 import json 
 import argparse
 from datetime import datetime
-from ICU_Water_Watch import utils, MSWEP
+from ICU_Water_Watch import utils, MSWEP, domains 
 import xarray as xr
 from dask.diagnostics import ProgressBar 
 
@@ -58,10 +58,10 @@ parser.add_argument(
 
 parser.add_argument(
     "-d",
-    "--domains",
+    "--regions",
     type=str,
-    default='./domains.json',
-    help="""A JSON file with the mapping between domain names and [lonmin, lonmax, latmin, latmax], default './domains.json'""",
+    default='./regions.json',
+    help="""A JSON file with the mapping between region names and [lonmin, lonmax, latmin, latmax], default './regions.json'""",
 )
 
 # %% parse the arguments 
@@ -73,7 +73,7 @@ verbose = bool(args.verbose)
 credentials = args.credentials
 ipath = args.ipath 
 opath = args.opath 
-domains = args.domains
+regions = args.regions
 
 # %% cast the paths 
 dpath_MSWEP_NRT = pathlib.Path(ipath)
@@ -94,12 +94,12 @@ lfiles_NRT_dates = [
 ]
 
 # %% read the JSON file containing the mapping between domain name and 
-with open(domains) as f: 
+with open(regions) as f: 
     
-    domains = json.load(f)
+    regions = json.load(f)
 
 # %% function definition 
-def extract_domain_from_files_list(lfiles, lfiles_dates, domains, country, opath): 
+def extract_region_from_files_list(lfiles, lfiles_dates, regions, country, opath): 
     
     country_dir = country.replace(': ','_').replace(' ','_')
     
@@ -123,7 +123,7 @@ def extract_domain_from_files_list(lfiles, lfiles_dates, domains, country, opath
 
             dset = dset.sortby("lat")
 
-            dset = domains.extract_domain(dset, domains[country])
+            dset = domains.extract_domain(dset, regions[country])
     
             with ProgressBar(): 
         
@@ -132,7 +132,6 @@ def extract_domain_from_files_list(lfiles, lfiles_dates, domains, country, opath
             dset.attrs['filename_origin'] = fname.name
     
             dset['DOY'] = (('time'), [int(fname.name[-6:-3])])
-        
             print(f"{str(opath.joinpath(f'MSWEP_Daily_{date_file:%Y-%m-%d}.nc'))} does not exists ... saving ...")
         
             dset.to_netcdf(opath.joinpath(f'MSWEP_Daily_{date_file:%Y-%m-%d}.nc'),  encoding=encoding, format='NETCDF4')
@@ -150,9 +149,9 @@ def extract_domain_from_files_list(lfiles, lfiles_dates, domains, country, opath
 
 def main(): 
 
-    for cname in domains.keys(): 
+    for cname in regions.keys(): 
 
-        extract_domain_from_files_list(lfiles_NRT, lfiles_NRT_dates, domains, cname, dpath_MSWEP_subsets)
+        extract_region_from_files_list(lfiles_NRT, lfiles_NRT_dates, regions, cname, dpath_MSWEP_subsets)
 
 if __name__ == "__main__":
 
