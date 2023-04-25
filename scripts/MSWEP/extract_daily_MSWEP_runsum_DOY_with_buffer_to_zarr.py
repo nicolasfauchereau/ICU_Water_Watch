@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 # coding: utf-8
 
@@ -17,7 +16,8 @@ parser.add_argument(
     "--ndays_agg",
     type=int,
     default=90,
-    help="""The number of days for the rainfall accumulation, in [30,60,90,180,360], default 90 days""",
+    help="""The number of days for the rainfall accumulation, in [30,60,90,180,360]
+    \ndefault 90 days""",
 )
 
 parser.add_argument(
@@ -25,7 +25,8 @@ parser.add_argument(
     "--doy_start",
     type=int,
     default=1,
-    help="""The day of year to start the loop, default 1""",
+    help="""The day of year to start the loop
+    \ndefault 1""",
 )
 
 parser.add_argument(
@@ -33,22 +34,25 @@ parser.add_argument(
     "--doy_stop",
     type=int,
     default=365,
-    help="""The day of year to stop the loop, default 365""",
+    help="""The day of year to stop the loop
+    \ndefault 365""",
 )
 
 parser.add_argument(
     "-f",
     "--fname",
     type=str,
-    help="""The input filename, e.g. 'merged_1979_2020_chunked_noleap_runsum_{ndays_agg}.nc'""",
+    help="""The input filename, e.g. 'merged_1979_2020_chunked_noleap_runsum_{ndays_agg}.nc'
+    \nno default""",
 )
 
 parser.add_argument(
     "-o",
     "--opath",
     type=str,
-    default='/media/nicolasf/END19101/ICU/data/MSWEP/Daily/subsets_nogauge/SP',
-    help="""The directory root where to save the zarr datasets, a 'climatologies/${ndays_agg}days' directory will be created therein""",
+    default="/media/nicolasf/END19101/ICU/data/MSWEP/Daily/subsets_nogauge/SP",
+    help="""The directory root where to save the zarr datasets, a 'climatologies/${ndays_agg}days' directory will be created therein
+    \ndefault /media/nicolasf/END19101/ICU/data/MSWEP/Daily/subsets_nogauge/SP""",
 )
 
 parser.add_argument(
@@ -56,7 +60,8 @@ parser.add_argument(
     "--window",
     type=int,
     default=15,
-    help="""The size of the window in days, should be an odd number, the buffer is defined as {window}//2, default is 15 (7 days each side of the target DOY)""",
+    help="""The size of the window in days, should be an odd number, the buffer is defined as {window}//2
+    \ndefault is 15 (7 days each side of the target DOY)""",
 )
 
 args = parser.parse_args()
@@ -76,20 +81,25 @@ opath.mkdir(parents=True, exist_ok=True)
 
 dset = xr.open_dataset(fname)
 
-dset = dset.chunk({'time':-1, 'lat':200, 'lon':200})
+dset = dset.chunk({"time": -1, "lat": 200, "lon": 200})
 
-dset = dset.drop('time_bnds')
+dset = dset.drop("time_bnds")
 
-dset = dset.rolling({'time':window}, center=True, min_periods=window).construct(window_dim='buffer')
+dset = dset.rolling({"time": window}, center=True, min_periods=window).construct(
+    window_dim="buffer"
+)
 
-for DOY in np.arange(doy_start, doy_stop + 1): 
-
+for DOY in np.arange(doy_start, doy_stop + 1):
     print(f"processing DOY {DOY:03d} ...")
-    
+
     doy_dset = dset.sel(time=(dset.time.dt.dayofyear == DOY))
-    
-    doy_dset.to_zarr(opath.joinpath(f'MSWEP_nogauge_{ndays_agg}_days_runsum_{window // 2}_days_buffer_DOY_{DOY:03d}.zarr'))
-    
+
+    doy_dset.to_zarr(
+        opath.joinpath(
+            f"MSWEP_nogauge_{ndays_agg}_days_runsum_{window // 2}_days_buffer_DOY_{DOY:03d}.zarr"
+        )
+    )
+
     doy_dset.close()
 
 dset.close()

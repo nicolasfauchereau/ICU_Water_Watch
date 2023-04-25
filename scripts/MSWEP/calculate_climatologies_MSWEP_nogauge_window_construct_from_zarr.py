@@ -28,7 +28,8 @@ parser.add_argument(
     "--ndays_agg",
     type=int,
     default=90,
-    help="""The number of days for the rainfall accumulation, in [30,60,90,180,360], default 90 days""",
+    help="""The number of days for the rainfall accumulation, in [30,60,90,180,360]
+    \ndefault 90 days""",
 )
 
 parser.add_argument(
@@ -36,7 +37,7 @@ parser.add_argument(
     "--doy_start",
     type=int,
     default=1,
-    help="""The day of year to start the loop, default 1""",
+    help="""The day of year to start the loop\\ndefault 1""",
 )
 
 parser.add_argument(
@@ -44,7 +45,8 @@ parser.add_argument(
     "--doy_stop",
     type=int,
     default=365,
-    help="""The day of year to stop the loop, default 365""",
+    help="""The day of year to stop the loop
+    \ndefault 365""",
 )
 
 parser.add_argument(
@@ -52,7 +54,8 @@ parser.add_argument(
     "--clim_start",
     type=int,
     default=1993,
-    help="""The start year for the climatological period, default 1993""",
+    help="""The start year for the climatological period
+    \ndefault 1993""",
 )
 
 parser.add_argument(
@@ -60,7 +63,8 @@ parser.add_argument(
     "--clim_stop",
     type=int,
     default=2016,
-    help="""The end year for the climatological period, default 2016""",
+    help="""The end year for the climatological period
+    \ndefault 2016""",
 )
 
 parser.add_argument(
@@ -68,7 +72,8 @@ parser.add_argument(
     "--varname",
     type=str,
     default="precipitation",
-    help="""The variable name, default 'precipitation'""",
+    help="""The variable name
+    \ndefault 'precipitation'""",
 )
 
 parser.add_argument(
@@ -76,7 +81,8 @@ parser.add_argument(
     "--ipath_zarr",
     type=str,
     default="/media/nicolasf/END19101/ICU/data/MSWEP/Daily/subsets_nogauge/SP/climatologies/",
-    help="""The path containing the zarr datasets (1 for each DOY), default '/media/nicolasf/END19101/ICU/data/MSWEP/Daily/subsets_nogauge/SP/climatologies/'""",
+    help="""The path containing the zarr datasets (1 for each DOY)
+    \ndefault `/media/nicolasf/END19101/ICU/data/MSWEP/Daily/subsets_nogauge/SP/climatologies/`""",
 )
 
 parser.add_argument(
@@ -84,7 +90,7 @@ parser.add_argument(
     "--dask_dir",
     type=str,
     default="./dask_dir",
-    help="""The path to the dask folder, default './dask_dir'""",
+    help="""The path to the dask folder, default `./dask_dir`""",
 )
 
 args = parser.parse_args()

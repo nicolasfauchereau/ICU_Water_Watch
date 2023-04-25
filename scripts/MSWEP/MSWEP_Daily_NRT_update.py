@@ -16,7 +16,8 @@ def main():
         "--credentials",
         type=str,
         default='./MSWEP_credentials.txt',
-        help="""Text file with login and password for data.gloh2o.org""",
+        help="""Text file with login and password for data.gloh2o.org\
+        \ndefault `MSWEP_credentials.txt`""",
     )
 
     parser.add_argument(
@@ -24,7 +25,8 @@ def main():
         "--opath",
         type=str,
         default='/media/nicolasf/END19101/ICU/data/glo2ho/MSWEP280/NRT/Daily/',
-        help="""Path to the local daily MSWEP netcdf files (one file per day, NRT version)""",
+        help="""Path to the local daily MSWEP netcdf files (one file per day, NRT version)
+        \ndefault `/media/nicolasf/END19101/ICU/data/glo2ho/MSWEP280/NRT/Daily/`""",
     )
 
     args = parser.parse_args()

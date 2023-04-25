@@ -21,7 +21,8 @@ parser.add_argument(
     "--update",
     type=int,
     default=1,
-    help="""whether to update the NRT datasets first, default 1 (True: Update)""",
+    help="""whether to update the NRT datasets first
+    \ndefault 1 (True: Update)""",
 )
 
 parser.add_argument(
@@ -29,7 +30,8 @@ parser.add_argument(
     "--verbose",
     type=int,
     default=1,
-    help="""whether to print something when a file exists already on disk, default 1 (True: Verbose)""",
+    help="""whether to print something when a file exists already on disk
+    \ndefault 1 (True: Verbose)""",
 )
 
 parser.add_argument(
@@ -37,7 +39,8 @@ parser.add_argument(
     "--credentials",
     type=str,
     default="./MSWEP_credentials.txt",
-    help="""Text file with login and password for data.gloh2o.org, only needed if `--update 1`, default './MSWEP_credentials.txt'""",
+    help="""Text file with login and password for data.gloh2o.org, only needed if `--update 1`
+    \ndefault './MSWEP_credentials.txt'""",
 )
 
 parser.add_argument(
@@ -45,7 +48,8 @@ parser.add_argument(
     "--ipath",
     type=str,
     default="/media/nicolasf/END19101/ICU/data/glo2ho/MSWEP280/NRT/Daily/",
-    help="""The path to the `raw` MSWEP Daily NRT files, default `/media/nicolasf/END19101/ICU/data/glo2ho/MSWEP280/NRT/Daily/`""",
+    help="""The path to the `raw` MSWEP Daily NRT files
+    \ndefault `/media/nicolasf/END19101/ICU/data/glo2ho/MSWEP280/NRT/Daily/`""",
 )
 
 parser.add_argument(
@@ -53,7 +57,8 @@ parser.add_argument(
     "--opath",
     type=str,
     default="/media/nicolasf/END19101/ICU/data/MSWEP/Daily/subsets_nogauge/",
-    help="""The path where to save the extracted files, a directory {country} will be created therein\ndefault `/media/nicolasf/END19101/ICU/data/MSWEP/Daily/subsets_nogauge/`""",
+    help="""The path where to save the extracted files, a directory {country} will be created therein
+    \ndefault `/media/nicolasf/END19101/ICU/data/MSWEP/Daily/subsets_nogauge/`""",
 )
 
 parser.add_argument(
@@ -61,7 +66,8 @@ parser.add_argument(
     "--regions",
     type=str,
     default="./regions.json",
-    help="""A JSON file with the mapping between region names and [lonmin, lonmax, latmin, latmax], default './regions.json'""",
+    help="""A JSON file with the mapping between region names and [lonmin, lonmax, latmin, latmax]
+    \ndefault './regions.json'""",
 )
 
 # %% parse the arguments
