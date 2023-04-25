@@ -16,7 +16,7 @@ from ICU_Water_Watch import MSWEP
 
 # %% parse the command line arguments
 parser = argparse.ArgumentParser(
-    prog="calculate_climatologies_MSWEP_nogauge_window_construct_zarr.py",
+    prog="calculate_climatologies_MSWEP_nogauge_window_construct_from_zarr.py",
     description="""
                                 calculate the MSWEP climatologies (average, quantiles, SPI alpha and beta params) from the buffered DOY ZARR files for\n
                                 the 'no-gauge' version of Daily MSWEP, see `extract_daily_MSWEP_runsum_DOY_with_buffer_to_zarr.py` for the processing of the running accumulation and the creation\n

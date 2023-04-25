@@ -7,7 +7,7 @@ import numpy as np
 import xarray as xr
 
 parser = argparse.ArgumentParser(
-    prog="extract_daily_MSWEP_runsum_DOY_with_buffer_zarr.py",
+    prog="extract_daily_MSWEP_runsum_DOY_with_buffer_to_zarr.py",
     description="""construct zarr datasets for each DOY from a netcdf file containing running accumulations""",
 )
 

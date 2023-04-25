@@ -103,10 +103,10 @@ optional arguments:
 
 ### 9) calculate the climatological quantities (average, percentiles, SPI alpha and gamma parameters) from the DOY zarr datasets
 
-see help of `extract_daily_MSWEP_runsum_DOY_with_buffer_to_zarr.py`: 
+see help of `calculate_climatologies_MSWEP_nogauge_window_construct_from_zarr.py`: 
 
 ```
-usage: calculate_climatologies_MSWEP_nogauge_window_construct_zarr.py [-h] [-n NDAYS_AGG] [-s DOY_START] [-e DOY_STOP] [-cs CLIM_START] [-ce CLIM_STOP] [-v VARNAME]
+usage: calculate_climatologies_MSWEP_nogauge_window_construct_from_zarr.py [-h] [-n NDAYS_AGG] [-s DOY_START] [-e DOY_STOP] [-cs CLIM_START] [-ce CLIM_STOP] [-v VARNAME]
                                                                       [-i IPATH_ZARR] [-d DASK_DIR]
 
 calculate the MSWEP climatologies (average, quantiles, SPI alpha and beta params) from the buffered DOY ZARR files for the 'no-gauge' version of Daily MSWEP, see
