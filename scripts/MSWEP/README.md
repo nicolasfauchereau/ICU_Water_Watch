@@ -1,4 +1,6 @@
-# Processing of the MSWEP daily 'nogauge' dataset 
+# MSWEP 2.8.0 Daily No Gauge Data for the Island Climate Update 
+
+## Processing of the MSWEP daily 'Past nogauge' dataset and calculation of climatologies
 
 ### 1) extraction of the Pacific domain 
 
@@ -133,7 +135,51 @@ optional arguments:
                         The path to the dask folder, default `./dask_dir`
 ```
 
+## Update and extractions from the MSWEP 2.8.0 Near Real Time (NRT) dataset 
 
+
+### 1) update the NRT dataset 
+
+That is handled by the script `MSWEP_Daily_NRT_update.py`
+
+```
+usage: MSWEP_Daily_NRT_update.py [-h] [-c CREDENTIALS] [-o OPATH]
+
+update the MSWEP daily NRT dataset locally, from the glo2ho FTP server
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c CREDENTIALS, --credentials CREDENTIALS
+                        Text file with login and password for data.gloh2o.org default `MSWEP_credentials.txt`
+  -o OPATH, --opath OPATH
+                        Path to the local daily MSWEP netcdf files (one file per day, NRT version) default `/media/nicolasf/END19101/ICU/data/glo2ho/MSWEP280/NRT/Daily/`
+```
+
+### 2) extraction of the regional domains (including South Pacific [100E, 240E, 50S, 30N])
+
+That is handled by the script `extract_regions_MSWEP_NRT.py`
+
+```
+usage: extract_domains_MSWEP_NRT.py [-h] [-u UPDATE] [-v VERBOSE] [-c CREDENTIALS] [-i IPATH] [-o OPATH] [-d REGIONS]
+
+extract the regional domains defined in `regions.json (mapping region name to [lonmin, lonmax, latmin, latmax])`
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -u UPDATE, --update UPDATE
+                        whether to update the NRT datasets first default 1 (True: Update)
+  -v VERBOSE, --verbose VERBOSE
+                        whether to print something when a file exists already on disk default 1 (True: Verbose)
+  -c CREDENTIALS, --credentials CREDENTIALS
+                        Text file with login and password for data.gloh2o.org, only needed if `--update 1` default './MSWEP_credentials.txt'
+  -i IPATH, --ipath IPATH
+                        The path to the `raw` MSWEP Daily NRT files default `/media/nicolasf/END19101/ICU/data/glo2ho/MSWEP280/NRT/Daily/`
+  -o OPATH, --opath OPATH
+                        The path where to save the extracted files, a directory {country} will be created therein default
+                        `/media/nicolasf/END19101/ICU/data/MSWEP/Daily/subsets_nogauge/`
+  -d REGIONS, --regions REGIONS
+                        A JSON file with the mapping between region names and [lonmin, lonmax, latmin, latmax] default './regions.json'
+```
 
 
 

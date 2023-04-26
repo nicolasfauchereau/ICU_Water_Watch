@@ -13,7 +13,7 @@ from dask.diagnostics import ProgressBar
 # %%
 parser = argparse.ArgumentParser(
     prog="extract_domains_MSWEP_NRT.py",
-    description="""extract """,
+    description="""extract the regional domains defined in `regions.json (mapping region name to [lonmin, lonmax, latmin, latmax])`""",
 )
 
 parser.add_argument(
