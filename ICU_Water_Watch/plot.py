@@ -350,7 +350,7 @@ def map_decile(dset, varname='pctscore', mask=None, cmap=None, geoms=None, tickl
 
         plt.close(f)
 
-def map_precip_accum(dset, varname='precipitationCal', mask=None, geoms=None, cmap=None, fpath=None, close=True, gridlines=False): 
+def map_precip_accum(dset, varname='precipitationCal', mask=None, geoms=None, cmap=None, fpath=None, close=True, gridlines=False, source=None): 
 
     last_day, ndays = get_attrs(dset) 
     
@@ -431,12 +431,17 @@ def map_precip_accum(dset, varname='precipitationCal', mask=None, geoms=None, cm
         
         add_geom(ax=ax, geoms=geoms)
 
-    # title 
+    # first get rid of the default title  
 
     ax.set_title('')
-    
-    # title = f"Last {ndays} days\ncumulative rainfall (mm)"
-    title = f"Cumulative rainfall (mm)\n{ndays} days to {last_day:%d %b %Y}"
+
+    if source is not None: 
+
+        title = f"Cumulative rainfall (mm), source: {source}\n{ndays} days to {last_day:%d %b %Y}"
+
+    else: 
+
+        title = f"Cumulative rainfall (mm)\n{ndays} days to {last_day:%d %b %Y}"
     
     ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
 
@@ -464,7 +469,7 @@ def map_precip_accum(dset, varname='precipitationCal', mask=None, geoms=None, cm
         
         plt.close(f)
 
-def map_precip_anoms(dset, varname='anoms', mask=None, cmap=None, geoms=None, fpath=None, close=True, gridlines=False): 
+def map_precip_anoms(dset, varname='anoms', mask=None, cmap=None, geoms=None, fpath=None, close=True, gridlines=False, source=None): 
     """
     """
 
@@ -513,7 +518,13 @@ def map_precip_anoms(dset, varname='anoms', mask=None, cmap=None, geoms=None, fp
         
     ax.set_title("") # to get rid of default title
 
-    title = f"Last {ndays} days cumulative rainfall anomalies (mm)\nto {last_day:%d %b %Y}" 
+    if source is not None: 
+
+        title = f"Cumulative rainfall anomalies (mm), source: {source}\n{ndays} days to {last_day:%d %b %Y}"
+
+    else: 
+
+        title = f"Cumulative rainfall anomalies (mm)\n{ndays} days to {last_day:%d %b %Y}" 
 
     ax.text(0.99, 0.94, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
     
@@ -541,7 +552,7 @@ def map_precip_anoms(dset, varname='anoms', mask=None, cmap=None, geoms=None, fp
         
         plt.close(f)
         
-def map_dry_days_Pacific(dset, varname='dry_days', mask=None, cmap=None, geoms=None, fpath=None, close=True, gridlines=False): 
+def map_dry_days_Pacific(dset, varname='dry_days', mask=None, cmap=None, geoms=None, fpath=None, close=True, gridlines=False, source=None): 
     
     last_day, ndays = get_attrs(dset)
 
@@ -606,7 +617,13 @@ def map_dry_days_Pacific(dset, varname='dry_days', mask=None, cmap=None, geoms=N
 
     ax.set_title('', fontsize=13, color='k') # get rid of default title
 
-    title = f"Number of dry days over the last {ndays} days\nto {last_day:%d %b %Y}"
+    if source is not None: 
+    
+        title = f"Number of dry days, source: {source}\n{ndays} days period to {last_day:%d %b %Y}"
+
+    else: 
+
+        title = f"Number of dry days\n{ndays} days period to {last_day:%d %b %Y}"
     
     ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
 
@@ -634,7 +651,7 @@ def map_dry_days_Pacific(dset, varname='dry_days', mask=None, cmap=None, geoms=N
         
         plt.close(f)
 
-def map_days_since_rain_Pacific(dset, varname='days_since_rain', mask=None, cmap=None, geoms=None, fpath=None, close=True, gridlines=False): 
+def map_days_since_rain_Pacific(dset, varname='days_since_rain', mask=None, cmap=None, geoms=None, fpath=None, close=True, gridlines=False, source=None): 
     
     last_day, ndays = get_attrs(dset)
     
@@ -696,7 +713,15 @@ def map_days_since_rain_Pacific(dset, varname='days_since_rain', mask=None, cmap
 
     ax.set_title("") # get rid of default title
     
-    title = f"Days since last rain, {ndays} days period\nto {last_day:%d %b %Y}"
+    if source is not None: 
+
+        title = f"Days since last rain, source: {source}\n{ndays} days period to {last_day:%d %b %Y}"
+
+    else: 
+
+        title = f"Days since last rain\n{ndays} days period to {last_day:%d %b %Y}"
+
+
     
     ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
 
@@ -1282,7 +1307,7 @@ def map_USDM(dset, world_coastlines, country_coastline, EEZ, varname='pctscore',
         
         plt.close(f)
 
-def map_SPI_Pacific(dset, varname='SPI', mask=None, geoms=None, domain=[125, 240, -35, 25], fpath=None, close=True, gridlines=False): 
+def map_SPI_Pacific(dset, varname='SPI', mask=None, geoms=None, domain=[125, 240, -35, 25], fpath=None, close=True, gridlines=False, source=None): 
 
     # get the last date and the number of days from the dataset 
     
@@ -1348,10 +1373,17 @@ def map_SPI_Pacific(dset, varname='SPI', mask=None, geoms=None, domain=[125, 240
         
         make_gridlines(ax=ax, lon_step=20, lat_step=10)
 
-    title = f"Standardized Precipitation Index (SPI)\n{ndays} days to {last_day:%d %b %Y}"
+    if source is not None: 
+
+        title = f"Standardized Precipitation Index (SPI)\n{ndays} days to {last_day:%d %b %Y}"
     
+    else: 
+
     ax.set_title("") # to get rid of the default title
-    
+
+
+
+
     ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
     
     # copyright notice 

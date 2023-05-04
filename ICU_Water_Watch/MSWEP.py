@@ -1,5 +1,5 @@
 import pathlib
-from datetime import datetime
+from datetime import datetime, date
 
 from . import utils
 
@@ -60,9 +60,38 @@ def update(ftp_url="data.gloh2o.org", remote_path="niwa_mswep/MSWEP_V280/NRT/Dai
 
     ftp.close()
 
-def make_dataset(): 
+def make_dataset(lfiles=None, dpath=None, varname='precipitation', ndays=None, check_lag=True, chunks={'time':-1, 'lat':'auto', 'lon':'auto'}): 
+    
+    import xarray as xr
 
-    pass
+    dset = xr.open_mfdataset(lfiles, concat_dim='time', combine='nested', parallel=True, engine='netcdf4', chunks=chunks)[[varname, 'DOY']]
+    
+    # get the last date in the dataset 
+    
+    last_date = dset.time.to_series().index[-1]
+    
+    last_date = datetime(last_date.year, last_date.month, last_date.day)
+    
+    ndays_in_dset = len(dset.time)
+    
+    # checks that the lag to realtime does not exceed 2 
+    
+    if (check_lag) and (ndays is not None): 
+        
+        if (datetime.now() - last_date).days > 2: 
+            
+            print(f"something is wrong, the last date in the dataset is {last_date:%Y-%m-%d}, the expected date should be not earlier than {datetime.now() - timedelta(days=2):%Y-%m-%d}")
+
+        if ndays_in_dset != ndays:
+            
+            print(f"something is wrong with the number of time-steps, expected {ndays}, got {ndays_in_dset}")    
+    
+    # adds the number of days and the last date as *attributes* of the dataset 
+    
+    dset.attrs['ndays'] = ndays_in_dset
+    dset.attrs['last_day'] = f"{last_date:%Y-%m-%d}"
+    
+    return dset
 
 def set_attrs(dset, ndays=None, last_day=None): 
     """
@@ -94,6 +123,8 @@ def set_attrs(dset, ndays=None, last_day=None):
             dset.attrs['last_day'] = last_day
         elif isinstance(last_day, datetime): 
             dset.attrs['last_day'] = f"{last_day:%Y-%m-%d}"
+        elif isinstance(last_day, date): 
+             dset.attrs['last_day'] = f"{last_day:%Y-%m-%d}"
             
         return dset 
     
