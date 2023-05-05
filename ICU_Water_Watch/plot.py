@@ -156,13 +156,13 @@ def add_geom(ax=None, geoms=None):
     
     # single geodataframe
     
-    if type(geoms is gpd.geodataframe.GeoDataFrame): 
+    if isinstance(geoms, gpd.geodataframe.GeoDataFrame): 
         
         geoms.boundary.plot(ax=ax, transform=ccrs.PlateCarree(), color='0.4', linewidth=0.8)
     
     # list of geodataframe
      
-    elif (type(geoms) is list) and (np.alltrue([type(geom) is gpd.geodataframe.GeoDataFrame for geom in geoms])): 
+    elif isinstance(geoms, list) and (np.alltrue([isinstance(geom, gpd.geodataframe.GeoDataFrame) for geom in geoms])): 
         
         for geom in geoms:
             
@@ -1379,10 +1379,7 @@ def map_SPI_Pacific(dset, varname='SPI', mask=None, geoms=None, domain=[125, 240
     
     else: 
 
-    ax.set_title("") # to get rid of the default title
-
-
-
+        ax.set_title("") # to get rid of the default title
 
     ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
     
@@ -2261,7 +2258,7 @@ def make_dummy_colorbar(ax, lims, colors_list=None, labels_list=None, xpos=0.8, 
         
         y = ystart + incy
         
-        cbar_ax = ax.axes.inset_axes([xpos, y, height / 2., height])
+        cbar_ax = ax.axes.inset_axes([xpos, y, height * 0.5, height])
         
         cb = plt.colorbar(im, cax=cbar_ax)
         
@@ -2276,4 +2273,159 @@ def make_dummy_colorbar(ax, lims, colors_list=None, labels_list=None, xpos=0.8, 
             ax.text(xpos+0.03, y+0.01, labels_list[i],  transform=ax.transAxes, va='bottom')
         
         incy += (height + 0.01)
+
+def map_categories(
+    dataarray,
+    mask=None,
+    colors_list=None,
+    labels_list=None,
+    geoms=None,
+    fpath=None,
+    extent=None,
+    close=False,
+    gridlines=False,
+    cartopy_coastlines=True,
+    spacing={"lon": 20, "lat": 10},
+    title="",
+    figname_root="EAR",
+    title_top=False,
+    cbar_xanchor=0.75,
+    cbar_yanchor=0.6,
+):
+    
+    from operator import itemgetter
+    
+    # get the global attributes (number of days and last day)
+    ndays = dataarray.attrs["ndays"]
+    last_day = dataarray.attrs["last_day"]
+
+    # get the unique categories from the dataarray
+    # cats = np.unique(dataarray)
+
+    # if nans remove
+    # cats = cats[~np.isnan(cats)]
+    
+    # print(cats)
+    
+    # number of unique categories
+    # ncats = len(cats)
+    
+    if mask is not None:
+        dataarray = dataarray * mask
+
+    if colors_list is None:
+        # EAR Watch colors
+        colors_list = ["#F04E37", "#F99D1C", "#FFDE40", "#FFFFFF", "#33BBED"]
+
+    if labels_list is None:
+        # EAR Watch categories
+        labels_list = [
+            "Severely dry (< 5%)",
+            "Seriously dry (< 10%)",
+            "Warning (< 25%)",
+            "Near or Wetter",
+            "Seriously wet (> 90%)",
+        ]
+
+    cats = np.arange(len(colors_list))
+    
+    ncats = len(cats)
         
+    # get only the colors and labels corresponding to values actually in the dataarray
+    
+    # cats = np.unique(dataarray)
+    # cats = cats[~np.isnan(cats)]
+    
+    # colors_list_indexed = list(itemgetter(*cats.tolist())(colors_list)) 
+    # labels_list_indexed = list(itemgetter(*cats.tolist())(labels_list))
+        
+    # print(colors_list_indexed)
+    # print(labels_list_indexed)
+    
+    f, ax = plt.subplots(
+        figsize=(13, 8),
+        subplot_kw={"projection": ccrs.PlateCarree(central_longitude=180)},
+    )
+
+    lims = []
+
+    for i, cat in enumerate(cats):
+        im = dataarray.where(dataarray == cat).plot(
+            levels=2,
+            colors=colors_list[i],
+            add_colorbar=False,
+            transform=ccrs.PlateCarree(),
+        )
+
+        lims.append(im)
+
+    if geoms is not None:
+         plot.add_geom(ax=ax, geoms=geoms)
+
+    if gridlines:
+        plot.make_gridlines(ax=ax, lon_step=spacing["lon"], lat_step=spacing["lat"])
+
+    if cartopy_coastlines: 
+        ax.coastlines("10m")
+
+    if extent is not None:
+        ax.set_extent(extent, crs=ccrs.PlateCarree())
+
+    plot.make_dummy_colorbar(
+        ax,
+        lims, 
+        colors_list=colors_list,
+        labels_list=labels_list,
+        xpos=cbar_xanchor,
+        ystart=cbar_yanchor,
+        bbox=True,
+    )
+
+    ax.set_title("")
+
+    if title_top:
+        ax.set_title(
+            title,
+            fontsize=13,
+            fontdict={"color": "k"},
+            horizontalalignment="center",
+        )
+
+    else:
+        ax.text(
+            0.99,
+            0.95,
+            title,
+            fontsize=13,
+            fontdict={"color": "k"},
+            bbox=dict(facecolor="w", edgecolor="w"),
+            horizontalalignment="right",
+            verticalalignment="center",
+            transform=ax.transAxes,
+        )
+
+    # copyright notice
+
+    ax.text(
+        0.0065,
+        0.02,
+        "\u00A9" + " NIWA",
+        transform=ax.transAxes,
+        bbox=dict(facecolor="w", edgecolor="w"),
+        fontdict=dict(color="0.4"),
+    )
+
+    f.patch.set_facecolor("white")
+
+    if fpath is not None:
+        if type(fpath) != pathlib.PosixPath:
+            fpath = pathlib.Path(fpath)
+
+        f.savefig(
+            fpath.joinpath(f"{figname_root}_{ndays}days_to_{last_day}.png"),
+            dpi=200,
+            bbox_inches="tight",
+        )
+
+    if close:
+        plt.close(f)

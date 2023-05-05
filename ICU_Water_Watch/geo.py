@@ -549,3 +549,15 @@ def get_shape_bounds(shape):
     domain = [float(shape.geometry.bounds.minx), float(shape.geometry.bounds.maxx), float(shape.geometry.bounds.miny), float(shape.geometry.bounds.maxy)]
     
     return domain 
+
+def expand_box(domain, buffer_in_degrees=1):
+
+    if not(isinstance(domain, list)): 
+        raise ValueError("the first argument (domain) should be a list [lonmin, lonmax, latmin, latmax]")
+        return None
+    else:
+        domain = [domain[0] - buffer_in_degrees, domain[1] + buffer_in_degrees, domain[2] - buffer_in_degrees, domain[3] + buffer_in_degrees]
+        return domain
+
+
+
