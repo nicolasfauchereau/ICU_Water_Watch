@@ -5,17 +5,19 @@
 import pathlib
 import argparse
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
-import numpy as np
 import pandas as pd
 import xarray as xr
-from cartopy import crs as ccrs
-from matplotlib import pyplot as plt
 from dask.diagnostics import ProgressBar
 
-from ICU_Water_Watch import domains, utils, plot, geo, MSWEP 
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning) 
+from shapely.errors import ShapelyDeprecationWarning
+warnings.filterwarnings("ignore", category=ShapelyDeprecationWarning) 
+
+from ICU_Water_Watch import geo, MSWEP 
 
 # %% description 
 parser = argparse.ArgumentParser(
@@ -60,12 +62,12 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "-l",
-    "--lag",
-    type=int,
-    default=2,
-    help="""The lag to realtime, depending on when the script is run, must be between 1 and 2 days\n
-    default 2 days""",
+    "-c",
+    "--cycle_time",
+    type=str,
+    default=None,
+    help="""The cycle time i.e. `%Y-%m-%d`\n
+    default None""",
 )
 
 parser.add_argument(
@@ -104,23 +106,22 @@ ipath = args.ipath
 dpath_shapes = args.dpath_shapes
 domain_name = args.domain_name
 ndays_agg = args.ndays_agg
-lag = args.lag
+cycle_time = args.cycle_time
 varname = args.varname
 clim_start = args.clim_start
 clim_stop = args.clim_stop 
 
-
-# dpath = "/media/nicolasf/END19101/ICU/data/MSWEP/Daily/subsets_nogauge"
+# %% values for testing 
+# ipath = "/media/nicolasf/END19101/ICU/data/MSWEP/Daily/subsets_nogauge"
 # dpath_shapes = "/home/nicolasf/operational/ICU/development/hotspots/data/shapefiles/"
 # domain_name = "SP"
-# nbdays_agg = 90
-# lag_to_realtime = 1
+# ndays_agg = 90
 # varname = "precipitation"
 # fig_kwargs = dict(dpi=200, bbox_inches="tight", facecolor="w")
 # clim_start = 1991
 # clim_stop = 2020
 
-
+# %% paths to pathlib.Path
 dpath = pathlib.Path(ipath).joinpath(domain_name)
 
 dpath_shapes = pathlib.Path(dpath_shapes)
@@ -137,33 +138,61 @@ print(f"Output path for the merged realtime acccumulation and climatologies is {
 # %% get the EEZs shapefiles, individual + merged
 EEZs, merged_EEZs = geo.get_EEZs(dpath_shapes=dpath_shapes)
 
-# %%
+# %% cycle time 
+
+if cycle_time is not None: 
+
+    cycle_time = datetime.strptime(cycle_time, "%Y-%m-%d").date()
+
+else: 
+    # if not defined, we revert to 2 days lag to realtime
+
+    cycle_time = datetime.utcnow().date() - relativedelta(days=2)
+
+# %% check that the cycle time is not in the future 
 today = datetime.utcnow().date()
-date_stop = today - timedelta(days=lag)
-DOY_stop = date_stop.timetuple().tm_yday
-date_start = date_stop - timedelta(days=ndays_agg - 1)
-DOY_start = date_start.timetuple().tm_yday
 
+if cycle_time > today: 
+    raise ValueError(f"cycle_time is set to {cycle_time:%Y-%m-%d}, but today (UTC) is {today:%Y-%m-%d}")
 
-# %% lis the files
+DOY_cycle_time = cycle_time.timetuple().tm_yday
+
+# %% list the files on disk 
 lfiles = list(dpath.glob("MSWEP_Daily_????-??-??.nc"))
 lfiles.sort()
-lfiles = lfiles[-ndays_agg:]
+
+# %% get the intended start date for the accumulation 
+date_start = cycle_time - relativedelta(days = ndays_agg - 1)
+
+# %% build the list of dates for the files that should be on disk 
+ldates = pd.date_range(date_start, cycle_time, freq='D')
+
+# %% build the list of files that should be on disk 
+lfiles_from_cycle_time = [
+    dpath.joinpath(f"MSWEP_Daily_{dt:%Y-%m-%d}.nc") for dt in ldates
+]
+
+# %% compare the list of files on disk and the list of files that *should* be on disk 
+lfiles_intersection = list(set(lfiles_from_cycle_time) & set(lfiles))
+
+# %% the length of the intersection should be equal to the number of days for the accumulation 
+if len(lfiles_intersection) != ndays_agg: 
+    lfiles_missing = list(set(lfiles_from_cycle_time) - set(lfiles))
+    lfiles_missing = '\n'.join(lfiles_missing)
+    message = f"""The number of available files to {cycle_time:%Y-%m-%d} {len(lfiles_intersection)} is not equal to the number of days {ndays_agg}\n
+    The files missing are {lfiles_missing}"""
+    raise ValueError(message)
+
 
 # %% get the bounding dates, from the list of files, and test
-date_first_file = datetime.strptime(lfiles[0].name[-13:-3], "%Y-%m-%d").date()
-date_last_file = datetime.strptime(lfiles[-1].name[-13:-3], "%Y-%m-%d").date()
-
-# %% some tests 
-
-if not(date_last_file == date_stop): 
-    raise ValueError(f"The date for the last file ({date_last_file:%Y-%m-%d}) is different from the expected date ({date_stop:%Y-%m-%d})")
-
-if not(date_first_file == date_start): 
-    raise ValueError(f"The date for the first file ({date_first_file:%Y-%m-%d}) is different from the expected date ({date_start:%Y-%m-%d})")
+date_first_file = datetime.strptime(lfiles_from_cycle_time[0].name[-13:-3], "%Y-%m-%d").date()
+date_last_file = datetime.strptime(lfiles_from_cycle_time[-1].name[-13:-3], "%Y-%m-%d").date()
 
 # %% make the dataset from the list of file
-dset = MSWEP.make_dataset(lfiles)
+dset = MSWEP.make_dataset(lfiles_from_cycle_time)
+
+# %% 
+dset = dset.chunk({'time':-1, 'lat':50, 'lon':50})
 
 # %% get the attributes
 last_date, ndays = MSWEP.get_attrs(dset)
@@ -241,9 +270,10 @@ climatological_average = climatological_average.squeeze()
 climatological_quantiles = climatological_quantiles.squeeze()
 climatological_SPI_params = climatological_SPI_params.squeeze()
 
-# %% rename the variable precipitation
+# %% rename the variable precipitation to precipitation_average
 climatological_average = climatological_average.rename({varname: f"{varname}_average"})
 
+# %% rename 
 climatological_quantiles = climatological_quantiles.rename(
     {varname: f"{varname}_quantiles"}
 )
@@ -266,6 +296,10 @@ dset = xr.merge(
 )
 
 # %% save to disk 
-dset.to_netcdf(
-    opath.joinpath(f"MSWEP_dset_merged_{ndays_agg}days_to_{last_date:%Y-%m-%d}.nc")
-)
+print(f"saving MSWEP_dset_merged_{ndays_agg}days_to_{last_date:%Y-%m-%d}.nc in {str(opath)}")
+with ProgressBar():
+    dset.to_netcdf(
+        opath.joinpath(f"MSWEP_dset_merged_{ndays_agg}days_to_{last_date:%Y-%m-%d}.nc")
+    )
+
+# %% EOF

@@ -15,9 +15,14 @@ from cartopy import crs as ccrs
 from matplotlib import pyplot as plt
 from dask.diagnostics import ProgressBar
 
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning) 
+from shapely.errors import ShapelyDeprecationWarning
+warnings.filterwarnings("ignore", category=ShapelyDeprecationWarning) 
+
 from ICU_Water_Watch import domains, utils, plot, geo, MSWEP 
 
-# small function to digitize
+# %% small function to digitize
 def _digitize(x, bins):
     return np.digitize(x.ravel(), bins.ravel())
 
@@ -74,12 +79,12 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "-l",
-    "--lag",
-    type=int,
-    default=2,
-    help="""The lag to realtime, depending on when the script is run, must be between 1 and 2 days\n
-    default 2 days""",
+    "-c",
+    "--cycle_time",
+    type=str,
+    default=None,
+    help="""The cycle time i.e. `%Y-%m-%d`\n
+    default None""",
 )
 
 parser.add_argument(
@@ -118,17 +123,17 @@ dpath_shapes = args.dpath_shapes
 fig_path = args.fig_path
 domain_name = args.domain_name
 ndays_agg = args.ndays_agg
-lag = args.lag
+cycle_time = args.cycle_time
 varname = args.varname
 clim_start = args.clim_start
 clim_stop = args.clim_stop
 
-# %% default parameters for testing
-# dpath = "/media/nicolasf/END19101/ICU/data/MSWEP/Daily/subsets_nogauge"
+# %% 
+# ipath = "/media/nicolasf/END19101/ICU/data/MSWEP/Daily/subsets_nogauge"
 # dpath_shapes = "/home/nicolasf/operational/ICU/development/hotspots/data/shapefiles"
+# fig_path = "/home/nicolasf/operational/ICU/development/hotspots/code/ICU_Water_Watch/figures"
 # domain_name = "SP"
 # ndays_agg = 90
-# lag = 2
 # varname = "precipitation"
 # clim_start = 1991
 # clim_stop = 2020
@@ -140,7 +145,6 @@ fig_kwargs = dict(dpi=200, bbox_inches="tight", facecolor="w")
 dpath = pathlib.Path(ipath).joinpath(f"{domain_name}/outputs")
 dpath_shapes = pathlib.Path(dpath_shapes)
 
-
 # %% paths to pathlib.Path
 dpath = pathlib.Path(ipath).joinpath(f"{domain_name}/outputs")
 dpath_shapes = pathlib.Path(dpath_shapes)
@@ -149,20 +153,36 @@ dpath_shapes = pathlib.Path(dpath_shapes)
 fig_path = pathlib.Path(fig_path)
 fig_path.mkdir(parents=True, exist_ok=True)
 
-# %% get today's date
+print(f"The figures will be saved in {str(fig_path)}")
+
+# %% cycle time
+
+if cycle_time is not None: 
+
+    cycle_time = datetime.strptime(cycle_time, "%Y-%m-%d").date()
+
+else: 
+    # if not defined, we revert to 2 days lag to realtime
+
+    cycle_time = datetime.utcnow().date() - relativedelta(days=2)
+
+# %% check that the cycle time is not in the future 
 today = datetime.utcnow().date()
-date_stop = today - timedelta(days=lag)
+
+if cycle_time > today: 
+    raise ValueError(f"cycle_time is set to {cycle_time:%Y-%m-%d}, but today (UTC) is {today:%Y-%m-%d}")
+
 
 # %% get the EEZs and coastlines 
 EEZs, merged_EEZs = geo.get_EEZs(dpath_shapes=dpath_shapes)
 coastlines = geo.get_coastlines(dpath_shapes=dpath_shapes)
 
 # %% get the file containing the data for the past N days +  the climatologies 
-fname = dpath.joinpath(f"MSWEP_dset_merged_{ndays_agg}days_to_{date_stop:%Y-%m-%d}.nc")
+fname = dpath.joinpath(f"MSWEP_dset_merged_{ndays_agg}days_to_{cycle_time:%Y-%m-%d}.nc")
 
 #%% test if the file is on disk 
 if not(fname.exists()): 
-    raise ValueError(f"MSWEP_dset_merged_{ndays_agg}days_to_{date_stop:%Y-%m-%d}.nc does not exist")
+    raise ValueError(f"MSWEP_dset_merged_{ndays_agg}days_to_{cycle_time:%Y-%m-%d}.nc does not exist")
 
 #%% open the file, with dask chunking 
 dset = xr.open_dataset(fname, chunks={"time": "auto", "lat": 50, "lon": 50})
@@ -200,7 +220,6 @@ plot.map_precip_accum(
     close=True,
 )
 
-
 # %% plot the precip anomalies
 plot.map_precip_anoms(
     dset,
@@ -220,7 +239,7 @@ plot.map_dry_days_Pacific(
     geoms=EEZs,
     source="MSWEP 2.8.0",
     fpath=fig_path,
-    close=False,
+    close=True,
 )
 
 # %% plot the number of days since last rain
@@ -231,13 +250,13 @@ plot.map_days_since_rain_Pacific(
     geoms=EEZs,
     source="MSWEP 2.8.0",
     fpath=fig_path,
-    close=False,
+    close=True,
 )
 
 # %% now define the quantile thresholds for the EAR Watch Categories
 EAR_threshs = [0.05, 0.1, 0.25, 0.9]
 
-EAR_quantiles = dset[["precipitation_quantiles"]].sel(quantile=EAR_threshs)
+EAR_quantiles = dset[[f"{varname}_quantiles"]].sel(quantile=EAR_threshs)
 
 EAR_colors_list = ["#F04E37", "#F99D1C", "#FFDE40", "#FFFFFF", "#33BBED"]
 
@@ -256,9 +275,10 @@ EAR_categories = xr.apply_ufunc(
     EAR_quantiles[f"{varname}_quantiles"],
     input_core_dims=[[], ["quantile"]],
     vectorize=True,
-    dask="allowed",
+    dask="parallelized",
 )
 
+print(f"calculating the EAR Watch categories for {ndays_agg} accumulations ending {cycle_time:%Y-%m-%d}")
 with ProgressBar():
     EAR_categories = EAR_categories.compute()
 
@@ -266,7 +286,7 @@ with ProgressBar():
 EAR_categories.attrs = attrs
 
 # % plot 
-title = f'Water Stress (aligned to "EAR" alert levels), source MSWEP 2.8.0\n{ndays_agg} days to {date_stop:%d %b %Y}'
+title = f'Water Stress (aligned to "EAR" alert levels), source MSWEP 2.8.0\n{ndays_agg} days to {cycle_time:%d %b %Y}'
 
 plot.map_categories(
     EAR_categories,
@@ -278,8 +298,8 @@ plot.map_categories(
     gridlines=False,
     title=title,
     figname_root="EAR",
-    fpath="../../figures/MSWEP_dev/",
-    close=False,
+    fpath=fig_path,
+    close=True,
 )
 
 # %% now define the quantile thresholds for the USDM (US Drought Monitor) Categories
@@ -308,6 +328,7 @@ USDM_categories = xr.apply_ufunc(
     dask="parallelized",
 )
 
+print(f"calculating the USDM categories for {ndays_agg} accumulations ending {cycle_time:%Y-%m-%d}")
 with ProgressBar():
     USDM_categories = USDM_categories.compute()
 
@@ -316,7 +337,7 @@ USDM_categories.attrs = attrs
 
 
 # %% plot 
-title = f"US Drought Monitor (USDM), source MSWEP 2.8.0\n{ndays_agg} days to {date_stop:%d %b %Y}"
+title = f"US Drought Monitor (USDM), source MSWEP 2.8.0\n{ndays_agg} days to {cycle_time:%d %b %Y}"
 
 plot.map_categories(
     USDM_categories,
@@ -328,8 +349,9 @@ plot.map_categories(
     gridlines=False,
     title=title,
     figname_root="USDM",
-    fpath="../../figures/MSWEP_dev/",
+    fpath=fig_path,
     cbar_yanchor=0.55,
+    close=True
 )
 
 # %% now calculate the SPI (Standardized Precipitation Index)
@@ -339,12 +361,14 @@ SPI = MSWEP.calculate_SPI(dset[varname], dset["alpha"], dset["beta"], name="SPI"
 SPI_threshs = [-2, -1.5, -1, 1, 1.5, 2]
 
 # %% derive the SPI categories
+print(f"calculating the SPI categories for {ndays_agg} accumulations ending {cycle_time:%Y-%m-%d}")
+
 SPI_categories = np.digitize(SPI["SPI"].data, SPI_threshs)
+
 SPI["SPI_categories"] = (("lat", "lon"), SPI_categories)
 
 # %% add the attributes 
 SPI["SPI_categories"].attrs = attrs
-
 
 # %% colors list and labels for the SPI 
 SPI_colors_list = ["#F04E37", "#F99D1C", "#FFDE40", "#FFFFFF", "#96ceff", "#4553bf", "#09146b"]
@@ -360,7 +384,7 @@ SPI_labels = [
 ]
 
 # %% plot 
-title = f"Standardized Precipitation Index (SPI), source MSWEP 2.8.0\n{ndays_agg} days to {date_stop:%d %b %Y}"
+title = f"Standardized Precipitation Index (SPI), source MSWEP 2.8.0\n{ndays_agg} days to {cycle_time:%d %b %Y}"
 
 plot.map_categories(
     SPI["SPI_categories"],
@@ -375,8 +399,8 @@ plot.map_categories(
     cbar_yanchor=0.495,
     cbar_xanchor=0.85,
     figname_root="SPI",
-    fpath="../../figures/MSWEP_dev/",
-    close=False,
+    fpath=fig_path,
+    close=True,
 )
 
 # %% Now start some data munging before plotting the country level maps
@@ -388,6 +412,8 @@ SPI_categories_ds = SPI[['SPI_categories']]
 
 # %% main loop 
 for country_name in coastlines.country_na.values:
+
+    print(f"Now mapping the country level EAR, USDM and SPI for {country_name}")
 
     country_fname = utils.sanitize_name(country_name)
     
@@ -410,12 +436,13 @@ for country_name in coastlines.country_na.values:
     gridlines=True,
     cartopy_coastlines=False,
     spacing={"lon": 2.5, "lat": 2.5},
-    title=f"SPI, {country_name}, {ndays_agg} days to {date_stop:%Y-%m-%d}",
+    title=f"SPI, {country_name}, {ndays_agg} days to {cycle_time:%Y-%m-%d}",
     figname_root=f"SPI_{country_fname}", 
-    fpath='../../figures/MSWEP_dev/',
+    fpath=fig_path,
     cbar_xanchor=1.01,
     cbar_yanchor=0,
     title_top=True, 
+    fit=True,
     close=True,
     )
 
@@ -429,12 +456,13 @@ for country_name in coastlines.country_na.values:
     gridlines=True,
     cartopy_coastlines=False,
     spacing={"lon": 2.5, "lat": 2.5},
-    title=f"EAR, {country_name}, {ndays_agg} days to {date_stop:%Y-%m-%d}",
+    title=f"EAR, {country_name}, {ndays_agg} days to {cycle_time:%Y-%m-%d}",
     figname_root=f"EAR_{country_fname}", 
-    fpath='../../figures/MSWEP_dev/',
+    fpath=fig_path,
     cbar_xanchor=1.01,
     cbar_yanchor=0,
     title_top=True, 
+    fit=True,
     close=True,
     )
     
@@ -448,11 +476,12 @@ for country_name in coastlines.country_na.values:
     gridlines=True,
     cartopy_coastlines=False,
     spacing={"lon": 2.5, "lat": 2.5},
-    title=f"USDM, {country_name}, {ndays_agg} days to {date_stop:%Y-%m-%d}",
+    title=f"USDM, {country_name}, {ndays_agg} days to {cycle_time:%Y-%m-%d}",
     figname_root=f"USDM_{country_fname}", 
-    fpath='../../figures/MSWEP_dev/',
+    fpath=fig_path,
     cbar_xanchor=1.01,
     cbar_yanchor=0,
     title_top=True, 
+    fit=True,
     close=True,
     )

@@ -20,9 +20,9 @@ parser.add_argument(
     "-u",
     "--update",
     type=int,
-    default=1,
+    default=0,
     help="""whether to update the NRT datasets first
-    \ndefault 1 (True: Update)""",
+    \ndefault 0 (False: do not update)""",
 )
 
 parser.add_argument(

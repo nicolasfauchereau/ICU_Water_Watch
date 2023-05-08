@@ -2289,6 +2289,7 @@ def map_categories(
     title="",
     figname_root="EAR",
     title_top=False,
+    fit=False, 
     cbar_xanchor=0.75,
     cbar_yanchor=0.6,
 ):
@@ -2328,9 +2329,7 @@ def map_categories(
         ]
 
     cats = np.arange(len(colors_list))
-    
-    ncats = len(cats)
-        
+      
     # get only the colors and labels corresponding to values actually in the dataarray
     
     # cats = np.unique(dataarray)
@@ -2341,11 +2340,25 @@ def map_categories(
         
     # print(colors_list_indexed)
     # print(labels_list_indexed)
-    
-    f, ax = plt.subplots(
-        figsize=(13, 8),
+
+    if fit: 
+
+        nlon = len(dataarray['lon']) 
+        nlat = len(dataarray['lat']) 
+        w = 9
+        h = int(np.ceil(w * (nlat / nlon)))
+
+        f, ax = plt.subplots(
+        figsize=(w, h),
         subplot_kw={"projection": ccrs.PlateCarree(central_longitude=180)},
     )
+
+    else: 
+
+        f, ax = plt.subplots(
+            figsize=(13, 8),
+            subplot_kw={"projection": ccrs.PlateCarree(central_longitude=180)},
+        )
 
     lims = []
 
@@ -2360,10 +2373,10 @@ def map_categories(
         lims.append(im)
 
     if geoms is not None:
-         plot.add_geom(ax=ax, geoms=geoms)
+         add_geom(ax=ax, geoms=geoms)
 
     if gridlines:
-        plot.make_gridlines(ax=ax, lon_step=spacing["lon"], lat_step=spacing["lat"])
+        make_gridlines(ax=ax, lon_step=spacing["lon"], lat_step=spacing["lat"])
 
     if cartopy_coastlines: 
         ax.coastlines("10m")
@@ -2371,7 +2384,7 @@ def map_categories(
     if extent is not None:
         ax.set_extent(extent, crs=ccrs.PlateCarree())
 
-    plot.make_dummy_colorbar(
+    make_dummy_colorbar(
         ax,
         lims, 
         colors_list=colors_list,
