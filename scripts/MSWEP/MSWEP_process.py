@@ -66,7 +66,7 @@ parser.add_argument(
     "--cycle_time",
     type=str,
     default=None,
-    help="""The cycle time i.e. `%Y-%m-%d`\n
+    help="""The cycle time i.e YYYY-MM-DD\n
     default None""",
 )
 
