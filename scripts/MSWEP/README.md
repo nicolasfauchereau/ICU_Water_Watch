@@ -247,9 +247,4 @@ optional arguments:
                         The first year of the climatological period, can be 1991 or 1993 default 1991
   -ce CLIM_STOP, --clim_stop CLIM_STOP
                         The last year of the climatological period, can be 2020 or 2016 default 2020
-
-
 ```
-
-
-
