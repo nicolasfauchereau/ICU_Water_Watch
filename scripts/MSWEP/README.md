@@ -181,5 +181,75 @@ optional arguments:
                         A JSON file with the mapping between region names and [lonmin, lonmax, latmin, latmax] default './regions.json'
 ```
 
+## Daily processing of MSWEP 2.8.0 Near Real Time (NRT) and mapping
+
+The daily processing of MSWEP 2.8.0 NRT involves reading the extracted daily files (for the South Pacific ['SP'] region)
+calculating the accumulations (over 30, 60, 90, 180 and 360 days), reading the pre-computed climatologies (average, quantiles and SPI parameters), 
+calculating the anomalies, and merging accumulations, anomalies and climatologies in one xarray dataset, which is then saved to disk. 
+
+This is handled by the script `MSWEP_process.py` 
+
+The daily mapping of MSWEP 2.8.0 NRT involves reading the file saved by `MSWEP_process.py`, mapping the accumulations, anomalies, number of dry days, day since last rain, then calculating and mapping the "Water Stress" (aligned to the "Early Action Rainfall" Watch levels), USDM (US Drough Monitor) and SPI (Standardized Precipitation Index). 
+
+This is handled by the script `MSWEP_map.py` 
+
+This is the help for `MSWEP_process.py`: 
+
+```
+usage: MSWEP_process.py [-h] [-i IPATH] [-s DPATH_SHAPES] [-d DOMAIN_NAME] [-n NDAYS_AGG] [-c CYCLE_TIME] [-v VARNAME] [-cs CLIM_START] [-ce CLIM_STOP]
+
+Put together the climatologies and the real time accumulations, and calculate the precipitation anomalies
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i IPATH, --ipath IPATH
+                        The path to the daily NRT MSWEP files default `/media/nicolasf/END19101/ICU/data/MSWEP/Daily/subsets_nogauge`
+  -s DPATH_SHAPES, --dpath_shapes DPATH_SHAPES
+                        The path to shapefiles (ICU EEZs and coastlines) default `/home/nicolasf/operational/ICU/development/hotspots/data/shapefiles`
+  -d DOMAIN_NAME, --domain_name DOMAIN_NAME
+                        The domain for which the MWSEP NRT files have been extracted default `SP` ('South Pacific': [100E, 240E, 50S, 30N])
+  -n NDAYS_AGG, --ndays_agg NDAYS_AGG
+                        The number of days for the rainfall accumulation, in [30,60,90,180,360] default 90 days
+  -c CYCLE_TIME, --cycle_time CYCLE_TIME
+                        The cycle time i.e YYYY-MM-DD default None
+  -v VARNAME, --varname VARNAME
+                        The variable name default `precipitation`
+  -cs CLIM_START, --clim_start CLIM_START
+                        The first year of the climatological period, can be 1991 or 1993 default 1991
+  -ce CLIM_STOP, --clim_stop CLIM_STOP
+                        The last year of the climatological period, can be 2020 or 2016 default 2020
+```
+
+This is the help for `MSWEP_map.py`: 
+
+```
+usage: MSWEP_map.py [-h] [-i IPATH] [-s DPATH_SHAPES] [-f FIG_PATH] [-d DOMAIN_NAME] [-n NDAYS_AGG] [-c CYCLE_TIME] [-v VARNAME] [-cs CLIM_START] [-ce CLIM_STOP]
+
+calculate the EAR, USDM and SPI categories, and map them as well as precipitation accumulations, anomalies, dry days and days since last rain
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i IPATH, --ipath IPATH
+                        The path to the daily merged MSWEP 2.8.0 netcdf files default `/media/nicolasf/END19101/ICU/data/MSWEP/Daily/subsets_nogauge`
+  -s DPATH_SHAPES, --dpath_shapes DPATH_SHAPES
+                        The path to shapefiles (ICU EEZs and coastlines) default `/home/nicolasf/operational/ICU/development/hotspots/data/shapefiles`
+  -f FIG_PATH, --fig_path FIG_PATH
+                        The path to save the figures default `/home/nicolasf/operational/ICU/development/hotspots/code/ICU_Water_Watch/figures`
+  -d DOMAIN_NAME, --domain_name DOMAIN_NAME
+                        The domain for which the MWSEP NRT files have been extracted default `SP` ('South Pacific': [100E, 240E, 50S, 30N])
+  -n NDAYS_AGG, --ndays_agg NDAYS_AGG
+                        The number of days for the rainfall accumulation, in [30,60,90,180,360] default 90 days
+  -c CYCLE_TIME, --cycle_time CYCLE_TIME
+                        The cycle time i.e. YYYY-MM-DD default None
+  -v VARNAME, --varname VARNAME
+                        The variable name default `precipitation`
+  -cs CLIM_START, --clim_start CLIM_START
+                        The first year of the climatological period, can be 1991 or 1993 default 1991
+  -ce CLIM_STOP, --clim_stop CLIM_STOP
+                        The last year of the climatological period, can be 2020 or 2016 default 2020
+
+
+```
+
 
 
