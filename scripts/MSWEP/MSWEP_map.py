@@ -278,7 +278,7 @@ EAR_categories = xr.apply_ufunc(
     dask="parallelized",
 )
 
-print(f"calculating the EAR Watch categories for {ndays_agg} accumulations ending {cycle_time:%Y-%m-%d}")
+print(f"calculating the EAR Watch categories for {ndays_agg} days accumulations ending {cycle_time:%Y-%m-%d}")
 with ProgressBar():
     EAR_categories = EAR_categories.compute()
 
@@ -328,7 +328,7 @@ USDM_categories = xr.apply_ufunc(
     dask="parallelized",
 )
 
-print(f"calculating the USDM categories for {ndays_agg} accumulations ending {cycle_time:%Y-%m-%d}")
+print(f"calculating the USDM categories for {ndays_agg} days accumulations ending {cycle_time:%Y-%m-%d}")
 with ProgressBar():
     USDM_categories = USDM_categories.compute()
 
@@ -361,7 +361,7 @@ SPI = MSWEP.calculate_SPI(dset[varname], dset["alpha"], dset["beta"], name="SPI"
 SPI_threshs = [-2, -1.5, -1, 1, 1.5, 2]
 
 # %% derive the SPI categories
-print(f"calculating the SPI categories for {ndays_agg} accumulations ending {cycle_time:%Y-%m-%d}")
+print(f"calculating the SPI categories for {ndays_agg} days accumulations ending {cycle_time:%Y-%m-%d}")
 
 SPI_categories = np.digitize(SPI["SPI"].data, SPI_threshs)
 

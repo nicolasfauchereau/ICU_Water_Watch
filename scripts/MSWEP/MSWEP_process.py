@@ -192,7 +192,7 @@ date_last_file = datetime.strptime(lfiles_from_cycle_time[-1].name[-13:-3], "%Y-
 dset = MSWEP.make_dataset(lfiles_from_cycle_time)
 
 # %% 
-dset = dset.chunk({'time':-1, 'lat':50, 'lon':50})
+dset = dset.chunk({'time':-1, 'lat':100, 'lon':100})
 
 # %% get the attributes
 last_date, ndays = MSWEP.get_attrs(dset)
@@ -279,6 +279,9 @@ climatological_quantiles = climatological_quantiles.rename(
 )
 
 # %% calculate the anomalies 
+
+climatological_average = climatological_average.chunk({'lat':100, 'lon':100})
+
 dset_accum["anoms"] = dset_accum[varname] - climatological_average[f"{varname}_average"]
 
 # %% add the EEZs mask 
@@ -295,11 +298,15 @@ dset = xr.merge(
     )
 )
 
+dset = dset.chunk({'time':-1, 'quantile':-1, 'lat':100, 'lon':100})
+
 # %% save to disk 
 print(f"saving MSWEP_dset_merged_{ndays_agg}days_to_{last_date:%Y-%m-%d}.nc in {str(opath)}")
 with ProgressBar():
     dset.to_netcdf(
         opath.joinpath(f"MSWEP_dset_merged_{ndays_agg}days_to_{last_date:%Y-%m-%d}.nc")
     )
+
+dset.close()
 
 # %% EOF
