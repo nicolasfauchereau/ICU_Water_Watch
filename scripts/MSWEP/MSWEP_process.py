@@ -160,6 +160,7 @@ DOY_cycle_time = cycle_time.timetuple().tm_yday
 # %% list the files on disk 
 lfiles = list(dpath.glob("MSWEP_Daily_????-??-??.nc"))
 lfiles.sort()
+lfiles = lfiles[-ndays_agg:]
 
 # %% get the intended start date for the accumulation 
 date_start = cycle_time - relativedelta(days = ndays_agg - 1)
@@ -172,15 +173,21 @@ lfiles_from_cycle_time = [
     dpath.joinpath(f"MSWEP_Daily_{dt:%Y-%m-%d}.nc") for dt in ldates
 ]
 
+# print("\n".join([f.name for f in lfiles_from_cycle_time]))
+# print("\n".join([f.name for f in lfiles]))
+
 # %% compare the list of files on disk and the list of files that *should* be on disk 
 lfiles_intersection = list(set(lfiles_from_cycle_time) & set(lfiles))
+lfiles_intersection.sort()
+
 
 # %% the length of the intersection should be equal to the number of days for the accumulation 
 if len(lfiles_intersection) != ndays_agg: 
     lfiles_missing = list(set(lfiles_from_cycle_time) - set(lfiles))
+    lfiles_missing = [str(f.name) for f in lfiles_missing]
     lfiles_missing = '\n'.join(lfiles_missing)
-    message = f"""The number of available files to {cycle_time:%Y-%m-%d} {len(lfiles_intersection)} is not equal to the number of days {ndays_agg}\n
-    The files missing are {lfiles_missing}"""
+    message = f"""\nThe number of available files on disk for cycle time {cycle_time:%Y-%m-%d} ({len(lfiles_intersection)}) is not equal to the number of days ({ndays_agg})\n
+    files missing = {lfiles_missing}"""
     raise ValueError(message)
 
 
