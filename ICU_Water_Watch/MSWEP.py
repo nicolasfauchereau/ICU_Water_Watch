@@ -7,10 +7,13 @@ def update(ftp_url="data.gloh2o.org", remote_path="niwa_mswep/MSWEP_V280/NRT/Dai
 
     import pathlib 
     import ftplib
+    from datetime import datetime
 
     opath = pathlib.Path(opath)
 
     opath.mkdir(parents=True, exist_ok=True)
+
+    print(f"Output folder is {str(opath)}")
 
     with open(credentials, 'r') as f: 
         creds = f.readlines() 
@@ -49,11 +52,13 @@ def update(ftp_url="data.gloh2o.org", remote_path="niwa_mswep/MSWEP_V280/NRT/Dai
 
         for filename in lfiles_missing: 
 
+            datefstr = datetime.strptime(filename.split('.')[0], '%Y%j')
+
             with open(opath.joinpath(filename), 'wb') as f:
 
                 ftp.retrbinary('RETR ' + filename, f.write)
 
-            print(f"retrieved {filename}")
+            print(f"retrieved {filename}, date {datefstr:%Y-%m-%d}")
     else: 
     
         pass 
