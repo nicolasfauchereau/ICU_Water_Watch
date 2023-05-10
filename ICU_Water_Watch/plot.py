@@ -463,6 +463,8 @@ def map_precip_accum(dset, varname='precipitationCal', mask=None, geoms=None, cm
             
             fpath = pathlib.Path(fpath)
 
+        fpath.mkdir(parents=True, exist_ok=True)
+
         f.savefig(fpath.joinpath(f"precip_accumulation_{ndays}days_to_{last_day:%Y-%m-%d}.png"), dpi=200, bbox_inches='tight')
     
     if close: 
@@ -545,6 +547,8 @@ def map_precip_anoms(dset, varname='anoms', mask=None, cmap=None, geoms=None, fp
         if type(fpath) != pathlib.PosixPath: 
             
             fpath = pathlib.Path(fpath)
+        
+        fpath.mkdir(parents=True, exist_ok=True)
 
         f.savefig(fpath.joinpath(f"precip_anomalies_{ndays}days_to_{last_day:%Y-%m-%d}.png"), dpi=200, bbox_inches='tight')
     
@@ -645,6 +649,8 @@ def map_dry_days_Pacific(dset, varname='dry_days', mask=None, cmap=None, geoms=N
             
             fpath = pathlib.Path(fpath)
 
+        fpath.mkdir(parents=True, exist_ok=True)
+
         f.savefig(fpath.joinpath(f"nb_dry_days_{ndays}days_to_{last_day:%Y-%m-%d}.png"), dpi=200, bbox_inches='tight')
     
     if close: 
@@ -721,8 +727,6 @@ def map_days_since_rain_Pacific(dset, varname='days_since_rain', mask=None, cmap
 
         title = f"Days since last rain\n{ndays} days period to {last_day:%d %b %Y}"
 
-
-    
     ax.text(0.99, 0.95, title, fontsize=13, fontdict={'color':'k'}, bbox=dict(facecolor='w', edgecolor='w'), horizontalalignment='right', verticalalignment='center', transform=ax.transAxes)
 
     # copyright notice 
@@ -742,6 +746,8 @@ def map_days_since_rain_Pacific(dset, varname='days_since_rain', mask=None, cmap
         if type(fpath) != pathlib.PosixPath: 
             
             fpath = pathlib.Path(fpath)
+
+        fpath.mkdir(parents=True, exist_ok=True)
 
         f.savefig(fpath.joinpath(f"days_since_rain_{ndays}days_to_{last_day:%Y-%m-%d}.png"), dpi=200, bbox_inches='tight')
     
@@ -866,10 +872,8 @@ def map_dry_days(dset, world_coastlines, country_coastline, EEZ, varname='dry_da
         if type(path) is not pathlib.PosixPath: 
             
             path = pathlib.Path(path)
-            
-        if not path.exists(): 
-            
-            path.mkdir(parents=True)
+        
+    path.mkdir(parents=True, exist_ok=True)
         
     if filename is not None: 
         
@@ -974,6 +978,8 @@ def map_EAR_Watch_Pacific(dset, varname='pctscore', mask=None, geoms=None, fpath
             
             fpath = pathlib.Path(fpath)
 
+        fpath.mkdir(parents=True, exist_ok=True)
+
         f.savefig(fpath.joinpath(f"EAR_Watch_Pacific_{ndays}days_to_{last_day:%Y-%m-%d}.png"), dpi=200, bbox_inches='tight')
     
     if close: 
@@ -1064,6 +1070,8 @@ def map_USDM_Pacific(dset, mask=None, geoms=None, fpath=None, close=True, gridli
         if type(fpath) != pathlib.PosixPath: 
             
             fpath = pathlib.Path(fpath)
+
+        fpath.mkdir(parents=True, exist_ok=True)
 
         f.savefig(fpath.joinpath(f"USDM_Pacific_{ndays}days_to_{last_day:%Y-%m-%d}.png"), dpi=200, bbox_inches='tight')
     
@@ -1172,10 +1180,8 @@ def map_EAR_Watch(dset, world_coastlines, country_coastline, EEZ, varname='pctsc
     else: 
         
         fpath = pathlib.Path(fpath)
-            
-        if not fpath.exists(): 
-            
-            fpath.mkdir(parents=True)
+
+        fpath.mkdir(parents=True, exist_ok=True)
     
     # build the file name 
     
@@ -1290,10 +1296,8 @@ def map_USDM(dset, world_coastlines, country_coastline, EEZ, varname='pctscore',
     else: 
             
         fpath = pathlib.Path(fpath)
-            
-        if not fpath.exists():
-            
-            fpath.mkdir(parents=True)
+        
+        fpath.mkdir(parents=True, exist_ok=True)
     
     # build the file name 
     
@@ -1401,6 +1405,8 @@ def map_SPI_Pacific(dset, varname='SPI', mask=None, geoms=None, domain=[125, 240
             
             fpath = pathlib.Path(fpath)
 
+        fpath.mkdir(parents=True, exist_ok=True)
+
         f.savefig(fpath.joinpath(f"GPM_IMERG_SPI_Pacific_{ndays}days_to_{last_day:%Y-%m-%d}.png"), dpi=200, bbox_inches='tight')
         # f.savefig(fpath.joinpath(f"GPM_IMERG_SPI_Pacific_{ndays}days_to_{last_day:%Y-%m-%d}.pdf"), bbox_inches='tight')
     
@@ -1499,11 +1505,9 @@ def map_SPI(dset_sub_country, world_coastlines, country_coastline, EEZ, varname=
     else: 
             
         fpath = pathlib.Path(fpath)
-            
-        if not fpath.exists():
-            
-            fpath.mkdir(parents=True)
-    
+        
+        fpath.mkdir(parents=True, exist_ok=True)
+
     # build the file name 
     
     filename = f"{utils.sanitize_name(country_name)}_{mask_name}_SPI_{ndays}nbdays_to_{last_day:%Y-%m-%d}.png"
@@ -1884,6 +1888,8 @@ def map_MME_forecast(probs_mean, \
         if type(fpath) != pathlib.PosixPath: 
             
             fpath = pathlib.Path(fpath)
+
+        fpath.mkdir(parents=True, exist_ok=True)
 
         if period is not None: 
 
@@ -2433,6 +2439,8 @@ def map_categories(
     if fpath is not None:
         if type(fpath) != pathlib.PosixPath:
             fpath = pathlib.Path(fpath)
+            
+        fpath.mkdir(parents=True, exist_ok=True)
 
         f.savefig(
             fpath.joinpath(f"{figname_root}_{ndays}days_to_{last_day}.png"),

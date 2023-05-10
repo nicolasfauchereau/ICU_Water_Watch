@@ -133,7 +133,7 @@ dpath_climatology = dpath.joinpath(
 # %% output path 
 opath = dpath.joinpath("outputs")
 opath.mkdir(parents=True, exist_ok=True)
-print(f"Output path for the merged realtime acccumulation and climatologies is {str(opath)}")
+print(f"\nOutput path for the merged realtime acccumulation and climatologies is {str(opath)}\n")
 
 # %% get the EEZs shapefiles, individual + merged
 EEZs, merged_EEZs = geo.get_EEZs(dpath_shapes=dpath_shapes)
@@ -153,14 +153,13 @@ else:
 today = datetime.utcnow().date()
 
 if cycle_time > today: 
-    raise ValueError(f"cycle_time is set to {cycle_time:%Y-%m-%d}, but today (UTC) is {today:%Y-%m-%d}")
+    raise ValueError(f"\ncycle_time is set to {cycle_time:%Y-%m-%d}, but today (UTC) is {today:%Y-%m-%d}\n")
 
 DOY_cycle_time = cycle_time.timetuple().tm_yday
 
 # %% list the files on disk 
 lfiles = list(dpath.glob("MSWEP_Daily_????-??-??.nc"))
 lfiles.sort()
-lfiles = lfiles[-ndays_agg:]
 
 # %% get the intended start date for the accumulation 
 date_start = cycle_time - relativedelta(days = ndays_agg - 1)
@@ -187,7 +186,7 @@ if len(lfiles_intersection) != ndays_agg:
     lfiles_missing = [str(f.name) for f in lfiles_missing]
     lfiles_missing = '\n'.join(lfiles_missing)
     message = f"""\nThe number of available files on disk for cycle time {cycle_time:%Y-%m-%d} ({len(lfiles_intersection)}) is not equal to the number of days ({ndays_agg})\n
-    files missing = {lfiles_missing}"""
+    files missing = {lfiles_missing}\n"""
     raise ValueError(message)
 
 
@@ -209,7 +208,7 @@ DOY = last_date.timetuple().tm_yday
 
 # %% get the right DOY for the climatology and correct in the file attributes
 if (last_date.year % 4) == 0:
-    print(f"{last_date.year} is a leap year, so DOY will go from {DOY} to {(DOY - 1)}")
+    print(f"\n{last_date.year} is a leap year, so DOY will go from {DOY} to {(DOY - 1)}\n")
     DOY -= 1
 
 dset = dset.drop("DOY")
@@ -217,14 +216,14 @@ dset.attrs["DOY"] = DOY
 
 # %% calculate the realtime accumulations
 print(
-    f"calculating accumulation for the {ndays} days period ending {last_date:%Y-%m-%d}\n"
+    f"\ncalculating accumulation for the {ndays} days period ending {last_date:%Y-%m-%d}\n"
 )
 
 dset_accum = MSWEP.calculate_realtime_accumulation(dset)
 
 # %% rain days statistics
 print(
-    f"getting the rain days statistics for the {ndays} days period ending {last_date:%Y-%m-%d}\n"
+    f"\ngetting the rain days statistics for the {ndays} days period ending {last_date:%Y-%m-%d}\n"
 )
 
 dset_ndays = MSWEP.get_rain_days_stats(dset[[varname]], threshold=1)
@@ -234,7 +233,7 @@ lfiles_clim = list(dpath_climatology.glob(f"*DOY_{DOY:03d}*.nc"))
 
 # %% should be 3 files
 if len(lfiles_clim) != 3: 
-    raise ValueError(f"There should be 3 for the climatologies, found {len(lfiles)}")
+    raise ValueError(f"\nThere should be 3 files for the climatologies, found {len(lfiles)}\n")
 
 #%% open the climatological average
 climatological_average = xr.open_dataset(
@@ -270,7 +269,7 @@ climatological_SPI_params = xr.open_dataset(
 # %% test the DOY 
 DOY_clim = int(climatological_SPI_params["DOY"].data)
 if DOY_clim != DOY:
-    raise ValueError(f"The DOY in the climatology is {DOY_clim}, expected {DOY}")
+    raise ValueError(f"\nThe DOY in the climatology is {DOY_clim}, expected {DOY}\n")
 
 # %% remove the singleton dimension (DOY)
 climatological_average = climatological_average.squeeze()
@@ -308,7 +307,7 @@ dset = xr.merge(
 dset = dset.chunk({'time':-1, 'quantile':-1, 'lat':100, 'lon':100})
 
 # %% save to disk 
-print(f"saving MSWEP_dset_merged_{ndays_agg}days_to_{last_date:%Y-%m-%d}.nc in {str(opath)}")
+print(f"\nsaving MSWEP_dset_merged_{ndays_agg}days_to_{last_date:%Y-%m-%d}.nc in {str(opath)}\n")
 with ProgressBar():
     dset.to_netcdf(
         opath.joinpath(f"MSWEP_dset_merged_{ndays_agg}days_to_{last_date:%Y-%m-%d}.nc")
